@@ -1,0 +1,24 @@
+# 本地运行精简依赖（不含 chromadb / paddleocr 等重依赖）
+# 代码里对它们都是 try-import 可选，缺失会自动降级
+
+# 核心
+networkx>=3.1
+jinja2>=3.1
+python-dotenv>=1.0
+
+# Web 服务
+fastapi>=0.110
+uvicorn>=0.27
+python-multipart>=0.0.9
+
+# LLM 接入（DeepSeek 走 OpenAI 兼容协议）
+openai>=1.0
+pydantic>=2.0
+
+# Excel / 图片单据解析
+openpyxl>=3.1
+rapidocr-onnxruntime>=1.2.3
+
+# 选装（地理距离、帕累托前沿；缺失有内置兜底）
+geopy>=2.4
+paretoset>=1.0

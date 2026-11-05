@@ -1,0 +1,27 @@
+{# customs/templates/declaration.j2 #}
+{# Jinja2 报关单模板 #}
+{# variables: cargo, hs_code, from_port, dest_port, tonnage, unit_price, total_usd, package_type, gross_weight, net_weight, supervision_code #}
+======================================================
+          中华人民共和国海关出口货物报关单
+======================================================
+
+申报商品：{{ cargo }}
+HS编码：{{ hs_code.code }}
+商品描述：{{ hs_code.description }}
+关税税率：{{ hs_code.tariff_rate }}
+监管证件：{{ hs_code.supervision_code | default("无") }}
+
+起运港：{{ from_port | default("____") }}
+目的港：{{ dest_port | default("____") }}
+
+申报数量：{{ tonnage | default("____") }} 吨
+申报单价：{{ unit_price | default("____") }} 美元/吨
+申报总额：{{ total_usd | default("____") }} 美元
+原产地：中国
+
+包装方式：{{ package_type | default("____") }}
+毛重：{{ gross_weight | default("____") }} kg
+净重：{{ net_weight | default("____") }} kg
+
+{% if hs_code.remark %}备注：{{ hs_code.remark }}{% endif %}
+======================================================

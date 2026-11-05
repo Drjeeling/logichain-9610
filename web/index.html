@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>出海物流多 Agent 协同系统</title>
+    <link rel="stylesheet" href="/static/css/main.css?v=20261016b">
+    <!-- 高德地图 JS API -->
+    <script src="https://webapi.amap.com/maps?v=2.0&key=8d39dfaf33aaf52311f32c2f5b734811&plugin=AMap.Scale,AMap.ToolBar"></script>
+</head>
+<body>
+    <!-- 顶栏 -->
+    <header class="topbar">
+        <div class="brand">
+            <div class="logo-mark"></div>
+            <div class="brand-text">
+                <h1>LogiChain</h1>
+                <span class="brand-sub">出海物流多 Agent 协同系统</span>
+            </div>
+        </div>
+        <div class="status-bar" id="statusBar">
+            <span class="status-dot" id="statusDot"></span>
+            <span id="statusText">系统就绪</span>
+        </div>
+    </header>
+
+    <!-- 主区域：三栏布局 -->
+    <main class="layout">
+        <!-- 左栏：单据识别 -->
+        <aside class="panel input-panel">
+            <div class="panel-header">
+                <h2>单据智能识别</h2>
+                <span class="panel-hint">甩入单据 · 自动跑通全链路</span>
+            </div>
+            <div class="panel-body">
+                <!-- 拖拽区 -->
+                <div class="drop-zone" id="dropZone">
+                    <input type="file" id="docFile"
+                           accept=".png,.jpg,.jpeg,.bmp,.webp,.tif,.tiff,.xlsx,.xls,.csv,.json" hidden>
+                    <div class="dz-icon">
+                        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                            <polyline points="14 2 14 8 20 8"/>
+                            <line x1="9" y1="13" x2="15" y2="13"/>
+                            <line x1="9" y1="17" x2="13" y2="17"/>
+                        </svg>
+                    </div>
+                    <div class="dz-title">把发票 / 装箱单拖到这里</div>
+                    <div class="dz-sub">图片(PNG/JPG) · Excel · CSV · JSON<br>AI 自动识别起运地、目的港、货名、货量，无需手填</div>
+                    <button class="btn-ghost" id="dzBrowse">点击选择文件</button>
+                </div>
+
+                <!-- 示例单据 -->
+                <div class="samples-head">
+                    <span>示例单据 · 真实业务场景</span>
+                    <span class="samples-tip">可直接下载后拖回上方识别</span>
+                </div>
+                <div class="samples-list" id="samplesList">
+                    <div class="samples-loading">加载示例单据中…</div>
+                </div>
+
+                <!-- 高级：手动填写 -->
+                <details class="manual-form">
+                    <summary>高级 · 手动填写需求</summary>
+                    <div class="manual-body">
+                        <div class="form-group">
+                            <label>起运地</label>
+                            <input type="text" id="originInput" placeholder="如：义乌、成都、深圳" list="cityList">
+                            <datalist id="cityList"></datalist>
+                        </div>
+                        <div class="form-group">
+                            <label>目的港</label>
+                            <input type="text" id="destInput" placeholder="如：洛杉矶、汉堡、新加坡" list="destList">
+                            <datalist id="destList"></datalist>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group half">
+                                <label>货重（吨）</label>
+                                <input type="number" id="weightInput" value="20" min="1">
+                            </div>
+                            <div class="form-group half">
+                                <label>发运月份</label>
+                                <select id="monthSelect">
+                                    <option value="1">1月</option>
+                                    <option value="2">2月</option>
+                                    <option value="3">3月</option>
+                                    <option value="4">4月</option>
+                                    <option value="5">5月</option>
+                                    <option value="6">6月</option>
+                                    <option value="7">7月</option>
+                                    <option value="8">8月</option>
+                                    <option value="9">9月</option>
+                                    <option value="10">10月</option>
+                                    <option value="11" selected>11月</option>
+                                    <option value="12">12月</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>优先级</label>
+                            <div class="radio-group">
+                                <label class="radio-label">
+                                    <input type="radio" name="priority" value="cost" checked>
+                                    <span>省钱</span>
+                                </label>
+                                <label class="radio-label">
+                                    <input type="radio" name="priority" value="time">
+                                    <span>最快</span>
+                                </label>
+                                <label class="radio-label">
+                                    <input type="radio" name="priority" value="balanced">
+                                    <span>折中</span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>附加需求（可选）</label>
+                            <textarea id="extraInput" rows="2" placeholder="如：锂电池、日用百货、加急"></textarea>
+                        </div>
+                        <button class="btn-primary" id="submitBtn">
+                            <span class="btn-text">开始规划</span>
+                            <span class="btn-spinner" style="display:none;"></span>
+                        </button>
+                    </div>
+                </details>
+            </div>
+        </aside>
+
+        <!-- 中栏：最优解 -->
+        <section class="panel result-panel">
+            <div class="panel-header">
+                <h2>最优方案</h2>
+                <div class="tabs" id="routeTabs"></div>
+            </div>
+            <div class="panel-body" id="resultBody">
+                <div class="empty-state" id="emptyState">
+                    <div class="empty-icon">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+                            <circle cx="12" cy="12" r="10"/>
+                            <line x1="12" y1="8" x2="12" y2="12"/>
+                            <line x1="12" y1="16" x2="12.01" y2="16"/>
+                        </svg>
+                    </div>
+                    <p>填写左侧需求，点击"开始规划"</p>
+                    <small>系统将自动调用 4 个 Agent 协同工作</small>
+                </div>
+                <div class="result-content" id="resultContent" style="display:none;"></div>
+            </div>
+        </section>
+
+        <!-- 右栏：地图 -->
+        <section class="panel map-panel">
+            <div class="panel-header">
+                <h2>路线地图</h2>
+                <div class="map-legend">
+                    <span class="legend-item"><i class="dot truck"></i>公路</span>
+                    <span class="legend-item"><i class="dot rail"></i>铁路</span>
+                    <span class="legend-item"><i class="dot river"></i>河运</span>
+                    <span class="legend-item"><i class="dot sea"></i>海运</span>
+                    <span class="legend-item"><i class="dot air"></i>空运</span>
+                </div>
+            </div>
+            <div class="panel-body map-body">
+                <div id="mapContainer"></div>
+            </div>
+        </section>
+    </main>
+
+    <!-- 底部：Agent 协同轨迹 -->
+    <footer class="agent-trace" id="agentTrace" style="display:none;">
+        <div class="trace-header">
+            <h3>Agent 协同流程</h3>
+            <span class="trace-duration" id="traceDuration"></span>
+        </div>
+        <div class="trace-flow" id="traceFlow"></div>
+    </footer>
+
+    <script src="/static/js/app.js?v=20261016b"></script>
+</body>
+</html>

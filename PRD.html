@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LogiChain 出海物流多 Agent 协同系统 — PRD</title>
+<style>
+:root {
+  --bg: #0a1628;
+  --panel: #0f1e36;
+  --card: #142540;
+  --elevated: #1a2e4f;
+  --border: #1f3a5f;
+  --border-light: #2a4a6f;
+  --text: #e6f0ff;
+  --text-2: #8eaed0;
+  --text-3: #5a7898;
+  --accent: #00d4ff;
+  --accent-2: #0066ff;
+  --success: #00e8a0;
+  --warning: #ffb547;
+  --danger: #ff5470;
+  --font: -apple-system, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  --mono: 'SF Mono', 'JetBrains Mono', Consolas, monospace;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 15px;
+  line-height: 1.7;
+  padding: 0;
+}
+.container { max-width: 900px; margin: 0 auto; padding: 48px 32px 96px; }
+
+/* 封面 */
+.cover {
+  text-align: center;
+  padding: 64px 0 48px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 48px;
+}
+.cover-logo {
+  width: 56px; height: 56px;
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  border-radius: 12px;
+  margin: 0 auto 24px;
+  box-shadow: 0 0 24px rgba(0,212,255,0.3);
+}
+.cover h1 {
+  font-size: 32px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+}
+.cover .subtitle {
+  color: var(--text-2);
+  font-size: 16px;
+  margin-top: 8px;
+}
+.cover .meta {
+  margin-top: 24px;
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+  font-size: 13px;
+  color: var(--text-3);
+}
+.cover .meta span {
+  display: flex; align-items: center; gap: 6px;
+}
+.cover .meta .dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--accent);
+}
+
+/* 章节标题 */
+h2 {
+  font-size: 22px;
+  font-weight: 700;
+  margin-top: 48px;
+  margin-bottom: 16px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
+}
+h3 {
+  font-size: 17px;
+  font-weight: 600;
+  margin-top: 32px;
+  margin-bottom: 12px;
+  color: var(--accent);
+}
+h4 {
+  font-size: 15px;
+  font-weight: 600;
+  margin-top: 20px;
+  margin-bottom: 8px;
+  color: var(--text-2);
+}
+
+p { margin-bottom: 12px; color: var(--text); }
+strong { color: var(--accent); font-weight: 600; }
+em { color: var(--text-2); font-style: normal; }
+
+/* 表格 */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 12px 0 20px;
+  font-size: 13px;
+}
+th {
+  background: var(--card);
+  color: var(--accent);
+  font-weight: 600;
+  text-align: left;
+  padding: 10px 14px;
+  border: 1px solid var(--border);
+  white-space: nowrap;
+}
+td {
+  padding: 8px 14px;
+  border: 1px solid var(--border);
+  color: var(--text);
+  vertical-align: top;
+}
+tr:nth-child(even) td { background: rgba(20,37,64,0.5); }
+
+/* 代码块 */
+pre {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 16px;
+  overflow-x: auto;
+  font-family: var(--mono);
+  font-size: 13px;
+  line-height: 1.6;
+  margin: 12px 0 20px;
+}
+code {
+  font-family: var(--mono);
+  font-size: 13px;
+  background: var(--card);
+  padding: 2px 6px;
+  border-radius: 3px;
+  color: var(--accent);
+}
+pre code {
+  background: none;
+  padding: 0;
+  color: var(--text);
+}
+
+/* 标签 */
+.tag {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 3px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.tag-p0 { background: rgba(0,212,255,0.15); color: var(--accent); }
+.tag-p1 { background: rgba(255,181,71,0.15); color: var(--warning); }
+.tag-done { background: rgba(0,232,160,0.15); color: var(--success); }
+.tag-stub { background: rgba(255,84,112,0.15); color: var(--danger); }
+
+/* 列表 */
+ul, ol { margin: 8px 0 16px 24px; }
+li { margin-bottom: 4px; }
+
+/* 分隔线 */
+hr { border: none; border-top: 1px solid var(--border); margin: 32px 0; }
+
+/* 提示框 */
+.callout {
+  background: var(--card);
+  border-left: 3px solid var(--accent);
+  border-radius: 0 6px 6px 0;
+  padding: 12px 16px;
+  margin: 16px 0;
+  font-size: 14px;
+}
+.callout.warning { border-left-color: var(--warning); }
+.callout.danger { border-left-color: var(--danger); }
+.callout .label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: var(--text-3);
+  margin-bottom: 4px;
+}
+
+/* 目录 */
+.toc {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 24px 32px;
+  margin-bottom: 48px;
+}
+.toc-title {
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-3);
+  margin-bottom: 12px;
+}
+.toc ol {
+  margin: 0;
+  padding-left: 20px;
+}
+.toc a {
+  color: var(--text-2);
+  text-decoration: none;
+  font-size: 14px;
+}
+.toc a:hover { color: var(--accent); }
+.toc .sub { padding-left: 20px; font-size: 13px; }
+</style>
+</head>
+<body>
+<div class="container">
+
+<!-- 封面 -->
+<div class="cover">
+  <div class="cover-logo"></div>
+  <h1>LogiChain 出海物流多 Agent 协同系统</h1>
+  <div class="subtitle">Product Requirements Document</div>
+  <div class="meta">
+    <span><span class="dot"></span> 版本 1.0</span>
+    <span><span class="dot"></span> 2026-10</span>
+    <span><span class="dot"></span> 状态：开发中</span>
+  </div>
+</div>
+
+<!-- 目录 -->
+<div class="toc">
+  <div class="toc-title">目录</div>
+  <ol>
+    <li><a href="#bg">背景与目标</a></li>
+    <li><a href="#scope">范围与边界</a></li>
+    <li><a href="#model">产品模型：角色、对象与状态</a></li>
+    <li><a href="#fr">功能需求</a>
+      <div class="sub">
+        <a href="#fr-coordinator">4.1 协调器入口层</a> ·
+        <a href="#fr-transport">4.2 运输路线 Agent</a> ·
+        <a href="#fr-customs">4.3 报关单证 Agent</a> ·
+        <a href="#fr-booking">4.4 订舱 Agent</a> ·
+        <a href="#fr-tracking">4.5 追踪 Agent</a> ·
+        <a href="#fr-web">4.6 可视化前端</a>
+      </div>
+    </li>
+    <li><a href="#rules">共享规则与计算模型</a></li>
+    <li><a href="#open">待定问题</a></li>
+  </ol>
+</div>
+
+<!-- 1. 背景 -->
+<h2 id="bg">1. 背景与目标</h2>
+
+<h3>1.1 问题背景</h3>
+<p>中小外贸企业在出海物流环节面临三个痛点：</p>
+<ul>
+  <li><strong>多式联运方案难规划</strong>：义乌到洛杉矶需要公路→河运→海运多段衔接，不同运输方式成本/时效/碳排放差异大，企业缺少帕累托前沿对比工具。</li>
+  <li><strong>报关单证专业门槛高</strong>：HS 编码归类需查阅海关税则，不同商品的监管证件/认证要求/关税税率不同，错误归类导致退运或罚款。</li>
+  <li><strong>信息分散、多系统切换</strong>：运输、报关、订舱、追踪分散在不同系统，数据重复录入，缺乏统一协同入口。</li>
+</ul>
+
+<h3>1.2 产品决策</h3>
+<p>构建一个多 Agent 协同系统，用户输入自然语言需求（文字或发票图片），系统自动调用 4 个专业 Agent 协同完成从国内运输到报关单证的全链路方案输出。</p>
+
+<h3>1.3 可观测目标</h3>
+<ul>
+  <li>用户输入"义乌发 20 吨日用百货到洛杉矶，省钱优先"，3 秒内返回 4 条候选路线 + 报关单草稿 + HS 编码 + 合规风险提示。</li>
+  <li>用户上传发票图片，系统自动 OCR 提取商品信息并完成归类，无需手动填写商品名。</li>
+  <li>用户在地图上看到不同方案的路线差异，点击切换方案时地图实时更新。</li>
+</ul>
+
+<hr>
+
+<!-- 2. 范围 -->
+<h2 id="scope">2. 范围与边界</h2>
+
+<h3>2.1 P0 核心流程</h3>
+<p><strong>入口条件</strong>：用户在网页输入起运地 + 目的港 + 货重 + 优先级，或上传发票图片。</p>
+<p><strong>P0 动作</strong>：</p>
+<ol>
+  <li>协调器识别用户意图（单环节 vs 全流程）</li>
+  <li>运输 Agent 生成多式联运路线方案（帕累托前沿）</li>
+  <li>报关 Agent OCR 提取商品 → HS 编码归类 → 生成报关单草稿 → 合规校验</li>
+  <li>订舱 Agent 查询船期 → 推荐最优订舱方案</li>
+  <li>追踪 Agent 生成运单 → 模拟状态查询</li>
+  <li>前端渲染：方案卡片 + 地图路线 + Agent 输出汇总</li>
+</ol>
+<p><strong>完成证据</strong>：页面中间栏显示方案卡片（含成本/时效/中转次数/碳排放），底部显示 4 个 Agent 的输出摘要，右侧地图画出选中方案的彩色路线。</p>
+
+<h3>2.2 P1 辅助功能</h3>
+<ul>
+  <li>季节性系数调整（旺季查验率/运价上浮）</li>
+  <li>geopy 经纬度距离计算（自动选最近港口）</li>
+  <li>发票上传 → OCR 预处理 → 字段存 context → 下游 Agent 复用</li>
+  <li>DeepSeek LLM 智能意图解析（正则失败时降级到 LLM）</li>
+</ul>
+
+<h3>2.3 明确排除</h3>
+<ul>
+  <li>不对接真实海关单一窗口（报关单为草稿，不实际申报）</li>
+  <li>不对接真实船公司 API（船期数据为模拟）</li>
+  <li>不对接真实物流追踪 API（运单状态为模拟状态机）</li>
+  <li>不做用户注册/登录/权限管理</li>
+  <li>不做支付/结算功能</li>
+</ul>
+
+<hr>
+
+<!-- 3. 产品模型 -->
+<h2 id="model">3. 产品模型：角色、对象与状态</h2>
+
+<h3>3.1 角色</h3>
+<table>
+  <tr><th>角色</th><th>描述</th><th>核心诉求</th></tr>
+  <tr><td>物流操作员</td><td>外贸企业负责安排运输和报关的人员</td><td>快速获得多种联运方案对比，选择最优路线</td></tr>
+  <tr><td>报关员</td><td>负责 HS 编码归类和单证制作的人员</td><td>准确归类商品，生成合规报关单，预判风险</td></tr>
+  <tr><td>系统协调器</td><td>Agent 协调入口，非人类角色</td><td>识别意图、分派任务、传递 context</td></tr>
+</table>
+
+<h3>3.2 核心对象</h3>
+<table>
+  <tr><th>对象</th><th>关键字段</th><th>生命周期</th></tr>
+  <tr>
+    <td>DispatchResult</td>
+    <td>intent, results[], steps[], total_duration, final_summary</td>
+    <td>单次请求创建 → 返回前端 → 前端渲染后丢弃</td>
+  </tr>
+  <tr>
+    <td>Route</td>
+    <td>path, modes, cost_per_ton, hours, carbon_g_per_ton, is_pareto, tag, L1-L4 breakdown</td>
+    <td>Transport Agent 生成 → 存入 results → 前端渲染为方案卡片</td>
+  </tr>
+  <tr>
+    <td>CargoInfo</td>
+    <td>cargo_name, tonnage, unit_price_usd, material, usage, source</td>
+    <td>OCR/文字提取 → 存入 context → 下游 Agent 复用</td>
+  </tr>
+  <tr>
+    <td>HSCode</td>
+    <td>code, description, tariff_rate, supervision_code, keywords[], category, remark</td>
+    <td>知识库查询 → LLM 选择 → 存入 results → 报关单渲染</td>
+  </tr>
+  <tr>
+    <td>ComplianceRisk</td>
+    <td>rule_id, risk, advice, severity(info/warning/critical)</td>
+    <td>规则引擎校验 → 存入 results → 前端显示风险提示</td>
+  </tr>
+  <tr>
+    <td>Declaration</td>
+    <td>cargo, hs_code, from_port, dest_port, tonnage, unit_price, total_usd</td>
+    <td>Jinja2 模板渲染 → 存入 results → 前端显示报关单草稿</td>
+  </tr>
+</table>
+
+<h3>3.3 意图模式状态机</h3>
+<pre><code>用户输入
+    │
+    ▼
+协调器意图识别
+    │
+    ├── 命中全流程关键词（"全流程/出海/出口/到国外"）
+    │       → mode=pipeline, agents=[transport, booking, customs, tracking]
+    │
+    ├── 命中多环节关键词（运输+报关 等 ≥2 个）
+    │       → mode=pipeline, 按命中的 agent 顺序串联
+    │
+    ├── 命中单环节关键词
+    │       → mode=single, 只调用对应 agent
+    │
+    └── 兜底：识别到起讫地节点
+            → mode=single, agents=[transport]</code></pre>
+
+<h3>3.4 协调器 context 传递链</h3>
+<pre><code>用户输入（文字/图片）
+    │
+    ▼
+协调器入口
+    │  ├── 检测到图片 → OCR 预处理 → 抽 cargo_name/tonnage/price
+    │  │                 → 存入 pre_context
+    │  └── 文字 → 直接传 enhanced_query
+    │
+    ▼
+Agent 1: Transport
+    │  输入: query + pre_context
+    │  输出: Route[], destination_port
+    │  写入 context: {destination_port, cargo, tonnage}
+    │
+    ▼
+Agent 2: Booking
+    │  输入: query + context（含 destination_port）
+    │  输出: 船期推荐
+    │  写入 context: {ship_company, eta_days}
+    │
+    ▼
+Agent 3: Customs
+    │  输入: query + context（含 cargo/destination_port）
+    │  优先读 pre_context 避免重复 OCR
+    │  输出: HS编码, 报关单, 合规风险
+    │  写入 context: {hs_code, declaration}
+    │
+    ▼
+Agent 4: Tracking
+    │  输入: query + context
+    │  输出: 运单状态
+    │
+    ▼
+汇总 → DispatchResult</code></pre>
+
+<hr>
+
+<!-- 4. 功能需求 -->
+<h2 id="fr">4. 功能需求</h2>
+
+<!-- 4.1 协调器 -->
+<h3 id="fr-coordinator">4.1 协调器入口层 <span class="tag tag-p0">P0</span> <span class="tag tag-done">已实现</span></h3>
+
+<h4>目的</h4>
+<p>作为系统统一入口，识别用户意图，决定调用哪些 Agent 及执行顺序，并在图片输入时做 OCR 预处理。</p>
+
+<h4>处理规则</h4>
+<table>
+  <tr><th>规则</th><th>行为</th></tr>
+  <tr><td>图片检测</td><td>query 以 .jpg/.jpeg/.png/.bmp 结尾时触发 OCR 预处理</td></tr>
+  <tr><td>OCR 预处理</td><td>PaddleOCR 提取文本 → DeepSeek-VLM 结构化为 cargo_name/tonnage/unit_price → 存入 pre_context</td></tr>
+  <tr><td>意图识别</td><td>关键词匹配优先（确定性高、免费），正则失败时降级到 DeepSeek LLM</td></tr>
+  <tr><td>执行模式</td><td>single：只调 1 个 Agent；pipeline：按 [transport→booking→customs→tracking] 顺序串联</td></tr>
+  <tr><td>context 传递</td><td>pipeline 模式下，前一个 Agent 的输出写入 context，后一个 Agent 从 context 读取</td></tr>
+  <tr><td>OCR 降级</td><td>OCR 失败（无图片/API 错误）→ 静默回退到文字 query，不阻断流程</td></tr>
+</table>
+
+<h4>异常处理</h4>
+<ul>
+  <li>无可用 Agent → 返回"无法处理该需求"提示</li>
+  <li>单个 Agent 执行异常 → 标记 error 状态，不阻断其他 Agent 执行</li>
+  <li>OCR 模块不可用 → 跳过预处理，文字 query 直接传给下游</li>
+</ul>
+
+<!-- 4.2 运输 -->
+<h3 id="fr-transport">4.2 运输路线 Agent <span class="tag tag-p0">P0</span> <span class="tag tag-done">已实现</span></h3>
+
+<h4>目的</h4>
+<p>为用户生成国内段多式联运路线方案，提供帕累托前沿对比，让用户在成本与时效间做权衡。</p>
+
+<h4>节点与边</h4>
+<table>
+  <tr><th>类型</th><th>节点示例</th><th>数量</th></tr>
+  <tr><td>origin（起运地）</td><td>义乌、成都、北京、苏州、广州、深圳、西安、郑州</td><td>13</td></tr>
+  <tr><td>sea_port（海港）</td><td>宁波港、上海港、深圳港、广州港、青岛港、天津港</td><td>6</td></tr>
+  <tr><td>river_port（河港）</td><td>杭州港</td><td>1</td></tr>
+  <tr><td>rail_hub（铁路站）</td><td>义乌西、金华西、宁波北仑、郑州东、北京南、广州南</td><td>6</td></tr>
+  <tr><td>airport（机场）</td><td>浦东机场、双流机场</td><td>2</td></tr>
+</table>
+<p>边覆盖公路、铁路、河运、海运、空运 5 种运输方式，当前 40 条边。</p>
+
+<h4>成本四层模型</h4>
+<table>
+  <tr><th>层级</th><th>含义</th><th>计算依据</th></tr>
+  <tr><td>L1 干线运费</td><td>各段运输费用之和</td><td>距离 × 单价 × 旺季系数</td></tr>
+  <tr><td>L2 中转衔接</td><td>中转装卸/仓储/换装费</td><td>每中转一次加固定费率</td></tr>
+  <tr><td>L3 时间滞期</td><td>在途时间的机会成本</td><td>总时效 × 时效惩罚率</td></tr>
+  <tr><td>L4 风险准备金</td><td>查验/扣关/延误风险</td><td>旺季风险准备金率 × L1</td></tr>
+</table>
+
+<h4>帕累托前沿</h4>
+<p>所有候选方案按 (cost, hours) 双目标排序，标记非劣解为 <code>is_pareto=True</code>。标签规则：</p>
+<ul>
+  <li>成本最低 → tag="最省钱"</li>
+  <li>时效最短 → tag="最快"</li>
+  <li>帕累托前沿上非极端解 → tag="折中(推荐)"</li>
+</ul>
+
+<h4>自动选最近港口</h4>
+<p>全流程模式下用户输入国外目的地（如洛杉矶），系统自动为起运地选最近海港：</p>
+<ol>
+  <li>从 nodes.json 查起运地经纬度</li>
+  <li>Haversine 公式算到所有 sea_port 的距离</li>
+  <li>选最近的返回</li>
+  <li>geopy 在线服务作方案 B（节点库无坐标时）</li>
+  <li>硬编码城市→港口映射作方案 C（兜底）</li>
+</ol>
+
+<h4>季节性调整</h4>
+<table>
+  <tr><th>月份</th><th>旺季系数</th><th>查验率影响</th><th>运价影响</th></tr>
+  <tr><td>9-12 月（旺季）</td><td>cost ×1.35, hours ×1.50</td><td>查验率上升</td><td>运价上浮</td></tr>
+  <tr><td>1-2 月（春节）</td><td>cost ×1.20, hours ×1.30</td><td>部分港口停摆</td><td>舱位紧张</td></tr>
+  <tr><td>3-8 月（淡季）</td><td>cost ×1.00, hours ×1.00</td><td>正常</td><td>正常</td></tr>
+</table>
+
+<!-- 4.3 报关 -->
+<h3 id="fr-customs">4.3 报关单证 Agent <span class="tag tag-p0">P0</span> <span class="tag tag-done">已实现</span> <span class="tag tag-p1">升级中</span></h3>
+
+<h4>目的</h4>
+<p>从发票/文字提取商品信息，完成 HS 编码归类，生成报关单草稿，校验合规风险。当前为升级阶段——扩展 HS 知识库和单证种类。</p>
+
+<h4>处理流程</h4>
+<pre><code>输入（文字/图片路径/context）
+    │
+    ▼
+1. 商品信息提取（优先级降级链）
+    │  ① context.from_image（协调器已 OCR）→ 直接复用
+    │  ② context.cargo（上游已识别）→ 直接复用
+    │  ③ 图片路径 → PaddleOCR + DeepSeek-VLM
+    │  ④ 文字 → 正则 + 品类关键词匹配
+    │
+    ▼
+2. HS 编码 RAG 检索
+    │  关键词匹配 Top-3 候选（Chroma 向量检索可选）
+    │  → DeepSeek LLM 在候选中选择最匹配的 1 条
+    │  → LLM 不可用时返回首个候选
+    │
+    ▼
+3. 报关单生成
+    │  Jinja2 模板渲染 → 出口货物报关单草稿
+    │  [TBD] 扩展为 4 张单：报关单 + 商业发票 + 装箱单 + 申报要素清单
+    │
+    ▼
+4. 合规规则引擎校验
+    │  JSON 规则匹配 → 返回 risks[]
+    │  [TBD] 扩展为 15+ 条规则</code></pre>
+
+<h4>HS 知识库当前状态</h4>
+<table>
+  <tr><th>品类</th><th>HS 编码</th><th>税率</th><th>监管</th><th>备注</th></tr>
+  <tr><td>锂电池</td><td>8507.60.00</td><td>0%</td><td>无</td><td>UN38.3+MSDS，美国 301 关税</td></tr>
+  <tr><td>服装</td><td>6203.42.00</td><td>8%</td><td>无</td><td>原产地证要求，反倾销</td></tr>
+  <tr><td>家具</td><td>9403.50.00</td><td>0%</td><td>无</td><td>反倾销税最高 198%</td></tr>
+  <tr><td>日用百货</td><td>3924.90.00</td><td>10%</td><td>无</td><td>FDA 食品级认证</td></tr>
+  <tr><td>机电产品</td><td>8517.62.00</td><td>0%</td><td>B</td><td>3C+FCC/CE 认证</td></tr>
+</table>
+<div class="callout warning">
+  <div class="label">[TBD] 待扩展</div>
+  计划扩展至 20-30 条 HS 编码，新增 LED 灯具、纺织品、鞋类、陶瓷、自行车、玩具、茶叶、钢铁制品、塑料包装、口罩等品类。
+</div>
+
+<h4>合规规则当前状态</h4>
+<p>7 条规则覆盖：锂电池危险品、服装原产地证、家具反倾销、关税非零提示、机电 3C 认证、日用品 FDA、美国 301 关税。</p>
+<div class="callout warning">
+  <div class="label">[TBD] 待扩展</div>
+  计划新增：RCEP 优惠关税、欧盟 CBAM 碳关税、出口退税、危险品运输鉴定、木质包装 ISPM15、食品级接触认证等规则。
+</div>
+
+<h4>报关单模板当前状态</h4>
+<p>当前仅 1 张"出口货物报关单"（Jinja2 模板），字段含商品名、HS 编码、起运港/目的港、数量/单价/总额、包装/毛重/净重。</p>
+<div class="callout warning">
+  <div class="label">[TBD] 待扩展</div>
+  计划新增商业发票（Commercial Invoice）、装箱单（Packing List）、申报要素清单 3 张模板。
+</div>
+
+<!-- 4.4 订舱 -->
+<h3 id="fr-booking">4.4 订舱 Agent <span class="tag tag-p0">P0</span> <span class="tag tag-stub">占位版</span></h3>
+
+<h4>目的</h4>
+<p>查询国际段船期，对比多船公司方案，推荐最优订舱。</p>
+
+<h4>当前实现</h4>
+<ul>
+  <li>从 context 读取 destination_port，从 query 正则匹配目的港</li>
+  <li>硬编码 2 条航线：宁波港/上海港 → 洛杉矶</li>
+  <li>按运价排序，标记"最省钱/最快"</li>
+</ul>
+<div class="callout warning">
+  <div class="label">[TBD]</div>
+  需扩展航线数据至深圳港/天津港/广州港/青岛港 → 洛杉矶/汉堡/鹿特丹/新加坡。真实船公司 API 不开放，继续用模拟数据。
+</div>
+
+<!-- 4.5 追踪 -->
+<h3 id="fr-tracking">4.5 追踪 Agent <span class="tag tag-p0">P0</span> <span class="tag tag-stub">占位版</span></h3>
+
+<h4>目的</h4>
+<p>创建运单号，查询运输状态，检测异常并给出处理建议。</p>
+
+<h4>当前实现</h4>
+<ul>
+  <li>用 hash 生成模拟运单号（SF/YT 前缀）</li>
+  <li>模拟状态机：国内运输中→港口集结→装船→在途→目的港→派送</li>
+  <li>关键词触发异常检测（"延误""扣关"）</li>
+</ul>
+<div class="callout">
+  <div class="label">设计说明</div>
+  真实物流 API（顺丰/中远）需商业签约，比赛演示用占位版可接受。留好 API 接入点，后续可替换。
+</div>
+
+<!-- 4.6 前端 -->
+<h3 id="fr-web">4.6 可视化前端 <span class="tag tag-p0">P0</span> <span class="tag tag-p1">开发中</span></h3>
+
+<h4>布局</h4>
+<p>三栏布局 + 顶栏 + 底栏：</p>
+<table>
+  <tr><th>区域</th><th>位置</th><th>内容</th></tr>
+  <tr><td>顶栏</td><td>顶部</td><td>LogiChain 品牌 + 系统状态指示灯</td></tr>
+  <tr><td>左栏</td><td>320px</td><td>需求输入表单：起运地/目的港/货重/月份/优先级/发票上传/附加需求</td></tr>
+  <tr><td>中栏</td><td>自适应</td><td>最优方案卡片（成本/时效/中转/碳排放 + 成本明细 L1-L4）+ Agent 输出汇总</td></tr>
+  <tr><td>右栏</td><td>自适应</td><td>高德地图（深色主题）：彩色路线 + 起讫点标记 + 信息窗</td></tr>
+  <tr><td>底栏</td><td>100px</td><td>Agent 协同流程轨迹（步骤 + 耗时 + 状态）</td></tr>
+</table>
+
+<h4>交互规则</h4>
+<ul>
+  <li>用户填写起运地+目的港后，"开始规划"按钮可点击</li>
+  <li>点击方案卡片 → 地图切换对应路线（高亮选中卡片）</li>
+  <li>输入目的港含"洛杉矶/汉堡/新加坡"等国外地名 → 自动加"全流程"关键词触发 pipeline</li>
+  <li>上传发票图片 → 走 dispatch_image 接口（OCR 预处理 + 全流程）</li>
+  <li>地图路线颜色按运输方式区分：公路蓝、铁路橙、河运绿、海运紫、空运黄</li>
+</ul>
+
+<h4>API 接口</h4>
+<table>
+  <tr><th>接口</th><th>方法</th><th>入参</th><th>返回</th></tr>
+  <tr><td>/api/dispatch</td><td>POST</td><td>query, month?</td><td>DispatchResult JSON</td></tr>
+  <tr><td>/api/dispatch_image</td><td>POST</td><td>file, query?, month?</td><td>DispatchResult JSON</td></tr>
+  <tr><td>/api/routes</td><td>POST</td><td>origin, dest, month, priority</td><td>Transport Agent 结果</td></tr>
+  <tr><td>/api/nodes</td><td>GET</td><td>—</td><td>节点列表（含经纬度）</td></tr>
+  <tr><td>/api/edges</td><td>GET</td><td>—</td><td>边列表</td></tr>
+  <tr><td>/api/ocr</td><td>POST</td><td>file</td><td>CargoInfo JSON</td></tr>
+  <tr><td>/api/health</td><td>GET</td><td>—</td><td>系统状态 + LLM 启用状态</td></tr>
+</table>
+
+<hr>
+
+<!-- 5. 共享规则 -->
+<h2 id="rules">5. 共享规则与计算模型</h2>
+
+<h3>5.1 成本计算公式</h3>
+<pre><code>total_cost = L1 + L2 + L3 + L4
+
+L1 = Σ(段距离 × 段单价) × 旺季系数
+L2 = 中转次数 × 中转费率
+L3 = 总时效 × 时效惩罚率
+L4 = 旺季风险准备金率 × L1</code></pre>
+
+<h3>5.2 季节性系数</h3>
+<table>
+  <tr><th>月份</th><th>cost 系数</th><th>hours 系数</th><th>查验率</th><th>风险准备金率</th></tr>
+  <tr><td>9, 10, 11, 12</td><td>1.35</td><td>1.50</td><td>上升</td><td>5%</td></tr>
+  <tr><td>1, 2</td><td>1.20</td><td>1.30</td><td>部分停摆</td><td>3%</td></tr>
+  <tr><td>3-8</td><td>1.00</td><td>1.00</td><td>正常</td><td>0%</td></tr>
+</table>
+
+<h3>5.3 帕累托前沿判定</h3>
+<p>方案 A 支配方案 B，当且仅当：A.cost ≤ B.cost 且 A.hours ≤ B.hours 且至少一个严格小于。不被任何其他方案支配的方案标记为帕累托前沿。</p>
+
+<h3>5.4 OCR 降级链</h3>
+<table>
+  <tr><th>优先级</th><th>来源</th><th>触发条件</th></tr>
+  <tr><td>1</td><td>coordinator_ocr（协调器预处理）</td><td>context.from_image + context.cargo_name 存在</td></tr>
+  <tr><td>2</td><td>upstream_context（上游 Agent）</td><td>context.cargo 存在</td></tr>
+  <tr><td>3</td><td>paddle_ocr+vlm</td><td>输入为图片路径</td></tr>
+  <tr><td>4</td><td>text_input</td><td>输入为文字（正则+关键词匹配）</td></tr>
+</table>
+
+<h3>5.5 HS 编码选择降级</h3>
+<table>
+  <tr><th>步骤</th><th>行为</th><th>降级条件</th></tr>
+  <tr><td>检索 Top-3 候选</td><td>关键词匹配打分</td><td>Chroma 启用时走向量检索</td></tr>
+  <tr><td>LLM 选择最优</td><td>DeepSeek 在候选中选 1</td><td>无 API Key 或调用失败 → 返回首个候选</td></tr>
+  <tr><td>结果校验</td><td>origin/destination 必须在节点列表内</td><td>不在列表 → 返回 None → 触发自动选港</td></tr>
+</table>
+
+<h3>5.6 Agent 执行异常处理</h3>
+<ul>
+  <li>单个 Agent 抛异常 → 标记 status=error，summary 记录错误信息，不影响其他 Agent</li>
+  <li>Agent 超时 [TBD，建议 30 秒] → 标记 timeout</li>
+  <li>所有 Agent 均失败 → 返回整体 error，提示用户重试</li>
+</ul>
+
+<hr>
+
+<!-- 6. 待定问题 -->
+<h2 id="open">6. 待定问题</h2>
+
+<table>
+  <tr><th>编号</th><th>问题</th><th>影响</th><th>当前处理</th></tr>
+  <tr><td>Q1</td><td>HS 知识库扩展到多少条？</td><td>影响报关 Agent 的品类覆盖率和演示效果</td><td>[Assumption] 先扩到 20 条</td></tr>
+  <tr><td>Q2</td><td>报关单证生成几张？</td><td>影响开发工作量和演示完整度</td><td>[Assumption] 先做报关单+申报要素 2 张，商业发票+装箱单 P1</td></tr>
+  <tr><td>Q3</td><td>是否加出口退税计算？</td><td>影响成本模型完整度</td><td>[TBD] 取决于退税率数据获取</td></tr>
+  <tr><td>Q4</td><td>是否加 RCEP/FTA 优惠判定？</td><td>影响关税准确度和专业性展示</td><td>[TBD] 评委是否关注关税优惠</td></tr>
+  <tr><td>Q5</td><td>订舱 Agent 是否接真实 API？</td><td>船公司 API 基本不开放</td><td>[Assumption] 继续用模拟数据，扩展航线覆盖</td></tr>
+  <tr><td>Q6</td><td>追踪 Agent 是否接真实 API？</td><td>顺丰/中远需商业签约</td><td>[Assumption] 留接入点，继续用占位版</td></tr>
+  <tr><td>Q7</td><td>前端按钮点击后渲染是否正常？</td><td>当前浏览器自动化测试遇到 input 事件触发问题</td><td>[TBD] 需手动验证</td></tr>
+</table>
+
+</div>
+</body>
+</html>

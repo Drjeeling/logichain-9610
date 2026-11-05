@@ -1,0 +1,570 @@
+{
+  "_meta": {
+    "version": "4.0",
+    "description": "合规规则引擎 v4：结构化时效 + 审核状态 + 例外 + 缺失处理；向后兼容 v3 的 condition 格式",
+    "schema_notes": [
+      "每条规则新增：rule_name/business_type/exceptions/missing_data_action/source_document_id/source_article/policy_validity{}/review_status/reviewer/last_reviewed/status",
+      "condition 保持 v3 格式（AND 分组）；exceptions 为 OR 分组例外条件",
+      "policy_validity 改为结构化对象；旧 policy_source/policy_validity 字段在消费时 fallback 读取",
+      "review_status: verified（原文核对）/ draft（从摘要/推断）/ needs_review（TODO）/ deprecated",
+      "status: active / expiring_soon（到期前6个月内）/ expired / superseded",
+      "禁止编造规则：每条 verified 为 draft 或 needs_review 时，risk 提示必须标注'待核验'",
+      "extension_hint: 新增规则照格式追加；优先引用已建档的 source_document_id（见 regulations/index.json）"
+    ],
+    "compatibility": "v3.0 所有字段保留为 fallback；v4 新字段优先消费"
+  },
+  "rules": [
+    {
+      "rule_id": "R001",
+      "rule_name": "锂电池危险品",
+      "description": "锂电池属于危险品，需提供 UN38.3 测试报告",
+      "business_type": [
+        "申报合规",
+        "危险品识别"
+      ],
+      "condition": {
+        "cargo": "锂电池"
+      },
+      "exceptions": null,
+      "missing_data_action": "warn",
+      "risk": "锂电池属于危险品，需提供 UN38.3 测试报告",
+      "advice": "提前办理 UN38.3 + MSDS 认证；目的国可能要求运输鉴定报告",
+      "severity": "critical",
+      "source_document_id": null,
+      "source_article": null,
+      "policy_source": null,
+      "policy_validity": {
+        "valid_from": null,
+        "valid_to": null,
+        "status": "active"
+      },
+      "review_status": "draft",
+      "reviewer": null,
+      "last_reviewed": null,
+      "status": "active"
+    },
+    {
+      "rule_id": "R002",
+      "rule_name": "服装原产地证",
+      "description": "美国/欧盟对中国服装有原产地证要求",
+      "business_type": [
+        "申报合规",
+        "原产地证"
+      ],
+      "condition": {
+        "cargo": "服装",
+        "dest_country_in": [
+          "美国",
+          "欧盟"
+        ]
+      },
+      "exceptions": null,
+      "missing_data_action": "warn",
+      "risk": "{dest} 对中国服装有原产地证要求",
+      "advice": "准备原产地证 C/O；核实是否涉及反倾销税",
+      "severity": "warning",
+      "source_document_id": null,
+      "source_article": null,
+      "policy_source": null,
+      "policy_validity": {
+        "valid_from": null,
+        "valid_to": null,
+        "status": "active"
+      },
+      "review_status": "draft",
+      "reviewer": null,
+      "last_reviewed": null,
+      "status": "active"
+    },
+    {
+      "rule_id": "R003",
+      "rule_name": "木家具反倾销税",
+      "description": "美国对中国木制家具有反倾销税（最高198%）",
+      "business_type": [
+        "风险预判",
+        "反倾销"
+      ],
+      "condition": {
+        "cargo": "家具",
+        "dest_country": "美国"
+      },
+      "exceptions": null,
+      "missing_data_action": "warn",
+      "risk": "美国对中国木制家具有反倾销税（最高 198%）",
+      "advice": "核实反倾销税率；建议改用其他材质或第三国转口",
+      "severity": "critical",
+      "source_document_id": null,
+      "source_article": null,
+      "policy_source": null,
+      "policy_validity": {
+        "valid_from": null,
+        "valid_to": null,
+        "status": "active"
+      },
+      "review_status": "draft",
+      "reviewer": null,
+      "last_reviewed": null,
+      "status": "active"
+    },
+    {
+      "rule_id": "R004",
+      "rule_name": "关税非零提示",
+      "description": "该商品存在关税，提示确认 FOB/CIF",
+      "business_type": [
+        "风险预判",
+        "税率提示"
+      ],
+      "condition": {
+        "hs_tariff_gt": "0%"
+      },
+      "exceptions": null,
+      "missing_data_action": "warn",
+      "risk": "该商品关税 {tariff}，建议确认 FOB/CIF 贸易条款",
+      "advice": "与买方明确 Incoterms；核实是否享有关税优惠",
+      "severity": "info",
+      "source_document_id": null,
+      "source_article": null,
+      "policy_source": null,
+      "policy_validity": {
+        "valid_from": null,
+        "valid_to": null,
+        "status": "active"
+      },
+      "review_status": "draft",
+      "reviewer": null,
+      "last_reviewed": null,
+      "status": "active"
+    },
+    {
+      "rule_id": "R005",
+      "rule_name": "机电产品认证",
+      "description": "机电产品需3C认证；目的国可能FCC/CE要求",
+      "business_type": [
+        "申报合规",
+        "认证要求"
+      ],
+      "condition": {
+        "hs_category": "机电产品"
+      },
+      "exceptions": null,
+      "missing_data_action": "warn",
+      "risk": "进口需 3C 认证；目的国可能有 FCC（美）/CE（欧）认证要求",
+      "advice": "提前办理 3C + 目的国对应认证",
+      "severity": "warning",
+      "source_document_id": null,
+      "source_article": null,
+      "policy_source": null,
+      "policy_validity": {
+        "valid_from": null,
+        "valid_to": null,
+        "status": "active"
+      },
+      "review_status": "draft",
+      "reviewer": null,
+      "last_reviewed": null,
+      "status": "active"
+    },
+    {
+      "rule_id": "R006",
+      "rule_name": "日用品 FDA 认证",
+      "description": "接触食品的日用品需 FDA 食品级认证",
+      "business_type": [
+        "申报合规",
+        "认证要求"
+      ],
+      "condition": {
+        "hs_category": "日用百货"
+      },
+      "exceptions": null,
+      "missing_data_action": "warn",
+      "risk": "若接触食品，需提供 FDA 食品级认证",
+      "advice": "区分一般用途与食品接触用途；后者必须 FDA 认证",
+      "severity": "warning",
+      "source_document_id": null,
+      "source_article": null,
+      "policy_source": null,
+      "policy_validity": {
+        "valid_from": null,
+        "valid_to": null,
+        "status": "active"
+      },
+      "review_status": "draft",
+      "reviewer": null,
+      "last_reviewed": null,
+      "status": "active"
+    },
+    {
+      "rule_id": "R007",
+      "rule_name": "美国 301 关税",
+      "description": "美国对中国部分商品加征 301 关税",
+      "business_type": [
+        "风险预判",
+        "关税"
+      ],
+      "condition": {
+        "dest_country": "美国",
+        "cargo_in": [
+          "锂电池",
+          "机电产品"
+        ]
+      },
+      "exceptions": null,
+      "missing_data_action": "warn",
+      "risk": "美国对中国部分商品加征 301 关税",
+      "advice": "核实 HTSUS 编码是否在 301 加税清单内",
+      "severity": "warning",
+      "source_document_id": null,
+      "source_article": null,
+      "policy_source": null,
+      "policy_validity": {
+        "valid_from": null,
+        "valid_to": null,
+        "status": "active"
+      },
+      "review_status": "draft",
+      "reviewer": null,
+      "last_reviewed": null,
+      "status": "active"
+    },
+    {
+      "rule_id": "R008",
+      "rule_name": "9610 退运免税时效",
+      "description": "9610 退运商品自出口之日起6个月内原状退运免进口税费",
+      "business_type": [
+        "退运处理",
+        "时效监控",
+        "F节点监控"
+      ],
+      "condition": {
+        "cargo_contains": "退运"
+      },
+      "exceptions": [
+        {
+          "field": "cargo",
+          "op": "contains",
+          "value": "食品",
+          "reason": "食品不适用退运免税，见R010"
+        }
+      ],
+      "missing_data_action": "ask_user",
+      "risk": "9610/1210/9710/9810 项下出口商品因滞销/退货原因，自出口之日起 6 个月内原状退运进境的（不含食品），免征进口关税和进口环节增值税、消费税；出口时已征的出口关税准予退还",
+      "advice": "核实出口日期是否在 6 个月内；准备出口申报清单/报关单 + 退运原因说明材料（滞销→自我声明，退货→退货记录/退货协议）；已退税的需补缴后凭《出口货物已补税/未退税证明》办理免税",
+      "severity": "critical",
+      "source_document_id": "ANN-16-2026-RETURN",
+      "source_article": "第一条、第三条",
+      "policy_source": "财政部 海关总署 税务总局公告 2026年第16号",
+      "policy_validity": {
+        "valid_from": "2026-01-01",
+        "valid_to": "2027-12-31",
+        "status": "active"
+      },
+      "review_status": "verified",
+      "reviewer": "C板块原文核对",
+      "last_reviewed": "2026-10-31",
+      "status": "active"
+    },
+    {
+      "rule_id": "R009",
+      "rule_name": "9610 原状退运判定",
+      "description": "原状退运的判定：基本形态与原出口一致；拆箱/检验/安装调试不破坏原状",
+      "business_type": [
+        "退运处理"
+      ],
+      "condition": {
+        "cargo_contains": "退运"
+      },
+      "exceptions": null,
+      "missing_data_action": "warn",
+      "risk": "原状退运指最小商品形态与原出口形态基本一致，不得增加配件/部件，不能经过加工/改装；但经拆箱、检(化)验、安装、调试等仍可视为原状；退运商品应未被使用过（试用后发现品质不良除外）",
+      "advice": "拆箱/检验/安装调试不影响原状认定；重点核查是否增加了配件或经过加工改装；试用后发现品质不良的退货仍可适用免税",
+      "severity": "warning",
+      "source_document_id": "ANN-16-2026-RETURN",
+      "source_article": "第三条（原状退运判定）",
+      "policy_source": "财政部 海关总署 税务总局公告 2026年第16号",
+      "policy_validity": {
+        "valid_from": "2026-01-01",
+        "valid_to": "2027-12-31",
+        "status": "active"
+      },
+      "review_status": "verified",
+      "reviewer": "C板块原文核对",
+      "last_reviewed": "2026-10-31",
+      "status": "active"
+    },
+    {
+      "rule_id": "R010",
+      "rule_name": "食品退运限制",
+      "description": "食品不可适用9610退运免税",
+      "business_type": [
+        "退运处理"
+      ],
+      "condition": {
+        "cargo_contains": "食品"
+      },
+      "exceptions": null,
+      "missing_data_action": "warn",
+      "risk": "cargo 含食品的，不可适用 9610 退运免税；食品退运需按食品监管要求单独申报检验检疫",
+      "advice": "食品退运需办理卫生证书与检验检疫；建议联系海关食品监管部门确认退运可行性",
+      "severity": "critical",
+      "source_document_id": "ANN-16-2026-RETURN",
+      "source_article": "第一条（不含食品）",
+      "policy_source": "财政部 海关总署 税务总局公告 2026年第16号",
+      "policy_validity": {
+        "valid_from": "2026-01-01",
+        "valid_to": "2027-12-31",
+        "status": "active"
+      },
+      "review_status": "verified",
+      "reviewer": "C板块原文核对",
+      "last_reviewed": "2026-10-31",
+      "status": "active"
+    },
+    {
+      "rule_id": "R011",
+      "rule_name": "品名一致性",
+      "description": "申报品名须与采购发票品名严格一致",
+      "business_type": [
+        "申报合规",
+        "退税"
+      ],
+      "condition": {
+        "cargo_contains": "发票不符"
+      },
+      "exceptions": null,
+      "missing_data_action": "warn",
+      "risk": "申报品名与采购发票品名不一致，出口退税将被海关卡审",
+      "advice": "申报品名须与增值税发票品名严格一致（含规格/型号）；不符的需先更正发票或申报内容",
+      "severity": "warning",
+      "source_document_id": null,
+      "source_article": null,
+      "policy_source": null,
+      "policy_validity": {
+        "valid_from": null,
+        "valid_to": null,
+        "status": "active"
+      },
+      "review_status": "draft",
+      "reviewer": null,
+      "last_reviewed": null,
+      "status": "active"
+    },
+    {
+      "rule_id": "R012",
+      "rule_name": "9610/9710 业务模式错配",
+      "description": "9610 为跨境电商零售出口（B2C）；B2B 批量出口应适用 9710，不应标注为 9610",
+      "business_type": [
+        "申报合规"
+      ],
+      "condition": {
+        "cargo_contains": "B2B"
+      },
+      "exceptions": null,
+      "missing_data_action": "warn",
+      "risk": "检测到 B2B 业务描述：9610 仅适用于跨境电商零售出口，B2B 批量出口应使用 9710（跨境电商 B2B 直接出口）；监管方式错配将导致清单/报关单退单",
+      "advice": "确认交易对象：零售（B2C）用 9610；企业对企业（B2B）用 9710；如为 B2B 请改选监管方式并核对清单类型",
+      "severity": "warning",
+      "source_document_id": "CROSSBORDER-9610-MODE",
+      "source_article": "9610 零售出口适用范围（组合条目）",
+      "policy_source": null,
+      "policy_validity": {
+        "valid_from": null,
+        "valid_to": null,
+        "status": "active"
+      },
+      "review_status": "verified",
+      "reviewer": "批判性复核（场景1 B2B+9610 矛盾）",
+      "last_reviewed": "2026-10-31",
+      "status": "active"
+    },
+    {
+      "rule_id": "R013",
+      "rule_name": "HS编码10位完整性",
+      "description": "申报用编码须为 10 位数字；4 位/8 位简化申报仅在特定场景允许",
+      "business_type": [
+        "归类校验"
+      ],
+      "condition": {
+        "hs_code_not_ten_digit": true
+      },
+      "exceptions": null,
+      "missing_data_action": "warn",
+      "risk": "HS 编码不足 10 位（当前 {cargo} 使用非完整税号），9610 清单/报关单存在退单风险（涉管制物项明确不得简化申报，ANN-78-2026）",
+      "advice": "补全至 10 位税号；仅非管制、非汇总场景可按现行简化申报规则处理",
+      "severity": "warning",
+      "source_document_id": "ANN-78-2026",
+      "source_article": "（二）跨境电商申报清单不得使用简化申报（4位码），需申报完整税号",
+      "policy_source": null,
+      "policy_validity": {
+        "valid_from": null,
+        "valid_to": null,
+        "status": "active"
+      },
+      "review_status": "verified",
+      "reviewer": "批判性复核（原 .00/.90 判据在 10 位码上为伪阳性）",
+      "last_reviewed": "2026-10-31",
+      "status": "active"
+    },
+    {
+      "rule_id": "R014",
+      "rule_name": "RCEP 优惠关税",
+      "description": "RCEP成员国可享协定优惠税率",
+      "business_type": [
+        "税率提示"
+      ],
+      "condition": {
+        "dest_country_in": [
+          "日本",
+          "韩国",
+          "澳大利亚",
+          "新西兰",
+          "越南",
+          "马来西亚",
+          "新加坡",
+          "泰国",
+          "菲律宾",
+          "印度尼西亚",
+          "文莱",
+          "柬埔寨",
+          "老挝",
+          "缅甸"
+        ]
+      },
+      "exceptions": null,
+      "missing_data_action": "warn",
+      "risk": "{dest} 为 RCEP 成员国，可享受 RCEP 协定优惠税率",
+      "advice": "申请签发 RCEP 原产地证书（中 RCEP 产地证）；核实商品是否在 RCEP 降税承诺清单内",
+      "severity": "info",
+      "source_document_id": null,
+      "source_article": null,
+      "policy_source": null,
+      "policy_validity": {
+        "valid_from": null,
+        "valid_to": null,
+        "status": "active"
+      },
+      "review_status": "draft",
+      "reviewer": null,
+      "last_reviewed": null,
+      "status": "active"
+    },
+    {
+      "rule_id": "R015",
+      "rule_name": "欧盟 CBAM 碳关税",
+      "description": "欧盟对钢铁/陶瓷等商品征收碳关税",
+      "business_type": [
+        "风险预判",
+        "关税"
+      ],
+      "condition": {
+        "dest_country_contains": "欧盟",
+        "cargo_contains": [
+          "钢铁",
+          "陶瓷"
+        ]
+      },
+      "exceptions": null,
+      "missing_data_action": "warn",
+      "risk": "目的国为欧盟且货物属钢铁/陶瓷，需按 CBAM 申报碳排放数据并缴纳碳关税",
+      "advice": "申报 CBAM 碳排放报告并获取核证；提供产品碳足迹核算报告；2026 年起正式缴碳关税",
+      "severity": "critical",
+      "source_document_id": null,
+      "source_article": null,
+      "policy_source": null,
+      "policy_validity": {
+        "valid_from": null,
+        "valid_to": null,
+        "status": "active"
+      },
+      "review_status": "draft",
+      "reviewer": null,
+      "last_reviewed": null,
+      "status": "active"
+    },
+    {
+      "rule_id": "R016",
+      "rule_name": "出口退税提示",
+      "description": "该商品关税非零，可申请出口退税",
+      "business_type": [
+        "退税提示"
+      ],
+      "condition": {
+        "hs_tariff_gt": "0%"
+      },
+      "exceptions": null,
+      "missing_data_action": "warn",
+      "risk": "该商品出口关税 {tariff}，可申请出口退税（退税率以财政部目录为准）",
+      "advice": "核实商品退税率（财政部出口退税率文库）；准备增值税发票办理退税；9610 模式按汇总申报退税",
+      "severity": "info",
+      "source_document_id": null,
+      "source_article": null,
+      "policy_source": null,
+      "policy_validity": {
+        "valid_from": null,
+        "valid_to": null,
+        "status": "active"
+      },
+      "review_status": "draft",
+      "reviewer": null,
+      "last_reviewed": null,
+      "status": "active"
+    },
+    {
+      "rule_id": "R017",
+      "rule_name": "退运免税临期预警",
+      "description": "ANN-16-2026 2027-12-31 到期前6个月，提示政策续期核查",
+      "business_type": [
+        "F节点监控",
+        "时效监控"
+      ],
+      "condition": {
+        "cargo_contains": "退运"
+      },
+      "exceptions": null,
+      "missing_data_action": "warn",
+      "risk": "适用退运免税政策（ANN-16-2026），政策将于 2027-12-31 到期，距到期不足6个月时需核查续期情况",
+      "advice": "关注财政部/海关总署/税务总局联合公告续期；到期后如未续期则退运需按一般贸易进口征税",
+      "severity": "info",
+      "source_document_id": "ANN-16-2026-RETURN",
+      "source_article": "第一条（2026-01-01 至 2027-12-31）",
+      "policy_source": "财政部 海关总署 税务总局公告 2026年第16号",
+      "policy_validity": {
+        "valid_from": "2026-01-01",
+        "valid_to": "2027-12-31",
+        "status": "active"
+      },
+      "review_status": "verified",
+      "reviewer": "C板块原文核对",
+      "last_reviewed": "2026-10-31",
+      "status": "expiring_soon_when_proximity"
+    },
+    {
+      "rule_id": "R018",
+      "rule_name": "9610 汇总申报次月15日前",
+      "description": "9610清单核放后须在次月15日前汇总申报；12月清单须当月汇总",
+      "business_type": [
+        "F节点监控",
+        "归并"
+      ],
+      "condition": {
+        "trade_mode": "9610"
+      },
+      "exceptions": null,
+      "missing_data_action": "warn",
+      "risk": "9610 模式须在出口清单核放后次月 15 日前完成月度汇总申报；12 月清单须在当月最后一个工作日前汇总（跨年度不适用）",
+      "advice": "逾期未汇总的系统16日自动汇总，但后续申报建议严格按期限；12月清单当月汇总避免跨年",
+      "severity": "warning",
+      "source_document_id": "CROSSBORDER-9610-MODE",
+      "source_article": "汇总申报：次月15日前；12月清单当月汇总（组合条目，成员文件待逐条建档）",
+      "policy_source": null,
+      "policy_validity": {
+        "valid_from": null,
+        "valid_to": null,
+        "status": "active"
+      },
+      "review_status": "needs_review",
+      "reviewer": null,
+      "last_reviewed": null,
+      "status": "active"
+    }
+  ]
+}

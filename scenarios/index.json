@@ -1,0 +1,36 @@
+[
+  {
+    "id": "scene1_ip",
+    "name": "场景一 · IP侵权类",
+    "subtitle": "3C配件出口 · 深圳 → 洛杉矶",
+    "risk_tag": "IP 侵权风险（品牌词：iPhone / Apple）",
+    "doc_type": "商业发票",
+    "invoice_no": "RX-INV-20251015-01",
+    "seller": "深圳市锐讯科技有限公司",
+    "buyer": "TechGear Trading Inc.",
+    "origin": "深圳港 Shenzhen",
+    "dest": "洛杉矶 · 美国",
+    "month": 11,
+    "gross_weight": "5,200 KGS",
+    "total_amount": 12600.0,
+    "png": "scene1_ip/RX-INV-20251015-01_商业发票.png",
+    "json": "scene1_ip/RX-INV-20251015-01_电子单据.json"
+  },
+  {
+    "id": "scene2_dg",
+    "name": "场景二 · 危险品类",
+    "subtitle": "电子配件出口 · 义乌 → 汉堡",
+    "risk_tag": "危险品风险（UN3480 / UN3481 锂电池）",
+    "doc_type": "商业发票",
+    "invoice_no": "HT-EXP-20251015-02",
+    "seller": "义乌市恒通电子配件有限公司",
+    "buyer": "EuroTech Handels GmbH",
+    "origin": "义乌 Yiwu",
+    "dest": "汉堡 · 德国",
+    "month": 11,
+    "gross_weight": "6,000 KGS",
+    "total_amount": 44000.0,
+    "png": "scene2_dg/HT-EXP-20251015-02_商业发票.png",
+    "json": "scene2_dg/HT-EXP-20251015-02_电子单据.json"
+  }
+]

@@ -1,0 +1,198 @@
+{
+  "_meta": {
+    "schema_version": "2.1",
+    "source": "1102_A板块_四场景输入字段值.md v2.1（2026-11-02）",
+    "golden_answer": "1102_B板块_GoldenAnswer_v2.1.md",
+    "nature": "构造的演示数据，字段值合理但非真实交易",
+    "notes": [
+      "场景1 两遍演示：with_facts=true 传入 cargo_facts；false 删除（B板块：证据充足→CANDIDATE，删除→NEED_MORE_FACTS）",
+      "毛净重：A板块仅给单一重量（350/120/75 千克），按毛重录入、净重留空待补，不虚构拆分",
+      "订单号/运单号为演示构造值（A板块未给），已在 demo_assumed_fields 声明",
+      "SKU/主数据/主体名称均来自 A板块 v2.1 原文"
+    ]
+  },
+  "product_master": [
+    {
+      "sku": "CASE-IP15P-001",
+      "name": "塑料制手机保护壳（TPU+PC）",
+      "model": "iPhone 15 Pro",
+      "model_hints": ["15pro", "苹果15pro", "15 pro"],
+      "hs_code": "3926909090"
+    },
+    {
+      "sku": "CASE-IP14P-002",
+      "name": "塑料制手机保护壳（TPU+PC）",
+      "model": "iPhone 14 Pro",
+      "model_hints": ["14pro", "苹果14pro", "14 pro"],
+      "hs_code": "3926909090"
+    }
+  ],
+  "subjects": {
+    "platform": "平台A",
+    "enterprise": "企业B",
+    "factory": "工厂C",
+    "agent": "代理报关企业D"
+  },
+  "scenarios": [
+    {
+      "id": "scenario_1_dispute",
+      "name": "归类争议（蓝牙音箱手机支架，9710 报关单）",
+      "doc_type": "declaration_form",
+      "query": "可折叠蓝牙音箱手机支架",
+      "context": {
+        "cargo_name": "可折叠蓝牙音箱手机支架",
+        "doc_type": "declaration_form",
+        "trade_mode": "9710",
+        "quantity": 1000,
+        "unit": "件",
+        "gross_weight": 350,
+        "total_amount": 6800,
+        "currency": "USD",
+        "incoterms": "FOB Shenzhen",
+        "dest_country": "美国",
+        "shipper_type": "跨境电商企业（9710 B2B 直接出口）",
+        "brand_owner": false,
+        "hs_candidates_expected": ["3926909090", "8518220000"]
+      },
+      "cargo_facts": {
+        "speaker_units": 2,
+        "speaker_size_mm": 40,
+        "shared_enclosure": true,
+        "standalone_playback": true,
+        "bluetooth": "5.3",
+        "stand_function": "折叠式背夹，无独立功能",
+        "battery": "内置锂电池 3.7V/1200mAh，USB-C 5V",
+        "shell_material": "ABS+PC",
+        "evidence": {
+          "SPEC-0001": "规格书：扬声器单元 2 个（左右声道各 1），40mm，装于同一箱体",
+          "MAN-001": "说明书：可独立播放（蓝牙 5.3）",
+          "STR-001": "结构图：折叠式背夹，无独立功能",
+          "BAT-002": "电池规格书：内置锂电池 3.7V/1200mAh"
+        }
+      },
+      "expected": {
+        "with_facts": {
+          "hs_code": "8518220000",
+          "status": "CANDIDATE",
+          "rejected": "3926909090",
+          "tier": "B",
+          "reasoning_includes": ["品目 8518", "分列", "851822"]
+        },
+        "without_facts": {
+          "status": "NEED_MORE_FACTS",
+          "dispute": true,
+          "questions_include": ["扬声器单元数量", "是否共用"]
+        }
+      }
+    },
+    {
+      "id": "scenario_2_elements",
+      "name": "申报要素缺失（手机壳，3926909090，报关单口径）",
+      "doc_type": "declaration_form",
+      "query": "塑料制手机壳",
+      "context": {
+        "cargo_name": "塑料制手机壳",
+        "doc_type": "declaration_form",
+        "hs_code": "3926909090",
+        "quantity": 800,
+        "unit": "件",
+        "gross_weight": 120,
+        "total_amount": 9600,
+        "currency": "EUR",
+        "incoterms": "FOB Yantian",
+        "dest_country": "德国",
+        "shipper": "企业B",
+        "production_sales_unit": "工厂C",
+        "declaration_agent": "代理报关企业D",
+        "material_evidence": "SPEC-0002（B级证据：TPU+PC）",
+        "usage": "手机保护",
+        "material": "塑料"
+      },
+      "expected": {
+        "blocked_elements": ["品牌类型", "出口享惠情况", "品牌", "型号", "材质（塑料品种）"],
+        "blocked_count": 5,
+        "gtin_blocked": false,
+        "cas_blocked": false
+      }
+    },
+    {
+      "id": "scenario_3_three_doc",
+      "name": "三单校验（9610 清单）",
+      "doc_type": "list_9610",
+      "query": "塑料手机壳",
+      "demo_assumed_fields": ["order.order_id", "waybill.logistics_no"],
+      "context": {
+        "cargo_name": "塑料手机壳",
+        "doc_type": "list_9610",
+        "trade_mode": "9610",
+        "platform": "平台A",
+        "order_id": "SO-2026-9610-0001",
+        "logistics_no": "WB-2026-9610-0001",
+        "quantity": 500,
+        "unit": "件",
+        "gross_weight": 75,
+        "total_amount": 6000,
+        "currency": "CNY",
+        "dest_country": "德国",
+        "shipper": "企业B",
+        "consignee": "Müller, Hans",
+        "production_sales_unit": "平台A",
+        "order": {
+          "order_id": "SO-2026-9610-0001",
+          "sku": "CASE-IP15P-001",
+          "title": "ins风磨砂肤感手机壳 苹果15Pro全包防摔 高级感女款",
+          "quantity": 500,
+          "amount": 6000,
+          "currency": "CNY",
+          "recipient": "Müller, Hans"
+        },
+        "payment": {
+          "merchant": "平台A商户"
+        },
+        "waybill": {
+          "logistics_no": "WB-2026-9610-0001",
+          "recipient": "Müller,H",
+          "cargo_name": "手机壳×500",
+          "quantity": 500,
+          "weight": 75
+        },
+        "declaration": {
+          "sku": "CASE-IP15P-001",
+          "cargo_name": "塑料手机壳",
+          "quantity": 500,
+          "amount": 6000,
+          "currency": "CNY"
+        }
+      },
+      "expected": {
+        "sku_alignment": "pass",
+        "cargo_name_diff": "pass_normalized",
+        "payment_status": "blocked",
+        "production_sales_unit": "blocked",
+        "recipient": "warning_preserved",
+        "overall": "blocked"
+      }
+    },
+    {
+      "id": "scenario_4_sku_conflict",
+      "name": "伪一致性 SKU 冲突（9610 清单）",
+      "doc_type": "list_9610",
+      "query": "塑料手机壳",
+      "base": "scenario_3_three_doc",
+      "context_overrides": {
+        "declaration": {
+          "sku": "CASE-IP14P-002",
+          "cargo_name": "塑料手机壳",
+          "quantity": 500,
+          "amount": 6000,
+          "currency": "CNY"
+        }
+      },
+      "expected": {
+        "numeric_checks": "pass",
+        "sku_alignment": "conflict",
+        "overall": "blocked"
+      }
+    }
+  ]
+}

@@ -1,0 +1,29 @@
+{
+  "_meta": {
+    "version": "1.0",
+    "description": "中转环节季节系数：旺季港口拥堵，装卸费/等待时间上浮",
+    "based_on": "结合 PDF 季节规律 + 春节/圣诞出口旺季经验值",
+    "rule": "中转费 = base_cost × cost_mult；等待时间 = base_hours × hours_mult + 查验期望"
+  },
+  "month_transfer_factor": {
+    "1":  {"cost_mult": 1.20, "hours_mult": 1.30, "note": "春节前出运高峰，港口拥堵"},
+    "2":  {"cost_mult": 0.85, "hours_mult": 0.80, "note": "春节假期作业减少"},
+    "3":  {"cost_mult": 0.95, "hours_mult": 0.95, "note": "节后恢复，正常水平"},
+    "4":  {"cost_mult": 0.90, "hours_mult": 0.90, "note": "淡季，运力充足"},
+    "5":  {"cost_mult": 0.90, "hours_mult": 0.90, "note": "淡季，运力充足"},
+    "6":  {"cost_mult": 0.95, "hours_mult": 0.95, "note": "夏季备货启动"},
+    "7":  {"cost_mult": 1.00, "hours_mult": 1.00, "note": "常规水平"},
+    "8":  {"cost_mult": 1.05, "hours_mult": 1.05, "note": "圣诞订单开始出运"},
+    "9":  {"cost_mult": 1.15, "hours_mult": 1.20, "note": "圣诞出口旺季开始"},
+    "10": {"cost_mult": 1.30, "hours_mult": 1.40, "note": "出口旺季高峰，堆场爆仓"},
+    "11": {"cost_mult": 1.35, "hours_mult": 1.50, "note": "抢运高峰，查验率上升"},
+    "12": {"cost_mult": 1.25, "hours_mult": 1.35, "note": "春节前抢运"}
+  },
+  "air_transfer_seasonal": {
+    "_note": "航空运输季节系数（受春运/圣诞旺季影响）",
+    "1":  1.40, "2": 0.90, "3": 1.00, "4": 0.95, "5": 0.95, "6": 1.00,
+    "7":  1.05, "8": 1.10, "9": 1.20, "10": 1.30, "11": 1.40, "12": 1.35
+  },
+  "peak_months": [9, 10, 11, 12, 1],
+  "low_season_months": [2, 3, 4, 5, 6]
+}

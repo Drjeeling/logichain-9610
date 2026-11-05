@@ -1,0 +1,31 @@
+# 核心依赖（必装）
+networkx>=3.1
+jinja2>=3.1
+python-dotenv>=1.0
+
+# Web 服务（网页平台 / API）
+fastapi>=0.110
+uvicorn>=0.27
+python-multipart>=0.0.9
+
+# 数据处理
+openpyxl>=3.1
+
+# 地理编码（全国任意城市→经纬度→最近港口匹配）
+geopy>=2.4
+
+# 帕累托前沿（可选，未装时走内置兜底实现）
+paretoset>=1.0
+
+# OCR 识图（可选，用于报关 Agent 读取发票图片）
+# 默认引擎 rapidocr-onnxruntime（轻量）；paddleocr 作为回退可另装
+rapidocr-onnxruntime>=1.2.3
+
+# 向量检索（可选，HS 编码库大时启用）
+chromadb>=0.4
+
+# LLM 接入（可选，启用 DeepSeek API 后用）
+openai>=1.0
+
+# 数据校验（可选）
+pydantic>=2.0

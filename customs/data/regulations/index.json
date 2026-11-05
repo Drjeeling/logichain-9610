@@ -1,0 +1,556 @@
+{
+  "_meta": {
+    "title": "智关 Agent 法规库 · 核心规则卡",
+    "source_file": "1031_法规库种子数据_v1.1.md",
+    "imported_at": "2026-10-31",
+    "card_count": 13,
+    "schema_version": "1.0",
+    "last_reviewed": "2026-10-25",
+    "review_cycle": "每季度 + 重大公告触发式",
+    "refresh_triggers": [
+      "每年12月底：检索'关于执行XXXX年关税调整方案'，更新税则与申报目录（触发器：ANN-260 系列）",
+      "单一窗口参数更新通知：跟踪'禁限管制识别码'等参数目录变化",
+      "失效预警：expiry_date 距今 < 6 个月的条目，自动标记待续期核查"
+    ],
+    "verification_legend": {
+      "2026-10-22 或更早日期": "已在本会话经真实网络检索核验",
+      "TODO": "未经核验或需全文核对，使用前必须处理"
+    },
+    "quality_rules": [
+      "任何用于演示页面的条款，text 字段必须是原文或明确标注 text_summary",
+      "official_url 为空的条目不可直接出现在答辩材料中",
+      "superseded_by 非空时，status 必须为 expired，且消费方不得引用"
+    ],
+    "import_fixes": [
+      "YAML 扫描错误修正：ANN-40-2026 critical_judgment_rule.scenario 含未加引号冒号，已加双引号"
+    ]
+  },
+  "cards": {
+    "LAW-CUSTOMS-2021": {
+      "id": "LAW-CUSTOMS-2021",
+      "title": "中华人民共和国海关法",
+      "issuer": "全国人民代表大会常务委员会",
+      "doc_no": "主席令（2021年修正版）",
+      "publish_date": null,
+      "effective_date": "2021-04-29",
+      "supersedes": null,
+      "superseded_by": null,
+      "status": "effective",
+      "official_url": "https://flk.npc.gov.cn（国家法律法规数据库，检索'海关法'）",
+      "verified_at": null,
+      "clauses": [
+        {
+          "false": "第四十四条",
+          "text_summary": "海关依照法律、行政法规的规定，对与进出境货物有关的知识产权实施保护。",
+          "used_by": [
+            "D风险预判",
+            "责任边界声明"
+          ]
+        }
+      ],
+      "notes": "知识产权保护的上位法依据。D Agent 品牌识别功能的合法性来源。 答辩时引用\"上位法链条\"：海关法第44条 → 知识产权海关保护条例 → 备案库查询。\n"
+    },
+    "DECREE-277-2025": {
+      "id": "DECREE-277-2025",
+      "title": "中华人民共和国海关进出口货物申报管理规定",
+      "issuer": "海关总署",
+      "doc_no": "海关总署令第277号",
+      "publish_date": "2025-03-27",
+      "effective_date": "2025-05-01",
+      "supersedes": [
+        "海关总署令第103号（2003年申报管理规定，经198/218/235/238/240/243号令修改）",
+        "出入境检验检疫报检规定（原质检总局令第16号）",
+        "海关总署令第220号（报关单修改和撤销管理办法）"
+      ],
+      "superseded_by": null,
+      "status": "effective",
+      "official_url": "https://www.gov.cn/gongbao/2025/issue_12026/202505/content_7022577.html",
+      "official_url_alt": "http://www.customs.gov.cn/customs/2025-03/28/article_2025112109024325771.html",
+      "verified_at": "2026-10-22",
+      "clauses": [
+        {
+          "false": "第二条",
+          "text": "本规定中的\"申报\"是指进口货物的收货人、出口货物的发货人（以下简称进出口货物收发货人） 以及受委托的报关企业，依法在规定的期限内，提交报关单以及相关随附的单证， 报告实际进出口货物的情况，并被海关接受的行为。",
+          "used_by": [
+            "系统定位"
+          ]
+        },
+        {
+          "false": "第五条",
+          "text": "申报采用电子数据报关单方式，特殊情况下经海关同意，可以采用纸质报关单方式。 电子数据报关单和纸质报关单具有同等法律效力。",
+          "used_by": [
+            "系统定位"
+          ]
+        },
+        {
+          "false": "第六条",
+          "text": "进出口货物收发货人、受委托的报关企业应当依法如实向海关申报，对申报内容的真实性、 准确性、完整性和规范性承担相应的法律责任。",
+          "used_by": [
+            "责任边界声明",
+            "全链路",
+            "答辩必引"
+          ]
+        },
+        {
+          "false": "第七条",
+          "text": "出口货物的发货人、受委托的报关企业应当在货物运抵海关监管区后、装货的二十四小时以前 向海关申报。……超过规定期限向海关申报的，海关依法征收滞报金。",
+          "used_by": [
+            "全链路时序"
+          ]
+        },
+        {
+          "false": "第八条",
+          "text": "进出口货物收发货人、受委托的报关企业向海关申报时，应当依法交验下列相关随附的单证， 按照规定可以免于提交的除外：（一）合同；（二）发票；（三）装箱清单；（四）载货清单（舱单）； （五）提（运）单；（六）代理报关授权委托协议；（七）进出口许可证件； （八）法律、行政法规和海关总署规定的与进出口货物有关的其他单证。",
+          "used_by": [
+            "场景一",
+            "C清单合规"
+          ]
+        },
+        {
+          "false": "第九条",
+          "text": "符合海关规定的，在进出口货物的品名、规格型号、数量等已确定无误并且取得提（运）单 或者载货清单（舱单）数据的情况下，进出口货物收发货人、受委托的报关企业可以在 进口货物启运后、抵港前或者出口货物运抵海关监管区前七日内，提前向海关办理申报手续。",
+          "used_by": [
+            "全链路时序",
+            "提前申报窗口提示"
+          ]
+        }
+      ],
+      "notes": "本系统最重要的法律文件。第六条确立\"申报主体对真实性负责\"， 是\"AI 不能承担申报责任、系统定位为辅助制单工具\"的直接法律依据。 答辩必引条款：第六条。\n"
+    },
+    "ANN-260-2025": {
+      "id": "ANN-260-2025",
+      "title": "关于执行2026年关税调整方案及有关事宜的公告",
+      "issuer": "海关总署",
+      "doc_no": "海关总署公告2025年第260号",
+      "publish_date": "2025-12-31",
+      "effective_date": "2026-01-01",
+      "supersedes": null,
+      "superseded_by": null,
+      "status": "effective",
+      "official_url": "http://www.customs.gov.cn/customs/2025-12/31/article_2025123119403025129.html",
+      "verified_at": "2026-10-22",
+      "attachments": [
+        {
+          "name": "2026年进出口非全税目暂定税率商品对应海关商品编号表",
+          "format": "xlsx"
+        },
+        {
+          "name": "2026年进出口非全税目适用进口环节增值税、消费税政策部分商品对应海关商品编号表",
+          "format": "xlsx"
+        }
+      ],
+      "key_facts": [
+        "2026年税则税目总数：8,972 个",
+        "本国子目注释：201 条",
+        "《海关进出口商品涉税规范申报目录（2026年版）》可通过海关总署门户网站查询"
+      ],
+      "clauses": [],
+      "used_by": [
+        "场景一",
+        "A归类",
+        "税则年度更新机制"
+      ],
+      "notes": "每年年末发布次年关税调整方案公告，是税则年度更新的固定机制。 法规库的\"年度刷新\"操作以此公告为触发点： 每年 12 月底检索\"关于执行XXXX年关税调整方案\"即可获取最新编号表。\n"
+    },
+    "CATALOG-DECLARATION-2026": {
+      "id": "CATALOG-DECLARATION-2026",
+      "title": "海关进出口商品涉税规范申报目录（2026年版）",
+      "issuer": "海关总署",
+      "doc_no": "随年度公告发布（见 ANN-260-2025 第二条）",
+      "publish_date": "2025-12-31",
+      "effective_date": "2026-01-01",
+      "supersedes": "2025年版及更早版本",
+      "superseded_by": null,
+      "status": "effective",
+      "official_url": "海关总署门户网站在线查询（入口：互联网+海关 → 我要查 → 进出口税则查询）",
+      "verified_at": null,
+      "structure": "税号级结构化数据（税号 → 申报要素清单，**最长前缀匹配**）",
+      "sample_entries": [
+        {
+          "hs_code": "3926（章级清单，3926909090 等适用）",
+          "description": "其他塑料制品",
+          "required_elements": [
+            {
+              "name": "品牌类型",
+              "required": true
+            },
+            {
+              "name": "出口享惠情况",
+              "required": true
+            },
+            {
+              "name": "用途",
+              "required": true
+            },
+            {
+              "name": "材质（塑料品种）",
+              "required": true
+            },
+            {
+              "name": "品牌（中文或外文名称）",
+              "required": true
+            },
+            {
+              "name": "型号",
+              "required": true
+            },
+            {
+              "name": "GTIN",
+              "required": false
+            },
+            {
+              "name": "CAS",
+              "required": false
+            }
+          ],
+          "element_count": 8,
+          "verify_status": "VERIFIED"
+        },
+        {
+          "hs_code": "851822",
+          "description": "多喇叭音箱（8518220000 适用）",
+          "required_elements": [
+            {
+              "name": "品牌类型",
+              "required": true
+            },
+            {
+              "name": "出口享惠情况",
+              "required": true
+            },
+            {
+              "name": "结构类型（是否有箱体）",
+              "required": true
+            },
+            {
+              "name": "用途",
+              "required": true
+            },
+            {
+              "name": "品牌（中文或外文名称）",
+              "required": true
+            },
+            {
+              "name": "型号",
+              "required": true
+            },
+            {
+              "name": "喇叭数量和尺寸",
+              "required": true
+            },
+            {
+              "name": "GTIN",
+              "required": false
+            },
+            {
+              "name": "CAS",
+              "required": false
+            }
+          ],
+          "element_count": 9,
+          "verify_status": "VERIFIED"
+        }
+      ],
+      "corrected_note": "原构造值错误已修正：3926 实为 8 项（含品牌类型、出口享惠情况）， GTIN/CAS 非必填；3926909010 官方品名为\"两用物项管制结构复合材料的预成形件和制品\" （CONTROL_MARK=3，管制品），非\"塑料制机器用零件\"。 详见 /workspace/D板块_申报要素核验说明.md。\n",
+      "used_by": [
+        "场景一",
+        "C清单合规"
+      ],
+      "notes": "场景一的核心数据源。该目录覆盖全部税号，每个税号的申报要素组合不同—— 这是\"企业不可能靠记忆填报\"的直接证据，也是 C Agent 必须存在的理由。 结构化方式：按税号建表，字段为 required_elements 数组。 更新机制：每年 1 月 1 日随新税则刷新，年中可能有税号调整公告需跟踪。\n"
+    },
+    "SAT-MGT-EXPORT-TAX": {
+      "id": "SAT-MGT-EXPORT-TAX",
+      "title": "出口货物劳务增值税和消费税管理办法",
+      "issuer": "国家税务总局",
+      "doc_no": "国家税务总局公告2012年第24号（经后续公告多次修改）",
+      "publish_date": "2012-06-14",
+      "effective_date": "2012-07-01",
+      "supersedes": null,
+      "superseded_by": null,
+      "status": "effective",
+      "official_url": "https://www.chinatax.gov.cn（税务总局站内检索文件名）",
+      "verified_at": null,
+      "clauses": [
+        {
+          "false": "计税依据条款（条号待核）",
+          "text_summary": "出口货物退（免）税的计税依据为出口货物的实际离岸价（FOB）。 以到岸价（CIF）成交的，应扣除国际运费和保险费后确定离岸价。",
+          "used_by": [
+            "场景二",
+            "C清单合规退税联动"
+          ]
+        }
+      ],
+      "notes": "场景二的法律依据。注意事项： 1) 各地税务局对运费保费的扣除凭证口径要求不一（有的认报关单运费栏，有的要求实际运费发票），\n   系统提示时应输出\"请确认适用主管税务机关口径\"，不做统一假设；\n2) 该办法 2012 年发布后修改次数多，务必引用现行有效版本； 3) 若演示企业走综试区无票免税，本条不适用，场景二整体替换（见文档 3.8 节）。\n"
+    },
+    "ANN-4-2023-RETURN": {
+      "id": "ANN-4-2023-RETURN",
+      "title": "关于跨境电子商务出口退运商品税收政策的公告",
+      "issuer": "财政部、海关总署、税务总局",
+      "doc_no": "财政部 海关总署 税务总局公告2023年第4号 → 被第16号（2026）延续",
+      "publish_date": "2023-01-30",
+      "effective_date": null,
+      "supersedes": null,
+      "superseded_by": "ANN-16-2026-RETURN",
+      "status": "expired",
+      "official_url": null,
+      "verified_at": "2026-10-12",
+      "clauses": [],
+      "used_by": [
+        "退运处理环节",
+        "F节点监控"
+      ],
+      "notes": "本卡保留的原因：演示\"失效监控\"机制的最佳教材—— 法规库必须能识别\"原政策到期 → 新公告延续\"的链条。 现行有效的是 2026 年第 16 号公告（见下一条）。\n"
+    },
+    "ANN-16-2026-RETURN": {
+      "id": "ANN-16-2026-RETURN",
+      "title": "关于延续实施跨境电子商务出口退运商品税收政策的公告",
+      "issuer": "财政部、海关总署、税务总局",
+      "doc_no": "财政部 海关总署 税务总局公告2026年第16号",
+      "publish_date": "2026-02-06",
+      "effective_date": "2026-01-01",
+      "expiry_date": "2027-12-31",
+      "supersedes": "ANN-4-2023-RETURN",
+      "superseded_by": null,
+      "status": "effective",
+      "official_url": "https://www.gov.cn/zhengce/zhengceku/202602/content_7057580.htm",
+      "official_url_alt": "https://tianjin.chinatax.gov.cn/11200000000/0300/030004/03000418/20260210141853105.shtml",
+      "verified_at": "2026-10-26",
+      "key_facts": [
+        "适用范围：出口申报日期 2026-01-01 至 2027-12-31",
+        "退运条件：6 个月内、原状退运（拆箱/检化验/安装/调试不破坏原状认定）",
+        "食品不适用",
+        "滞销退运仅需'自我声明'"
+      ],
+      "used_by": [
+        "退运处理",
+        "F节点监控"
+      ],
+      "notes": "法规库的 expiry_date 字段对本条至关重要：2027-12-31 到期前， 系统应向仍在使用退运功能的企业提前提示政策到期风险。\n"
+    },
+    "ANN-167-2024": {
+      "id": "ANN-167-2024",
+      "title": "关于进一步促进跨境电子商务出口发展的公告（三单及单证简化）",
+      "issuer": "海关总署",
+      "doc_no": "海关总署公告2024年第167号",
+      "publish_date": "2024-11-27",
+      "effective_date": "2024-12-15",
+      "supersedes": null,
+      "superseded_by": null,
+      "status": "effective",
+      "official_url": "https://www.bengbu.gov.cn/zfxxgk/public/22401/52274383.html",
+      "official_url_alt": "https://big5.china.com.cn/txt/2024-11/28/content_117574515.shtml",
+      "verified_at": "2026-10-26",
+      "key_facts": [
+        "出口申报不再要求传输收款单（三单实际为'两单+订单'）",
+        "取消海外仓企业备案",
+        "'先查验后装运'试点扩大至 12 关区，后已全国推广",
+        "9610 跨关区退运在 20 关区试点"
+      ],
+      "used_by": [
+        "场景三",
+        "B三单预检"
+      ],
+      "notes": "三单数据要求以本公告为最新口径。B Agent 的校验规则若引用更早的 \"必须传输收款单\"条款即为过时依据——这是失效监控必要性的又一实例。\n"
+    },
+    "CROSSBORDER-9610-MODE": {
+      "id": "CROSSBORDER-9610-MODE",
+      "title": "跨境电子商务零售出口监管要求（9610 模式汇总）",
+      "issuer": "海关总署（多个文件组合）",
+      "doc_no": "组合条目（9610 监管办法 + 历年相关公告）",
+      "publish_date": null,
+      "effective_date": null,
+      "supersedes": null,
+      "superseded_by": null,
+      "status": "effective",
+      "official_url": "http://www.customs.gov.cn（站内检索'跨境电子商务'监管文件）",
+      "verified_at": null,
+      "key_facts": [
+        "9610 出口：清单核放、汇总申报",
+        "汇总申报（月度）：八个同一（收发货人/运输方式/生产销售单位/运抵国/出境关别 + 最终目的国/10位商品编码/币制）",
+        "申报时限：次月 15 日前；12 月清单须当月最后一个工作日前汇总",
+        "未按时汇总的，系统 16 日自动汇总",
+        "汇总统计与汇总申报区别：汇总统计限 ≤5000 元且 4 位码；汇总申报无金额限制、须 10 位码"
+      ],
+      "sub_rules": [
+        {
+          "rule": "生产销售单位栏填报",
+          "source": "海关总署公告2026年第78号（无人机物项申报要求，其填报原则适用于跨境电商清单）",
+          "text_summary": "《跨境电商申报清单》\"生产销售单位\"栏应当填报商品境内生产厂家或销售单位信息， 不得填报电商平台、代理企业名称作为替代。",
+          "verify_status": "VERIFIED",
+          "used_by": [
+            "场景三",
+            "B三单预检"
+          ]
+        }
+      ],
+      "used_by": [
+        "场景三",
+        "B三单预检",
+        "E归并"
+      ],
+      "notes": "9610 是本系统特化场景，相关规则分散在多个文件中，建议以\"组合条目\"方式建档， 成员文件变化时逐条更新。\"生产销售单位不得填平台名\"是新增的高频错误点， 建议纳入 B Agent 校验规则。\n"
+    },
+    "CUSTOMS-TARIFF-2026": {
+      "id": "CUSTOMS-TARIFF-2026",
+      "title": "中华人民共和国进出口税则（2026年版）",
+      "issuer": "国务院关税税则委员会（方案）/ 海关总署（执行）",
+      "doc_no": "税委会公告2025年第11号 + 海关总署公告2025年第260号",
+      "publish_date": "2025-12-31",
+      "effective_date": "2026-01-01",
+      "supersedes": "2025年版",
+      "superseded_by": null,
+      "status": "effective",
+      "official_url": "http://www.customs.gov.cn（互联网+海关 → 进出口税则查询）",
+      "verified_at": "2026-10-28",
+      "structure": "税号级（申报用 10 位编码表 12,089 条；注意与税则 8,972 个税目口径不同——该表含拆分编号）",
+      "sample_entries": [
+        {
+          "hs_code": "3926909090",
+          "description": "其他塑料制品",
+          "chapter": "39",
+          "legal_unit": "035（千克）",
+          "rebate_rate": null,
+          "verify_status": "VERIFIED"
+        },
+        {
+          "hs_code": "8518220000",
+          "description": "多喇叭音箱",
+          "chapter": "85",
+          "legal_unit": "007（个）/ 035（千克）",
+          "rebate_rate": null,
+          "verify_status": "VERIFIED"
+        },
+        {
+          "hs_code": "3926909010",
+          "description": "两用物项管制结构复合材料的预成形件和制品",
+          "control_mark": "3",
+          "chapter": "39",
+          "legal_unit": "035（千克）",
+          "verify_status": "VERIFIED",
+          "warning": "原描述\"塑料制机器用零件\"为错误构造已纠正——同章相邻税号管制属性不同，管制判断必须逐税号精确匹配"
+        }
+      ],
+      "used_by": [
+        "场景四",
+        "A归类",
+        "全场景税号校验"
+      ],
+      "notes": "场景四两个候选编码的真实性与现行有效性已经 CusComplex 全表核验（2026-10-28）， 答辩最大风险点已消除。退税率仍需另行核验。\n"
+    },
+    "HARMONIZED-RULES": {
+      "id": "HARMONIZED-RULES",
+      "title": "进出口商品归类总规则（六条）及品目注释",
+      "issuer": "海关总署（依据《商品名称及编码协调制度》HS）",
+      "doc_no": "附于《进出口税则》卷首",
+      "publish_date": null,
+      "effective_date": "随税则年度更新",
+      "supersedes": null,
+      "superseded_by": null,
+      "status": "effective",
+      "official_url": "随《进出口税则》发布",
+      "verified_at": null,
+      "clauses": [
+        {
+          "false": "规则三（二）",
+          "text_summary": "混合物、不同材料或不同部件组合成的货品，以及零售的成套货品， 如不能按规则三（一）归类，则按构成货品基本特征的材料或部件归类。",
+          "used_by": [
+            "场景四",
+            "A归类"
+          ]
+        },
+        {
+          "false": "规则三（三）",
+          "text_summary": "当货品不能按规则三（一）或（二）归类时，应按**可给予的多个品目中排在最后** 的品目归类（\"从后归类\"原则）。",
+          "correction": "2026-10-28 更正：本卡初版误将规则三（二）\"基本特征\"的表述混入三（三）。 三（三）的正确内容是\"从后归类\"，与\"主要使用需求\"无关。 场景四的论证框架相应修正：39 章候选依据应为规则三（一）之外的具体归类 逻辑（如按主要功能/构成判断），而非规则三（三）的从后归类。 场景四页面引用前必须重写这一段。",
+          "used_by": [
+            "场景四",
+            "A归类"
+          ]
+        }
+      ],
+      "notes": "场景四的理论基础：蓝牙音箱手机支架的两个候选编码分别可用 规则三（二）（按基本特征→音箱）与构成/功能判断（→支架）论证。 注意：规则三（三）为从后归类，不构成支架候选的论据。 A Agent 在跨章候选并存时输出争议标记的逻辑依据是规则三整体框架。\n"
+    },
+    "ADVANCE-RULING-CLASSIFICATION": {
+      "id": "ADVANCE-RULING-CLASSIFICATION",
+      "title": "中华人民共和国海关预裁定管理暂行办法",
+      "issuer": "海关总署",
+      "doc_no": "海关总署令第236号",
+      "publish_date": "2017-12-26",
+      "effective_date": "2018-02-01",
+      "amended_by": [
+        "海关总署令第262号（2023）",
+        "海关总署令第273号（2024-10-28）"
+      ],
+      "supersedes": null,
+      "superseded_by": null,
+      "status": "effective",
+      "official_url": "http://www.customs.gov.cn/customs/2017-12/29/article_2025121221035619609.html",
+      "official_url_alt": "https://www.gov.cn/gongbao/content/2018/content_5277695.htm",
+      "verified_at": "2026-10-26",
+      "key_facts": [
+        "申请时限：货物拟进出口 3 个月之前提出；特殊情况下可在前 3 个月内提出（第 7 条）",
+        "预裁定决定有效期 3 年（第 13 条）",
+        "受理决定：收到申请 10 日内（第 8 条）；裁定书：受理后 60 日内（第 11 条）",
+        "申请人：与实际进出口活动有关且在海关备案的对外贸易经营者（第 4 条）"
+      ],
+      "used_by": [
+        "场景四",
+        "A归类",
+        "建议动作输出"
+      ],
+      "notes": "场景四\"建议申请预裁定\"动作的制度依据。绝大多数中小企业关务不知道该制度存在， 因此这是 A Agent 增值价值最直接的一条规则。 TODO 三处必须核验后才能写入演示页面。\n"
+    },
+    "ANN-40-2026": {
+      "id": "ANN-40-2026",
+      "title": "关于调整出口货物报关单申报项目的公告",
+      "issuer": "海关总署",
+      "doc_no": "海关总署公告2026年第40号",
+      "publish_date": "2026-04-15",
+      "effective_date": "2026-04-15",
+      "supersedes": null,
+      "superseded_by": null,
+      "status": "effective",
+      "official_url": "http://gjs.customs.gov.cn/customs/2026-04/17/article_2026041709292265703.html",
+      "pdf_url": "http://www.customs.gov.cn/customs/attachDir/2026/04/（见原文附件）",
+      "verified_at": "2026-10-22",
+      "key_facts": [
+        "出口报关单新增两项：禁限管制识别码、禁限管制申报要素",
+        "两项均为有条件必填",
+        "填制说明在单一窗口查阅；参数在单一窗口'参数查询'栏目维护，动态更新",
+        "2026-07-12 参数更新：新增石墨、稀土、挖泥船等货物参数"
+      ],
+      "related": [
+        {
+          "doc_no": "海关总署公告2026年第77号",
+          "subject": "车床、铣床、磨床等物项出口申报（机床按技术参数判定管制属性）",
+          "effective": "2026-06-30",
+          "verify_status": "TODO"
+        },
+        {
+          "doc_no": "海关总署公告2026年第78号",
+          "subject": "无人机及相关物项出口申报",
+          "effective": "2026-06-30",
+          "key_rules": [
+            "涉管制物项：报关单备注栏注明'属于出口管制物项'并附两用物项出口管制编码",
+            "跨境电商申报清单不得使用简化申报（4位码），须报完整10位税号",
+            "清单'规格型号'栏'其他'中据实填报物项名称及描述"
+          ],
+          "verify_status": "VERIFIED",
+          "official_url": "http://www.customs.gov.cn/customs/2026-06/09/article_2026061210543081602.html",
+          "data_support": "禁限管制识别码/申报要素参数已全量抓取（2026-10-27），8806 无人机段 147 条、申报要素 3001 类别 8 条，见 /workspace/E板块_ANN40参数数据说明.md"
+        }
+      ],
+      "critical_judgment_rule": {
+        "scenario": "碳棒（hs_code: 8545900000）",
+        "finding": "该税号不在\"禁限管制识别码\"目录中（2026-10-27 全量 707 条核验，0 命中）， 但在\"禁限管制申报要素\"的规范申报类别 3014\"石墨及其制品\"中列出（4 条要素）。 经黄埔海关答复确认：两项为独立填报，不存在必然关联。",
+        "implication": "系统判断逻辑不能是\"识别码目录没有→跳过\"， 必须对两个字段分别独立判断。"
+      },
+      "used_by": [
+        "C清单合规",
+        "D风险预判",
+        "场景一扩展"
+      ],
+      "notes": "这是 2026 年对出口申报影响最大的结构性变更，直接改写 9610 简化申报规则。 C Agent 的校验字段清单必须包含这两个新栏目，否则系统生成的单证在 2026 年 申报中即为缺项。碳棒案例是\"简单目录匹配必然出错\"的实证， 建议纳入系统设计文档与演示问答环节。\n"
+    }
+  }
+}

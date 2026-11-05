@@ -1,0 +1,519 @@
+{
+  "_meta": {
+    "version": "1.0",
+    "description": "申报要素（涉税规范申报目录）按税号前缀组织的官方核验表；用于报关单/规范申报要素完备性校验，不用于 9610 清单栏目校验",
+    "source": "中国国际贸易单一窗口 CusMerchElement 参数（m.singlewindow.cn，#/pages/parameterDetail/index?pqcode=CusMerchElement）",
+    "fetched_at": "2026-10-27",
+    "coverage": "交付抓取 9,250 行 / 1,202 个编码键（官方 totalRows=32,785，部分分页被限流）；本文件仅含已交付的 10 个键位",
+    "matching": "longest_prefix：税号逐位截短，取最长可命中键（如 3926909090 命中 3926；8518220000 命中 851822）",
+    "required_flag": "ELEMENT_NULL=1 表示必填，0 表示非必填",
+    "disclaimer": "申报要素适用于报关单（含汇总申报），9610 清单栏目体系为 CEB603；两者不得混用"
+  },
+  "elements": {
+    "3926": [
+      {
+        "seq": 1,
+        "element": "品牌类型",
+        "required": true,
+        "rowno": 11699
+      },
+      {
+        "seq": 2,
+        "element": "出口享惠情况",
+        "required": true,
+        "rowno": 11700
+      },
+      {
+        "seq": 3,
+        "element": "用途",
+        "required": true,
+        "rowno": 11701
+      },
+      {
+        "seq": 4,
+        "element": "材质（塑料品种）",
+        "required": true,
+        "rowno": 11702
+      },
+      {
+        "seq": 5,
+        "element": "品牌（中文或外文名称）",
+        "required": true,
+        "rowno": 11703
+      },
+      {
+        "seq": 6,
+        "element": "型号",
+        "required": true,
+        "rowno": 11704
+      },
+      {
+        "seq": 7,
+        "element": "GTIN",
+        "required": false,
+        "rowno": 11705
+      },
+      {
+        "seq": 8,
+        "element": "CAS",
+        "required": false,
+        "rowno": 11706
+      }
+    ],
+    "851822": [
+      {
+        "seq": 1,
+        "element": "品牌类型",
+        "required": true,
+        "rowno": 26903
+      },
+      {
+        "seq": 2,
+        "element": "出口享惠情况",
+        "required": true,
+        "rowno": 26904
+      },
+      {
+        "seq": 3,
+        "element": "结构类型（是否有箱体）",
+        "required": true,
+        "rowno": 26905
+      },
+      {
+        "seq": 4,
+        "element": "用途",
+        "required": true,
+        "rowno": 26906
+      },
+      {
+        "seq": 5,
+        "element": "品牌（中文或外文名称）",
+        "required": true,
+        "rowno": 26907
+      },
+      {
+        "seq": 6,
+        "element": "型号",
+        "required": true,
+        "rowno": 26908
+      },
+      {
+        "seq": 7,
+        "element": "喇叭数量和尺寸",
+        "required": true,
+        "rowno": 26909
+      },
+      {
+        "seq": 8,
+        "element": "GTIN",
+        "required": false,
+        "rowno": 26910
+      },
+      {
+        "seq": 9,
+        "element": "CAS",
+        "required": false,
+        "rowno": 26911
+      }
+    ],
+    "85459": [
+      {
+        "seq": 1,
+        "element": "品牌类型",
+        "required": true,
+        "rowno": 28642
+      },
+      {
+        "seq": 2,
+        "element": "出口享惠情况",
+        "required": true,
+        "rowno": 28643
+      },
+      {
+        "seq": 3,
+        "element": "用途",
+        "required": true,
+        "rowno": 28644
+      },
+      {
+        "seq": 4,
+        "element": "材质",
+        "required": true,
+        "rowno": 28645
+      },
+      {
+        "seq": 5,
+        "element": "品牌（中文或外文名称）",
+        "required": true,
+        "rowno": 28646
+      },
+      {
+        "seq": 6,
+        "element": "型号",
+        "required": true,
+        "rowno": 28647
+      },
+      {
+        "seq": 7,
+        "element": "GTIN",
+        "required": false,
+        "rowno": 28648
+      },
+      {
+        "seq": 8,
+        "element": "CAS",
+        "required": false,
+        "rowno": 28649
+      }
+    ],
+    "854519": [
+      {
+        "seq": 1,
+        "element": "品牌类型",
+        "required": true,
+        "rowno": 28625
+      },
+      {
+        "seq": 2,
+        "element": "出口享惠情况",
+        "required": true,
+        "rowno": 28626
+      },
+      {
+        "seq": 3,
+        "element": "用途",
+        "required": true,
+        "rowno": 28627
+      },
+      {
+        "seq": 4,
+        "element": "材质",
+        "required": true,
+        "rowno": 28628
+      },
+      {
+        "seq": 5,
+        "element": "品牌（中文或外文名称）",
+        "required": true,
+        "rowno": 28629
+      },
+      {
+        "seq": 6,
+        "element": "外观",
+        "required": true,
+        "rowno": 28630
+      },
+      {
+        "seq": 7,
+        "element": "型号",
+        "required": true,
+        "rowno": 28631
+      },
+      {
+        "seq": 8,
+        "element": "GTIN",
+        "required": false,
+        "rowno": 28632
+      },
+      {
+        "seq": 9,
+        "element": "CAS",
+        "required": false,
+        "rowno": 28633
+      }
+    ],
+    "85452": [
+      {
+        "seq": 1,
+        "element": "品牌类型",
+        "required": true,
+        "rowno": 28634
+      },
+      {
+        "seq": 2,
+        "element": "出口享惠情况",
+        "required": true,
+        "rowno": 28635
+      },
+      {
+        "seq": 3,
+        "element": "用途",
+        "required": true,
+        "rowno": 28636
+      },
+      {
+        "seq": 4,
+        "element": "材质",
+        "required": true,
+        "rowno": 28637
+      },
+      {
+        "seq": 5,
+        "element": "品牌（中文或外文名称）",
+        "required": true,
+        "rowno": 28638
+      },
+      {
+        "seq": 6,
+        "element": "型号",
+        "required": true,
+        "rowno": 28639
+      },
+      {
+        "seq": 7,
+        "element": "GTIN",
+        "required": false,
+        "rowno": 28640
+      },
+      {
+        "seq": 8,
+        "element": "CAS",
+        "required": false,
+        "rowno": 28641
+      }
+    ],
+    "854511": [
+      {
+        "seq": 1,
+        "element": "品牌类型",
+        "required": true,
+        "rowno": 28617
+      },
+      {
+        "seq": 2,
+        "element": "出口享惠情况",
+        "required": true,
+        "rowno": 28618
+      },
+      {
+        "seq": 3,
+        "element": "用途",
+        "required": true,
+        "rowno": 28619
+      },
+      {
+        "seq": 4,
+        "element": "材质",
+        "required": true,
+        "rowno": 28620
+      },
+      {
+        "seq": 5,
+        "element": "品牌（中文或外文名称）",
+        "required": true,
+        "rowno": 28621
+      },
+      {
+        "seq": 6,
+        "element": "型号",
+        "required": true,
+        "rowno": 28622
+      },
+      {
+        "seq": 7,
+        "element": "GTIN",
+        "required": false,
+        "rowno": 28623
+      },
+      {
+        "seq": 8,
+        "element": "CAS",
+        "required": false,
+        "rowno": 28624
+      }
+    ],
+    "851821": [
+      {
+        "seq": 1,
+        "element": "品牌类型",
+        "required": true,
+        "rowno": 26895
+      },
+      {
+        "seq": 2,
+        "element": "出口享惠情况",
+        "required": true,
+        "rowno": 26896
+      },
+      {
+        "seq": 3,
+        "element": "结构类型（是否有箱体）",
+        "required": true,
+        "rowno": 26897
+      },
+      {
+        "seq": 4,
+        "element": "用途",
+        "required": true,
+        "rowno": 26898
+      },
+      {
+        "seq": 5,
+        "element": "品牌（中文或外文名称）",
+        "required": true,
+        "rowno": 26899
+      },
+      {
+        "seq": 6,
+        "element": "型号",
+        "required": true,
+        "rowno": 26900
+      },
+      {
+        "seq": 7,
+        "element": "GTIN",
+        "required": false,
+        "rowno": 26901
+      },
+      {
+        "seq": 8,
+        "element": "CAS",
+        "required": false,
+        "rowno": 26902
+      }
+    ],
+    "851829": [
+      {
+        "seq": 1,
+        "element": "品牌类型",
+        "required": true,
+        "rowno": 26912
+      },
+      {
+        "seq": 2,
+        "element": "出口享惠情况",
+        "required": true,
+        "rowno": 26913
+      },
+      {
+        "seq": 3,
+        "element": "结构类型（是否有箱体）",
+        "required": true,
+        "rowno": 26914
+      },
+      {
+        "seq": 4,
+        "element": "用途",
+        "required": true,
+        "rowno": 26915
+      },
+      {
+        "seq": 5,
+        "element": "品牌（中文或外文名称）",
+        "required": true,
+        "rowno": 26916
+      },
+      {
+        "seq": 6,
+        "element": "型号",
+        "required": true,
+        "rowno": 26917
+      },
+      {
+        "seq": 7,
+        "element": "喇叭尺寸",
+        "required": true,
+        "rowno": 26918
+      },
+      {
+        "seq": 8,
+        "element": "GTIN",
+        "required": false,
+        "rowno": 26919
+      },
+      {
+        "seq": 9,
+        "element": "CAS",
+        "required": false,
+        "rowno": 26920
+      }
+    ],
+    "85189": [
+      {
+        "seq": 1,
+        "element": "品牌类型",
+        "required": true,
+        "rowno": 26940
+      },
+      {
+        "seq": 2,
+        "element": "出口享惠情况",
+        "required": true,
+        "rowno": 26941
+      },
+      {
+        "seq": 3,
+        "element": "用途（适用于XX品牌XX机或通用于XX机等）",
+        "required": true,
+        "rowno": 26942
+      },
+      {
+        "seq": 4,
+        "element": "品牌（中文或外文名称）",
+        "required": true,
+        "rowno": 26943
+      },
+      {
+        "seq": 5,
+        "element": "型号",
+        "required": true,
+        "rowno": 26944
+      },
+      {
+        "seq": 6,
+        "element": "GTIN",
+        "required": false,
+        "rowno": 26945
+      },
+      {
+        "seq": 7,
+        "element": "CAS",
+        "required": false,
+        "rowno": 26946
+      }
+    ],
+    "85181": [
+      {
+        "seq": 1,
+        "element": "品牌类型",
+        "required": true,
+        "rowno": 26889
+      },
+      {
+        "seq": 2,
+        "element": "出口享惠情况",
+        "required": true,
+        "rowno": 26890
+      },
+      {
+        "seq": 3,
+        "element": "品牌（中文或外文名称）",
+        "required": true,
+        "rowno": 26891
+      },
+      {
+        "seq": 4,
+        "element": "型号",
+        "required": true,
+        "rowno": 26892
+      },
+      {
+        "seq": 5,
+        "element": "GTIN",
+        "required": false,
+        "rowno": 26893
+      },
+      {
+        "seq": 6,
+        "element": "CAS",
+        "required": false,
+        "rowno": 26894
+      }
+    ]
+  },
+  "stats": {
+    "keys": 10,
+    "total_elements": 80,
+    "required_elements": 60
+  }
+}

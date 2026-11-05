@@ -1,0 +1,661 @@
+{
+  "_meta": {
+    "schema_version": "0.2",
+    "description": "9610 申报清单字段字典：定义每个栏位的来源、转换、必填条件、缺失处理、输出位置",
+    "source_basis": [
+      "customs/templates/declaration_9610.j2（模板栏位）",
+      "agents/decl_compliance.py FIELD_SPEC（校验字段）",
+      "customs/ocr.py CargoInfo（抽取字段）",
+      "海关总署令第277号 第八条（随附单证要求）",
+      "海关进出口商品涉税规范申报目录（2026年版）（申报要素）",
+      "D 板块申报要素核验数据（单一窗口 CusMerchElement，2026-10-27，10 个编码键）"
+    ],
+    "maintenance": "每季度 + 重大公告触发式；字段口径变更需经审核",
+    "notes": [
+      "required_condition 支持：'always'（任何场景必填）/ dict（条件必填，如 {cargo_contains:'石墨', doc_no:'ANN-40-2026'}）/ 'optional'",
+      "missing_action 支持：'block'（阻断制单）/ 'warn'（警告但允许继续）/ 'fill_default'（用默认值）/ 'ask_user'（交互闸门提问）",
+      "transform 为 null 时表示直接取值；标注 TODO 的表示转换规则待补",
+      "source 枚举：context（上游传入）/ cargo_info（CargoInfo 抽取）/ hs_code（HS知识库匹配）/ ocr（OCR从单据抽取）/ derived（派生计算）/ hardcoded（固定值）",
+      "申报要素（element_*）与清单栏位（column_*）是两层；字典同时覆盖",
+      "申报要素字段仅在 ctx.doc_type=declaration_form 时校验；9610 清单不适用"
+    ]
+  },
+  "sections": [
+    {
+      "section_id": "header",
+      "section_name": "申报基本信息",
+      "fields": [
+        {
+          "field_code": "column_trade_mode",
+          "cn_label": "监管方式",
+          "type": "enum",
+          "allowed_values": [
+            "9610",
+            "1210",
+            "9710",
+            "9810"
+          ],
+          "required_condition": "always",
+          "source": "hardcoded",
+          "source_field": null,
+          "transform": null,
+          "missing_action": "fill_default",
+          "default_value": "9610",
+          "template_var": "trade_mode",
+          "notes": "9610 跨境电商零售出口；本 Demo 固定 9610"
+        },
+        {
+          "field_code": "column_platform",
+          "cn_label": "跨境电商平台",
+          "type": "string",
+          "required_condition": "always",
+          "source": "context",
+          "source_field": "platform",
+          "transform": null,
+          "missing_action": "ask_user",
+          "default_value": null,
+          "template_var": "platform",
+          "notes": "必填但当前 OCR 不抽；交互闸门或人工填"
+        },
+        {
+          "field_code": "column_order_id",
+          "cn_label": "订单编号",
+          "type": "string",
+          "required_condition": "always",
+          "source": "context",
+          "source_field": "order_id",
+          "transform": null,
+          "missing_action": "ask_user",
+          "default_value": null,
+          "template_var": "order_id",
+          "notes": "三单一致性校验依据之一"
+        },
+        {
+          "field_code": "column_logistics_no",
+          "cn_label": "物流运单号",
+          "type": "string",
+          "required_condition": "always",
+          "source": "context",
+          "source_field": "logistics_no",
+          "transform": null,
+          "missing_action": "ask_user",
+          "default_value": null,
+          "template_var": "logistics_no",
+          "notes": "三单一致性校验依据之一；ANN-167-2024 已取消收款单传输，三单实际为两单+订单"
+        }
+      ]
+    },
+    {
+      "section_id": "goods",
+      "section_name": "商品信息",
+      "fields": [
+        {
+          "field_code": "column_cargo_spec",
+          "cn_label": "商品名称（规范）",
+          "type": "string",
+          "required_condition": "always",
+          "source": "hs_code",
+          "source_field": "official_name",
+          "transform": "若 official_name 缺失则 fallback 到 hs_code.description，再 fallback 到 cargo_info.cargo_name",
+          "missing_action": "block",
+          "default_value": null,
+          "template_var": null,
+          "notes": "规范名≠俗称；以 HS 库 official_name 为准，避免笼统"
+        },
+        {
+          "field_code": "column_cargo_common",
+          "cn_label": "商品俗称",
+          "type": "string",
+          "required_condition": "optional",
+          "source": "cargo_info",
+          "source_field": "cargo_name",
+          "transform": null,
+          "missing_action": "fill_default",
+          "default_value": "同规范名",
+          "template_var": null,
+          "notes": "俗称可以就是 OCR/用户输入的商品名"
+        },
+        {
+          "field_code": "column_hs_code",
+          "cn_label": "HS编码（10位）",
+          "type": "hs_code",
+          "required_condition": "always",
+          "source": "hs_code",
+          "source_field": "code",
+          "transform": "必须10位数字；不足10位的补0或报错",
+          "missing_action": "block",
+          "default_value": null,
+          "template_var": null,
+          "notes": "R013 规则：以 .00/.90 结尾警告；B 场景可能存在多候选"
+        },
+        {
+          "field_code": "column_hs_desc",
+          "cn_label": "商品描述",
+          "type": "string",
+          "required_condition": "optional",
+          "source": "hs_code",
+          "source_field": "description",
+          "transform": null,
+          "missing_action": "fill_default",
+          "default_value": "同规范名",
+          "template_var": null,
+          "notes": ""
+        },
+        {
+          "field_code": "column_tariff_rate",
+          "cn_label": "关税税率",
+          "type": "string",
+          "required_condition": "optional",
+          "source": "hs_code",
+          "source_field": "tariff_rate",
+          "transform": null,
+          "missing_action": "fill_default",
+          "default_value": "未知",
+          "template_var": null,
+          "notes": "R004/R016 条件依赖此字段"
+        },
+        {
+          "field_code": "column_supervision_code",
+          "cn_label": "监管证件代码",
+          "type": "string",
+          "required_condition": "optional",
+          "source": "hs_code",
+          "source_field": "supervision_code",
+          "transform": null,
+          "missing_action": "fill_default",
+          "default_value": "无",
+          "template_var": null,
+          "notes": ""
+        },
+        {
+          "field_code": "element_material",
+          "cn_label": "材质（申报要素）",
+          "type": "string",
+          "required_condition": "conditional",
+          "required_condition_detail": {
+            "hs_code": "3926909090"
+          },
+          "source": "cargo_info",
+          "source_field": "material",
+          "transform": null,
+          "missing_action": "warn",
+          "default_value": null,
+          "template_var": null,
+          "notes": "规范申报目录要求；C 场景 CEB603 清单按税号不同有不同申报要素"
+        },
+        {
+          "field_code": "element_usage",
+          "cn_label": "用途（申报要素）",
+          "type": "string",
+          "required_condition": "conditional",
+          "required_condition_detail": {
+            "hs_code": "3926909090"
+          },
+          "source": "cargo_info",
+          "source_field": "usage",
+          "transform": null,
+          "missing_action": "warn",
+          "default_value": null,
+          "template_var": null,
+          "notes": "CargoInfo.usage 当前默认空；待 OCR/LLM 抽取"
+        },
+        {
+          "field_code": "element_brand_type",
+          "cn_label": "品牌类型",
+          "type": "enum",
+          "required_condition": {
+            "doc_type": "declaration_form"
+          },
+          "source": "context",
+          "source_field": "brand_type",
+          "transform": "按实际情况填报（无品牌需对应代码），缺失即阻断",
+          "missing_action": "block",
+          "default_value": null,
+          "template_var": "brand_type",
+          "notes": "仅报关单/汇总申报层适用；9610 清单用 CEB603 栏目"
+        },
+        {
+          "field_code": "element_export_preferential",
+          "cn_label": "出口享惠情况",
+          "type": "enum",
+          "required_condition": {
+            "doc_type": "declaration_form"
+          },
+          "source": "context",
+          "source_field": "export_preferential",
+          "transform": "按是否享受出口优惠填报",
+          "missing_action": "block",
+          "default_value": null,
+          "template_var": "export_preferential",
+          "notes": "仅报关单/汇总申报层适用；9610 清单用 CEB603 栏目"
+        },
+        {
+          "field_code": "element_brand",
+          "cn_label": "品牌（中文或外文名称）",
+          "type": "string",
+          "required_condition": {
+            "doc_type": "declaration_form"
+          },
+          "source": "context",
+          "source_field": "brand",
+          "transform": "无品牌须明确填'无品牌'，不得留空",
+          "missing_action": "block",
+          "default_value": null,
+          "template_var": "brand",
+          "notes": "仅报关单/汇总申报层适用；9610 清单用 CEB603 栏目"
+        },
+        {
+          "field_code": "element_model",
+          "cn_label": "型号",
+          "type": "string",
+          "required_condition": {
+            "doc_type": "declaration_form"
+          },
+          "source": "context",
+          "source_field": "model",
+          "transform": "按实际型号填报；无型号须说明",
+          "missing_action": "block",
+          "default_value": null,
+          "template_var": "model",
+          "notes": "仅报关单/汇总申报层适用；9610 清单用 CEB603 栏目"
+        },
+        {
+          "field_code": "element_gtin",
+          "cn_label": "GTIN",
+          "type": "string",
+          "required_condition": {
+            "doc_type": "declaration_form"
+          },
+          "source": "context",
+          "source_field": "gtin",
+          "transform": "非必填；留空合法",
+          "missing_action": "fill_default",
+          "default_value": null,
+          "template_var": "gtin",
+          "notes": "仅报关单/汇总申报层适用；9610 清单用 CEB603 栏目"
+        },
+        {
+          "field_code": "element_cas",
+          "cn_label": "CAS",
+          "type": "string",
+          "required_condition": {
+            "doc_type": "declaration_form"
+          },
+          "source": "context",
+          "source_field": "cas",
+          "transform": "非必填；留空合法",
+          "missing_action": "fill_default",
+          "default_value": null,
+          "template_var": "cas",
+          "notes": "仅报关单/汇总申报层适用；9610 清单用 CEB603 栏目"
+        },
+        {
+          "field_code": "element_structure_type",
+          "cn_label": "结构类型（是否有箱体）",
+          "type": "string",
+          "required_condition": {
+            "doc_type": "declaration_form"
+          },
+          "source": "context",
+          "source_field": "structure_type",
+          "transform": "851822 专有必填；答不出说明按音箱归类证据不足",
+          "missing_action": "warn",
+          "default_value": null,
+          "template_var": "structure_type",
+          "notes": "仅报关单/汇总申报层适用；9610 清单用 CEB603 栏目"
+        },
+        {
+          "field_code": "element_speaker_spec",
+          "cn_label": "喇叭数量和尺寸",
+          "type": "string",
+          "required_condition": {
+            "doc_type": "declaration_form"
+          },
+          "source": "context",
+          "source_field": "speaker_spec",
+          "transform": "851822 专有必填；单喇叭商品应考虑 851829",
+          "missing_action": "warn",
+          "default_value": null,
+          "template_var": "speaker_spec",
+          "notes": "仅报关单/汇总申报层适用；9610 清单用 CEB603 栏目"
+        }
+      ]
+    },
+    {
+      "section_id": "quantity_price",
+      "section_name": "数量与价格",
+      "fields": [
+        {
+          "field_code": "column_quantity",
+          "cn_label": "申报数量",
+          "type": "positive_number",
+          "required_condition": "always",
+          "source": "cargo_info",
+          "source_field": "tonnage",
+          "transform": "取单据件数（件/个）；不得用重量替代件数",
+          "missing_action": "ask_user",
+          "default_value": null,
+          "template_var": "tonnage",
+          "notes": "场景1 1000件/350kg、场景2 800件/120kg、场景3 500件/75kg"
+        },
+        {
+          "field_code": "column_unit",
+          "cn_label": "计量单位",
+          "type": "enum",
+          "allowed_values": [
+            "千克",
+            "件",
+            "套",
+            "个",
+            "台",
+            "米",
+            "升",
+            "对",
+            "双"
+          ],
+          "required_condition": "always",
+          "source": "cargo_info",
+          "source_field": null,
+          "transform": "取单据计量单位；缺省按 HS 法定计量单位（3926909090=千克；8518220000=个/千克）",
+          "missing_action": "fill_default",
+          "default_value": "千克",
+          "template_var": "unit",
+          "notes": "当前 CargoInfo 无 unit 字段；需补充"
+        },
+        {
+          "field_code": "column_unit_price",
+          "cn_label": "申报单价",
+          "type": "positive_number",
+          "required_condition": "always",
+          "source": "cargo_info",
+          "source_field": "unit_price_usd",
+          "transform": "column_total_price ÷ column_quantity；币制与总价一致",
+          "missing_action": "ask_user",
+          "default_value": null,
+          "template_var": "unit_price",
+          "notes": "当前假设 USD；若用 CIF/EXW 需换算"
+        },
+        {
+          "field_code": "column_total_price",
+          "cn_label": "申报总价",
+          "type": "positive_number",
+          "required_condition": "always",
+          "source": "derived",
+          "source_field": null,
+          "transform": "column_quantity × column_unit_price",
+          "missing_action": "warn",
+          "default_value": null,
+          "template_var": "total_usd",
+          "notes": "数量×单价；与支付金额差异须能解释（退款/折扣/手续费/汇兑）"
+        },
+        {
+          "field_code": "column_currency",
+          "cn_label": "币制",
+          "type": "enum",
+          "allowed_values": [
+            "USD",
+            "EUR",
+            "JPY",
+            "GBP",
+            "CNY",
+            "HKD"
+          ],
+          "required_condition": "always",
+          "source": "context",
+          "source_field": "currency",
+          "transform": null,
+          "missing_action": "fill_default",
+          "default_value": "USD",
+          "template_var": "currency",
+          "notes": "FIELD_SPEC 第10条枚举值"
+        }
+      ]
+    },
+    {
+      "section_id": "parties",
+      "section_name": "收发货信息",
+      "fields": [
+        {
+          "field_code": "column_shipper",
+          "cn_label": "境内发货人",
+          "type": "string",
+          "required_condition": "always",
+          "source": "context",
+          "source_field": "shipper",
+          "transform": "可填境内发货人；注意不得以平台/代理名称替代生产销售单位（见 column_production_sales_unit）",
+          "missing_action": "ask_user",
+          "default_value": null,
+          "template_var": "shipper",
+          "notes": "高频错误点：企业误填电商平台名"
+        },
+        {
+          "field_code": "column_consignee",
+          "cn_label": "境外收货人",
+          "type": "string",
+          "required_condition": "always",
+          "source": "context",
+          "source_field": "consignee",
+          "transform": null,
+          "missing_action": "ask_user",
+          "default_value": null,
+          "template_var": "consignee",
+          "notes": ""
+        },
+        {
+          "field_code": "column_from_port",
+          "cn_label": "起运口岸",
+          "type": "string",
+          "required_condition": "always",
+          "source": "context",
+          "source_field": "from_port",
+          "transform": null,
+          "missing_action": "ask_user",
+          "default_value": null,
+          "template_var": "from_port",
+          "notes": ""
+        },
+        {
+          "field_code": "column_dest_country",
+          "cn_label": "目的国/港",
+          "type": "string",
+          "required_condition": "always",
+          "source": "context",
+          "source_field": "dest_port",
+          "transform": null,
+          "missing_action": "ask_user",
+          "default_value": null,
+          "template_var": "dest_port",
+          "notes": "规则引擎 risk 条件依赖此字段（dest_country_in / dest_country_contains）"
+        },
+        {
+          "field_code": "column_origin_country",
+          "cn_label": "原产地",
+          "type": "string",
+          "required_condition": "optional",
+          "source": "hardcoded",
+          "source_field": null,
+          "transform": null,
+          "missing_action": "fill_default",
+          "default_value": "中国",
+          "template_var": null,
+          "notes": ""
+        },
+        {
+          "field_code": "column_production_sales_unit",
+          "cn_label": "生产销售单位",
+          "type": "string",
+          "required_condition": "always",
+          "source": "context",
+          "source_field": "production_sales_unit",
+          "transform": "须填境内生产厂家或销售单位；不得填电商平台、代理企业名称（ANN-78-2026；该公告原文针对无人机物项，跨境电商清单适用性需人工复核）",
+          "missing_action": "block",
+          "default_value": null,
+          "template_var": "production_sales_unit",
+          "notes": "场景 3 错误设计：原填平台名 → 拦截"
+        }
+      ]
+    },
+    {
+      "section_id": "package",
+      "section_name": "包装信息",
+      "fields": [
+        {
+          "field_code": "column_package_type",
+          "cn_label": "包装方式",
+          "type": "string",
+          "required_condition": "optional",
+          "source": "cargo_info",
+          "source_field": "package_type",
+          "transform": null,
+          "missing_action": "fill_default",
+          "default_value": "纸箱",
+          "template_var": "package_type",
+          "notes": ""
+        },
+        {
+          "field_code": "column_gross_weight",
+          "cn_label": "毛重",
+          "type": "positive_number",
+          "required_condition": "always",
+          "source": "cargo_info",
+          "source_field": "gross_weight",
+          "transform": null,
+          "missing_action": "ask_user",
+          "default_value": null,
+          "template_var": "gross_weight",
+          "notes": ""
+        },
+        {
+          "field_code": "column_net_weight",
+          "cn_label": "净重",
+          "type": "positive_number",
+          "required_condition": "always",
+          "source": "cargo_info",
+          "source_field": "net_weight",
+          "transform": null,
+          "missing_action": "ask_user",
+          "default_value": null,
+          "template_var": "net_weight",
+          "notes": "逻辑一致性校验：净重≤毛重"
+        },
+        {
+          "field_code": "column_package_count",
+          "cn_label": "件数",
+          "type": "positive_integer",
+          "required_condition": "optional",
+          "source": "context",
+          "source_field": "package_count",
+          "transform": null,
+          "missing_action": "fill_default",
+          "default_value": 1,
+          "template_var": "package_count",
+          "notes": ""
+        }
+      ]
+    },
+    {
+      "section_id": "special_2026",
+      "section_name": "2026 年新增申报项（ANN-40-2026）",
+      "fields": [
+        {
+          "field_code": "column_restriction_code",
+          "cn_label": "禁限管制识别码",
+          "type": "enum",
+          "allowed_values": null,
+          "required_condition": "conditional",
+          "required_condition_detail": {
+            "doc_no": "ANN-40-2026"
+          },
+          "source": "derived",
+          "source_field": null,
+          "transform": "出口报关单栏位（ANN-40-2026）；按税号查 707 条识别码目录；与申报要素栏目独立判断",
+          "missing_action": "warn",
+          "default_value": null,
+          "template_var": null,
+          "notes": "2026 年 4 月 15 日起新增；碳棒(8545900000) 案例：识别码目录无值但申报要素需填 3014"
+        },
+        {
+          "field_code": "column_restriction_element",
+          "cn_label": "禁限管制申报要素",
+          "type": "string",
+          "required_condition": "conditional",
+          "required_condition_detail": {
+            "doc_no": "ANN-40-2026"
+          },
+          "source": "derived",
+          "source_field": null,
+          "transform": "出口报关单栏位；按规范申报类别匹配（如 3014 石墨）；两个字段不得互相推断",
+          "missing_action": "warn",
+          "default_value": null,
+          "template_var": null,
+          "notes": "参数非全量，演示取子集"
+        }
+      ]
+    }
+  ],
+  "field_relations": [
+    {
+      "rule_code": "REL-001",
+      "rule_name": "总价勾稽校验",
+      "left_fields": [
+        "column_quantity",
+        "column_unit_price"
+      ],
+      "right_field": "column_total_price",
+      "operator": "product_within_tolerance",
+      "tolerance": 0.05,
+      "severity": "warning",
+      "notes": "单价×数量 与总价偏差不超5%"
+    },
+    {
+      "rule_code": "REL-002",
+      "rule_name": "毛重净重关系",
+      "left_fields": [
+        "column_gross_weight",
+        "column_net_weight"
+      ],
+      "operator": "net_le_gross",
+      "severity": "critical",
+      "notes": "净重不得大于毛重"
+    },
+    {
+      "rule_code": "REL-003",
+      "rule_name": "HS编码格式",
+      "left_fields": [
+        "column_hs_code"
+      ],
+      "operator": "ten_digit_numeric",
+      "severity": "critical",
+      "notes": "必须10位数字"
+    },
+    {
+      "rule_code": "REL-004",
+      "rule_name": "申报要素按税号匹配",
+      "left_fields": [
+        "column_hs_code"
+      ],
+      "right_fields": [
+        "element_material",
+        "element_usage",
+        "element_brand",
+        "element_model"
+      ],
+      "operator": "required_by_catalog",
+      "severity": "warning",
+      "notes": "申报要素集合由规范申报目录按税号决定；当前仅有2个税号示例，需逐税号补"
+    },
+    {
+      "rule_code": "REL-005",
+      "rule_name": "生产销售单位主体合法性",
+      "left_fields": [
+        "column_production_sales_unit"
+      ],
+      "right_fields": [
+        "column_platform"
+      ],
+      "operator": "must_not_equal",
+      "severity": "critical",
+      "notes": "生产销售单位不得等于平台名称（ANN-78-2026，适用性待人工复核）"
+    }
+  ]
+}

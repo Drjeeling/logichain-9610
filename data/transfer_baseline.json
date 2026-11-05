@@ -1,0 +1,56 @@
+{
+  "_meta": {
+    "version": "1.0",
+    "description": "多式联运中转费基准（PERT 期望值，宽口径）",
+    "source": "多式联运中转费基准与成本核算模型.pdf (2026-10-10)",
+    "unit_note": "PDF 原始单位为元/TEU（20尺箱），按 20吨/TEU 换算为 元/吨",
+    "pert_formula": "E = (O + 4M + P) / 6",
+    "cost_layers": {
+      "L1_干线": "F(i) 运价（运价 API/指数，月度更新）",
+      "L2_衔接": "T(i) 中转费（本表，季度校准）",
+      "L3_时间": "H(i) 滞箱/滞港（船公司价目表）",
+      "L4_风险": "R 风险准备金（3%-5%）"
+    }
+  },
+  "mode_pair_transfer": {
+    "rail→truck":  {"cost_per_ton": 57.5,  "hours": 5.0,  "pert_yuan_per_teu": 1150, "narrow_range": "500-600",  "wide_range": "800-1500",  "note": "公路短驳+铁路装箱"},
+    "truck→rail":  {"cost_per_ton": 57.5,  "hours": 5.0,  "pert_yuan_per_teu": 1150, "narrow_range": "500-600",  "wide_range": "800-1500",  "note": "公路转铁路需装箱"},
+    "rail→river":  {"cost_per_ton": 112.5, "hours": 7.5,  "pert_yuan_per_teu": 2250, "narrow_range": "750-800",  "wide_range": "1500-3000", "note": "铁水联运，含场站装卸"},
+    "river→rail":  {"cost_per_ton": 112.5, "hours": 7.5,  "pert_yuan_per_teu": 2250, "narrow_range": "750-800",  "wide_range": "1500-3000", "note": "水铁联运"},
+    "rail→sea":    {"cost_per_ton": 112.5, "hours": 7.5,  "pert_yuan_per_teu": 2250, "narrow_range": "750-800",  "wide_range": "1500-3000", "note": "铁海联运，最慢"},
+    "sea→rail":    {"cost_per_ton": 112.5, "hours": 7.5,  "pert_yuan_per_teu": 2250, "narrow_range": "750-800",  "wide_range": "1500-3000", "note": "海铁联运"},
+    "truck→river": {"cost_per_ton": 32.5,  "hours": 3.0,  "pert_yuan_per_teu": 650,  "narrow_range": "100-225",  "wide_range": "500-800",   "note": "公路进河港"},
+    "river→truck": {"cost_per_ton": 32.5,  "hours": 3.0,  "pert_yuan_per_teu": 650,  "narrow_range": "100-225",  "wide_range": "500-800",   "note": "河港提箱"},
+    "truck→sea":   {"cost_per_ton": 57.5,  "hours": 1.5,  "pert_yuan_per_teu": 1150, "narrow_range": "100-225",  "wide_range": "800-1500",  "note": "公路进海港（推测值）"},
+    "sea→truck":   {"cost_per_ton": 57.5,  "hours": 1.5,  "pert_yuan_per_teu": 1150, "narrow_range": "100-225",  "wide_range": "800-1500",  "note": "海港提箱"},
+    "river→sea":   {"cost_per_ton": 32.5,  "hours": 3.0,  "pert_yuan_per_teu": 650,  "narrow_range": "100-225",  "wide_range": "500-800",   "note": "水水中转"},
+    "sea→river":   {"cost_per_ton": 32.5,  "hours": 3.0,  "pert_yuan_per_teu": 650,  "narrow_range": "100-225",  "wide_range": "500-800",   "note": "海水联运"},
+    "truck→air":   {"cost_per_ton": 9.0,   "hours": 12.0, "pert_yuan_per_kg": 0.45,  "narrow_range": "—",       "wide_range": "0.3-0.6 元/kg", "note": "公路到机场货站"},
+    "air→truck":   {"cost_per_ton": 9.0,   "hours": 12.0, "pert_yuan_per_kg": 0.45,  "narrow_range": "—",       "wide_range": "0.3-0.6 元/kg", "note": "机场提货"}
+  },
+  "time_demurrage": {
+    "_note": "L3 层：超免堆期后的滞期成本",
+    "sea_demurrage_per_day_usd": 75,
+    "sea_demurrage_per_day_cny": 540,
+    "sea_free_days": 5,
+    "air_free_hours": 72,
+    "air_storage_per_kg_per_day": 0.2,
+    "port_free_storage_days": 5
+  },
+  "risk_reserve": {
+    "_note": "L4 层：风险准备金（前三层小计 × 比例）",
+    "rate_normal": 0.03,
+    "rate_peak_season": 0.05,
+    "coverage": "甩箱、海关查验、单证不符等异常"
+  },
+  "inspection_surcharge": {
+    "_note": "查验额外等待（按概率叠加）",
+    "base_hours_addon": 24,
+    "probability_by_month": {
+      "1":  0.20, "2":  0.10, "3":  0.05, "4":  0.05, "5":  0.05, "6":  0.05,
+      "7":  0.05, "8":  0.05, "9":  0.15, "10": 0.25, "11": 0.30, "12": 0.25
+    },
+    "normal_probability": 0.05
+  },
+  "sensitivity_note": "敏感性分析：中转费±30% 仅影响总成本 ±0.9%；干线运价 ±50% 影响总成本 ±42%。结论：中转费用基准值即可，资源应投向干线运价动态询价。"
+}

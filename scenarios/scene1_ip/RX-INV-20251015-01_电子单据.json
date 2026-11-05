@@ -1,0 +1,41 @@
+{
+  "doc_type": "商业发票",
+  "seller": "深圳市锐讯科技有限公司",
+  "seller_en": "SHENZHEN RUIXUN TECHNOLOGY CO., LTD.",
+  "buyer": "TechGear Trading Inc.",
+  "invoice_no": "RX-INV-20251015-01",
+  "invoice_date": "2025-10-15",
+  "contract_no": "RX-TG-2025-1008",
+  "trade_terms": "FOB SHENZHEN",
+  "origin": "深圳港 Shenzhen",
+  "dest": "洛杉矶",
+  "dest_country": "美国",
+  "cargo_name": "iPhone 15 Pro 手机保护壳 (TPU+PC)",
+  "tonnage": 5.2,
+  "quantity": 12000,
+  "unit": "PCS",
+  "unit_price_usd": 0.98,
+  "total_amount_usd": 12600.0,
+  "currency": "USD",
+  "priority": "cost",
+  "month": 11,
+  "special_notes": "IP 侵权风险（品牌词：iPhone / Apple）",
+  "items": [
+    {
+      "desc": "iPhone 15 Pro 手机保护壳 (TPU+PC) / iPhone 15 Pro Protective Case",
+      "hs": "3926.90",
+      "qty": 8000,
+      "unit": "PCS",
+      "price": 0.98,
+      "amount": 7840.0
+    },
+    {
+      "desc": "iPhone 14 手机保护壳 (带 Apple Logo) / iPhone 14 Case with Apple Logo",
+      "hs": "3926.90",
+      "qty": 4000,
+      "unit": "PCS",
+      "price": 1.19,
+      "amount": 4760.0
+    }
+  ]
+}

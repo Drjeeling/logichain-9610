@@ -1,0 +1,268 @@
+{
+  "nodes": [
+    {"id": "义乌", "name": "义乌", "type": "origin", "lng": 120.07, "lat": 29.30},
+    {"id": "义乌西", "name": "义乌西站", "type": "rail_station", "lng": 119.95, "lat": 29.32},
+    {"id": "金华西", "name": "金华西站", "type": "rail_station", "lng": 119.65, "lat": 29.10},
+    {"id": "杭州港", "name": "杭州港", "type": "river_port", "lng": 120.16, "lat": 30.27},
+    {"id": "宁波北仑", "name": "宁波北仑站", "type": "rail_station", "lng": 121.84, "lat": 29.91},
+    {"id": "宁波港", "name": "宁波港", "type": "sea_port", "lng": 121.95, "lat": 29.87},
+    {"id": "成都", "name": "成都", "type": "origin", "lng": 104.07, "lat": 30.57},
+    {"id": "成都东", "name": "成都东站", "type": "rail_station", "lng": 104.15, "lat": 30.63},
+    {"id": "武汉", "name": "武汉港", "type": "river_port", "lng": 114.30, "lat": 30.59},
+    {"id": "南京", "name": "南京港", "type": "river_port", "lng": 118.79, "lat": 32.06},
+    {"id": "上海港", "name": "上海港", "type": "sea_port", "lng": 121.47, "lat": 31.23},
+    {"id": "重庆", "name": "重庆", "type": "origin", "lng": 106.55, "lat": 29.56},
+    {"id": "浦东机场", "name": "浦东国际机场", "type": "airport", "lng": 121.81, "lat": 31.14},
+    {"id": "双流机场", "name": "双流国际机场", "type": "airport", "lng": 103.94, "lat": 30.58},
+    {"id": "洛杉矶机场", "name": "洛杉矶国际机场 (LAX)", "type": "airport", "lng": -118.41, "lat": 33.94},
+    {"id": "苏州", "name": "苏州", "type": "origin", "lng": 120.62, "lat": 31.32},
+    {"id": "广州", "name": "广州", "type": "origin", "lng": 113.26, "lat": 23.13},
+    {"id": "深圳", "name": "深圳", "type": "origin", "lng": 114.06, "lat": 22.55},
+    {"id": "深圳港", "name": "深圳港", "type": "sea_port", "lng": 114.23, "lat": 22.48},
+    {"id": "广州港", "name": "广州港", "type": "sea_port", "lng": 113.51, "lat": 22.95},
+    {"id": "青岛港", "name": "青岛港", "type": "sea_port", "lng": 120.38, "lat": 36.07},
+    {"id": "天津港", "name": "天津港", "type": "sea_port", "lng": 117.78, "lat": 39.02},
+    {"id": "北京", "name": "北京", "type": "origin", "lng": 116.40, "lat": 39.90},
+    {"id": "西安", "name": "西安", "type": "origin", "lng": 108.94, "lat": 34.34},
+    {"id": "郑州", "name": "郑州", "type": "origin", "lng": 113.62, "lat": 34.75},
+    {"id": "郑州东", "name": "郑州东站", "type": "rail_station", "lng": 113.71, "lat": 34.75},
+    {"id": "广州南", "name": "广州南站", "type": "rail_station", "lng": 113.27, "lat": 23.15},
+    {"id": "北京南", "name": "北京南站", "type": "rail_station", "lng": 116.38, "lat": 39.87}
+  ],
+  "edges": [
+    {
+      "from": "义乌", "to": "义乌西", "mode": "truck",
+      "distance_km": 15, "base_price_per_km": 0.6,
+      "hours": 0.5, "frequency": "随时", "transfer_cost": 0, "transfer_hours": 0,
+      "carbon_g_per_ton_km": 62
+    },
+    {
+      "from": "义乌", "to": "宁波港", "mode": "truck",
+      "distance_km": 200, "base_price_per_km": 0.55,
+      "hours": 4, "frequency": "随时", "transfer_cost": 0, "transfer_hours": 0,
+      "carbon_g_per_ton_km": 62
+    },
+    {
+      "from": "义乌", "to": "杭州港", "mode": "truck",
+      "distance_km": 130, "base_price_per_km": 0.6,
+      "hours": 2.5, "frequency": "随时", "transfer_cost": 0, "transfer_hours": 0,
+      "carbon_g_per_ton_km": 62
+    },
+    {
+      "from": "义乌西", "to": "金华西", "mode": "rail",
+      "distance_km": 40, "base_price_per_km": 0.15,
+      "hours": 1.5, "frequency": "每周3班(一三五)", "transfer_cost": 0, "transfer_hours": 0,
+      "carbon_g_per_ton_km": 21
+    },
+    {
+      "from": "金华西", "to": "宁波北仑", "mode": "rail",
+      "distance_km": 220, "base_price_per_km": 0.15,
+      "hours": 6, "frequency": "每周3班(二四六)", "transfer_cost": 0, "transfer_hours": 0,
+      "carbon_g_per_ton_km": 21
+    },
+    {
+      "from": "宁波北仑", "to": "宁波港", "mode": "truck",
+      "distance_km": 12, "base_price_per_km": 0.6,
+      "hours": 0.5, "frequency": "随时", "transfer_cost": 200, "transfer_hours": 12,
+      "carbon_g_per_ton_km": 62
+    },
+    {
+      "from": "杭州港", "to": "宁波港", "mode": "river",
+      "distance_km": 150, "base_price_per_km": 0.05,
+      "hours": 24, "frequency": "每周4班(一二四六)", "transfer_cost": 300, "transfer_hours": 24,
+      "carbon_g_per_ton_km": 30
+    },
+    {
+      "from": "成都", "to": "成都东", "mode": "truck",
+      "distance_km": 18, "base_price_per_km": 0.6,
+      "hours": 0.8, "frequency": "随时", "transfer_cost": 0, "transfer_hours": 0,
+      "carbon_g_per_ton_km": 62
+    },
+    {
+      "from": "成都东", "to": "武汉", "mode": "rail",
+      "distance_km": 1100, "base_price_per_km": 0.13,
+      "hours": 36, "frequency": "每周2班(三六)", "transfer_cost": 0, "transfer_hours": 0,
+      "carbon_g_per_ton_km": 21
+    },
+    {
+      "from": "武汉", "to": "南京", "mode": "river",
+      "distance_km": 710, "base_price_per_km": 0.04,
+      "hours": 96, "frequency": "每周3班(一三五)", "transfer_cost": 0, "transfer_hours": 0,
+      "carbon_g_per_ton_km": 30
+    },
+    {
+      "from": "南京", "to": "上海港", "mode": "river",
+      "distance_km": 350, "base_price_per_km": 0.03,
+      "hours": 48, "frequency": "每日班", "transfer_cost": 0, "transfer_hours": 0,
+      "carbon_g_per_ton_km": 30
+    },
+    {
+      "from": "武汉", "to": "上海港", "mode": "river",
+      "distance_km": 1060, "base_price_per_km": 0.04,
+      "hours": 168, "frequency": "每周5班(二四六日一)", "transfer_cost": 0, "transfer_hours": 0,
+      "carbon_g_per_ton_km": 30
+    },
+    {
+      "from": "重庆", "to": "武汉", "mode": "river",
+      "distance_km": 1300, "base_price_per_km": 0.05,
+      "hours": 240, "frequency": "每周3班(二五日)", "transfer_cost": 0, "transfer_hours": 0,
+      "carbon_g_per_ton_km": 30
+    },
+    {
+      "from": "重庆", "to": "成都东", "mode": "rail",
+      "distance_km": 350, "base_price_per_km": 0.15,
+      "hours": 8, "frequency": "每日班", "transfer_cost": 0, "transfer_hours": 0,
+      "carbon_g_per_ton_km": 21
+    },
+    {
+      "from": "义乌西", "to": "宁波北仑", "mode": "rail",
+      "distance_km": 250, "base_price_per_km": 0.15,
+      "hours": 7, "frequency": "每周2班(三五)", "transfer_cost": 0, "transfer_hours": 0,
+      "carbon_g_per_ton_km": 21
+    },
+    {
+      "from": "上海港", "to": "浦东机场", "mode": "truck",
+      "distance_km": 60, "base_price_per_km": 0.7,
+      "hours": 1.5, "frequency": "随时", "transfer_cost": 0, "transfer_hours": 0,
+      "carbon_g_per_ton_km": 62
+    },
+    {
+      "from": "义乌", "to": "浦东机场", "mode": "truck",
+      "distance_km": 240, "base_price_per_km": 0.6,
+      "hours": 4.5, "frequency": "随时", "transfer_cost": 0, "transfer_hours": 0,
+      "carbon_g_per_ton_km": 62
+    },
+    {
+      "from": "成都", "to": "双流机场", "mode": "truck",
+      "distance_km": 20, "base_price_per_km": 0.6,
+      "hours": 0.8, "frequency": "随时", "transfer_cost": 0, "transfer_hours": 0,
+      "carbon_g_per_ton_km": 62
+    },
+    {
+      "from": "浦东机场", "to": "洛杉矶机场", "mode": "air",
+      "distance_km": 11000, "base_price_per_km": 8.5,
+      "hours": 14, "frequency": "每日3班", "transfer_cost": 0, "transfer_hours": 0,
+      "carbon_g_per_ton_km": 950
+    },
+    {
+      "from": "双流机场", "to": "洛杉矶机场", "mode": "air",
+      "distance_km": 11500, "base_price_per_km": 8.8,
+      "hours": 15, "frequency": "每日1班", "transfer_cost": 0, "transfer_hours": 0,
+      "carbon_g_per_ton_km": 950
+    },
+    {
+      "from": "苏州", "to": "上海港", "mode": "truck",
+      "distance_km": 130, "base_price_per_km": 0.55,
+      "hours": 2.5, "frequency": "随时", "transfer_cost": 0, "transfer_hours": 0,
+      "carbon_g_per_ton_km": 62
+    },
+    {
+      "from": "苏州", "to": "南京", "mode": "truck",
+      "distance_km": 220, "base_price_per_km": 0.55,
+      "hours": 3.5, "frequency": "随时", "transfer_cost": 0, "transfer_hours": 0,
+      "carbon_g_per_ton_km": 62
+    },
+    {
+      "from": "广州", "to": "广州南", "mode": "truck",
+      "distance_km": 20, "base_price_per_km": 0.6,
+      "hours": 0.8, "frequency": "随时", "transfer_cost": 0, "transfer_hours": 0,
+      "carbon_g_per_ton_km": 62
+    },
+    {
+      "from": "广州", "to": "广州港", "mode": "truck",
+      "distance_km": 60, "base_price_per_km": 0.55,
+      "hours": 1.5, "frequency": "随时", "transfer_cost": 0, "transfer_hours": 0,
+      "carbon_g_per_ton_km": 62
+    },
+    {
+      "from": "深圳", "to": "深圳港", "mode": "truck",
+      "distance_km": 25, "base_price_per_km": 0.6,
+      "hours": 0.8, "frequency": "随时", "transfer_cost": 0, "transfer_hours": 0,
+      "carbon_g_per_ton_km": 62
+    },
+    {
+      "from": "广州南", "to": "郑州东", "mode": "rail",
+      "distance_km": 1600, "base_price_per_km": 0.13,
+      "hours": 28, "frequency": "每日2班", "transfer_cost": 0, "transfer_hours": 0,
+      "carbon_g_per_ton_km": 21
+    },
+    {
+      "from": "郑州东", "to": "成都东", "mode": "rail",
+      "distance_km": 1200, "base_price_per_km": 0.13,
+      "hours": 22, "frequency": "每日2班", "transfer_cost": 0, "transfer_hours": 0,
+      "carbon_g_per_ton_km": 21
+    },
+    {
+      "from": "郑州东", "to": "北京南", "mode": "rail",
+      "distance_km": 700, "base_price_per_km": 0.14,
+      "hours": 12, "frequency": "每日3班", "transfer_cost": 0, "transfer_hours": 0,
+      "carbon_g_per_ton_km": 21
+    },
+    {
+      "from": "北京", "to": "北京南", "mode": "truck",
+      "distance_km": 15, "base_price_per_km": 0.6,
+      "hours": 0.6, "frequency": "随时", "transfer_cost": 0, "transfer_hours": 0,
+      "carbon_g_per_ton_km": 62
+    },
+    {
+      "from": "北京南", "to": "天津港", "mode": "rail",
+      "distance_km": 130, "base_price_per_km": 0.15,
+      "hours": 4, "frequency": "每日2班", "transfer_cost": 0, "transfer_hours": 0,
+      "carbon_g_per_ton_km": 21
+    },
+    {
+      "from": "北京", "to": "天津港", "mode": "truck",
+      "distance_km": 145, "base_price_per_km": 0.55,
+      "hours": 3, "frequency": "随时", "transfer_cost": 0, "transfer_hours": 0,
+      "carbon_g_per_ton_km": 62
+    },
+    {
+      "from": "郑州", "to": "郑州东", "mode": "truck",
+      "distance_km": 15, "base_price_per_km": 0.6,
+      "hours": 0.5, "frequency": "随时", "transfer_cost": 0, "transfer_hours": 0,
+      "carbon_g_per_ton_km": 62
+    },
+    {
+      "from": "郑州东", "to": "武汉", "mode": "rail",
+      "distance_km": 550, "base_price_per_km": 0.13,
+      "hours": 14, "frequency": "每日2班", "transfer_cost": 0, "transfer_hours": 0,
+      "carbon_g_per_ton_km": 21
+    },
+    {
+      "from": "西安", "to": "郑州东", "mode": "rail",
+      "distance_km": 480, "base_price_per_km": 0.14,
+      "hours": 11, "frequency": "每日3班", "transfer_cost": 0, "transfer_hours": 0,
+      "carbon_g_per_ton_km": 21
+    },
+    {
+      "from": "西安", "to": "成都东", "mode": "rail",
+      "distance_km": 720, "base_price_per_km": 0.14,
+      "hours": 16, "frequency": "每日2班", "transfer_cost": 0, "transfer_hours": 0,
+      "carbon_g_per_ton_km": 21
+    },
+    {
+      "from": "天津港", "to": "青岛港", "mode": "river",
+      "distance_km": 660, "base_price_per_km": 0.04,
+      "hours": 72, "frequency": "每周2班", "transfer_cost": 0, "transfer_hours": 0,
+      "carbon_g_per_ton_km": 30
+    },
+    {
+      "from": "青岛港", "to": "上海港", "mode": "river",
+      "distance_km": 880, "base_price_per_km": 0.04,
+      "hours": 96, "frequency": "每周3班", "transfer_cost": 0, "transfer_hours": 0,
+      "carbon_g_per_ton_km": 30
+    },
+    {
+      "from": "广州港", "to": "深圳港", "mode": "river",
+      "distance_km": 70, "base_price_per_km": 0.05,
+      "hours": 12, "frequency": "每日班", "transfer_cost": 0, "transfer_hours": 0,
+      "carbon_g_per_ton_km": 30
+    },
+    {
+      "from": "深圳港", "to": "上海港", "mode": "river",
+      "distance_km": 1500, "base_price_per_km": 0.04,
+      "hours": 180, "frequency": "每周3班", "transfer_cost": 0, "transfer_hours": 0,
+      "carbon_g_per_ton_km": 30
+    }
+  ]
+}

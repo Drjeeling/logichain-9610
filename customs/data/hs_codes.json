@@ -1,0 +1,592 @@
+{
+  "_meta": {
+    "version": "3.1",
+    "description": "跨境电商 9610 出口 HS 编码知识库（11 品类；3926909090/8518220000 申报要素经单一窗口核验）",
+    "source": "进出口税则(2026) + 单一窗口 CusComplex/CusMerchElement（2026-10-27）+ hsbianma.com 逐条核实",
+    "verified_date": "2026-10",
+    "extension_hint": "新增条目按下面字段格式追加到 hs_codes 数组即可；每条均需经 hsbianma.com / 海关税则官网核实，并填写 source 与 verified 字段",
+    "fields": {
+      "code": "HS 编码（10 位，以海关税则为准）",
+      "code_8digit": "8 位 HS 编码（现行有效编码，部分 10 位编码因政策调整显示'过期'时以 8 位为准）",
+      "description": "商品描述（海关税则规范描述）",
+      "official_name": "海关规范商品名称（用于报关单申报品名）",
+      "common_names": "俗称/别名列表（用于 RAG 检索与口语化品类匹配）",
+      "category": "品类标签（用于按品类分类查询）",
+      "tariff_rate": "最惠国关税税率（MFN）",
+      "export_rebate_rate": "出口退税率",
+      "vat_rate": "增值税率",
+      "unit": "法定计量单位（如 个/千克、千克/双 等）",
+      "regulatory_code": "海关监管证件代码（A=入境货物通关单/B=进口许可/J=黄金及其制品进出口准许证/无=无监管）",
+      "supervision_code": "监管证件代码（同 regulatory_code，保留以兼容 declaration.py / 模板）",
+      "inspection_category": "检验检疫类别（M=进口商品检验/L=民用商品入境验证/无=无检验检疫）",
+      "keywords": "用于 RAG 检索的关键词列表（务必覆盖常见别名/俗称/英文）",
+      "easily_confused_with": "易混淆编码及原因（对象：code=易混编码，reason=区分说明）",
+      "declaration_elements": "申报要素（报关单需申报的项目列表）",
+      "ciq_code": "CIQ 编码（检验检疫商品编号，部分品类有）",
+      "remark": "备注（特殊监管要求/反倾销/认证/危险品/政策调整等）",
+      "source": "来源（hsbianma.com / 海关税则官网 / 归类决定 / 公告等）",
+      "verified": "核实状态（true=已逐条核实）"
+    }
+  },
+  "hs_codes": [
+    {
+      "code": "8507600090",
+      "code_8digit": "85076000",
+      "description": "其他锂离子蓄电池",
+      "official_name": "锂离子蓄电池",
+      "common_names": [
+        "充电宝",
+        "移动电源",
+        "power bank",
+        "portable charger"
+      ],
+      "category": "锂电池",
+      "tariff_rate": "10%",
+      "export_rebate_rate": "6%",
+      "vat_rate": "13%",
+      "unit": "个/千克",
+      "regulatory_code": "A",
+      "supervision_code": "A",
+      "inspection_category": "M/L",
+      "keywords": [
+        "锂电池",
+        "蓄电池",
+        "锂离子电池",
+        "充电电池",
+        "电池组",
+        "lithium battery",
+        "Li-ion",
+        "充电宝",
+        "移动电源",
+        "power bank",
+        "便携式电池"
+      ],
+      "easily_confused_with": {
+        "code": "85071000",
+        "reason": "8507.10为启动用铅酸蓄电池，电解质为硫酸而非锂离子"
+      },
+      "declaration_elements": [
+        "用途",
+        "电极材质",
+        "比能量",
+        "品牌",
+        "型号",
+        "容量",
+        "是否含汞",
+        "额定电压"
+      ],
+      "ciq_code": "8507600090302",
+      "remark": "危险品；需UN38.3测试报告+MSDS；2025年起重量能量密度≥300Wh/kg的锂离子电池实施出口管制（商务部/海关总署公告2025年第58号）；10位编码8507600090状态显示'过期'（2026年电池消费税政策调整/财政部公告2026年第20号重新组织10位编码），8位85076000仍为现行有效编码",
+      "source": "hsbianma.com + 财政部电池产品清单 + 商务部公告2025年第58号",
+      "verified": true,
+      "confidence": "candidate",
+      "element_key": "8507"
+    },
+    {
+      "code": "3926909090",
+      "code_8digit": "39269090",
+      "description": "其他塑料制品（包括品目3901至3914所列材料的制品）",
+      "official_name": "其他塑料制品",
+      "common_names": [
+        "手机壳",
+        "手机保护壳",
+        "手机套",
+        "phone case",
+        "手机外壳",
+        "手机支架"
+      ],
+      "category": "塑料制品",
+      "tariff_rate": "10%",
+      "export_rebate_rate": "13%",
+      "vat_rate": "13%",
+      "unit": "千克",
+      "regulatory_code": "无",
+      "supervision_code": "无",
+      "inspection_category": "无",
+      "keywords": [
+        "手机壳",
+        "手机保护壳",
+        "手机套",
+        "保护壳",
+        "phone case",
+        "塑料手机壳",
+        "硅胶手机壳",
+        "塑料制品",
+        "手机支架",
+        "支架",
+        "折叠支架",
+        "桌面支架"
+      ],
+      "easily_confused_with": {
+        "code": "83024200",
+        "reason": "8302.42为金属钥匙扣/贱金属制品，材质不同章号不同（83章贱金属 vs 39章塑料）"
+      },
+      "declaration_elements": [
+        "品牌类型",
+        "出口享惠情况",
+        "用途",
+        "材质（塑料品种）",
+        "品牌（中文或外文名称）",
+        "型号",
+        "GTIN",
+        "CAS"
+      ],
+      "remark": "9610高频品类；硅胶/TPU材质均归此编码；无特殊监管证件；编码状态正常（更新2026/8/23）；申报要素 8 项（3926 章级清单，2026-10-27 单一窗口核验），按最长前缀匹配",
+      "source": "hsbianma.com + 英国海关裁定ruling 600009917（手机壳归入3926909790）",
+      "verified": true,
+      "declaration_elements_required": [
+        "品牌类型",
+        "出口享惠情况",
+        "用途",
+        "材质（塑料品种）",
+        "品牌（中文或外文名称）",
+        "型号"
+      ],
+      "element_key": "3926",
+      "confidence": "candidate"
+    },
+    {
+      "code": "9405429000",
+      "code_8digit": "94054290",
+      "description": "其他设计为仅使用发光二极管光源的其他电气灯具及照明装置（非光伏的，设计为仅使用LED光源）",
+      "official_name": "其他设计为仅使用发光二极管光源的其他电气灯具及照明装置",
+      "common_names": [
+        "LED灯带",
+        "灯条",
+        "软灯条",
+        "LED strip",
+        "灯带"
+      ],
+      "category": "照明",
+      "tariff_rate": "6%",
+      "export_rebate_rate": "13%",
+      "vat_rate": "13%",
+      "unit": "千克",
+      "regulatory_code": "无",
+      "supervision_code": "无",
+      "inspection_category": "无",
+      "keywords": [
+        "LED灯带",
+        "灯条",
+        "软灯条",
+        "灯带",
+        "LED strip",
+        "LED软灯带",
+        "装饰灯带",
+        "照明"
+      ],
+      "easily_confused_with": {
+        "code": "85394900",
+        "reason": "8539.49为LED光源/灯泡（归入品目85.39），非94.05的灯具及照明装置"
+      },
+      "declaration_elements": [
+        "用途",
+        "品牌"
+      ],
+      "remark": "9610高频品类；含电源适配器时需注意适配器单独归类；出口欧盟需CE+RoHS；编码状态正常（更新2026/8/23）",
+      "source": "hsbianma.com + WCO归类决定（LED灯具归入品目94.05）",
+      "verified": true,
+      "confidence": "candidate",
+      "element_key": "9405"
+    },
+    {
+      "code": "6109100021",
+      "code_8digit": "61091000",
+      "description": "其他棉制针织或钩编男式T恤衫（内衣除外）",
+      "official_name": "其他棉制针织或钩编男式T恤衫",
+      "common_names": [
+        "棉T恤",
+        "T恤",
+        "短袖",
+        "棉质T恤",
+        "cotton tee"
+      ],
+      "category": "服装",
+      "tariff_rate": "6%",
+      "export_rebate_rate": "13%",
+      "vat_rate": "13%",
+      "unit": "件/千克",
+      "regulatory_code": "A",
+      "supervision_code": "A",
+      "inspection_category": "M",
+      "keywords": [
+        "T恤",
+        "棉T恤",
+        "棉质T恤",
+        "短袖",
+        "汗衫",
+        "针织T恤",
+        "cotton t-shirt",
+        "tee",
+        "男式T恤"
+      ],
+      "easily_confused_with": {
+        "code": "61093000",
+        "reason": "6109.30为化学纤维制T恤衫，成分不同（化纤 vs 棉）子目不同"
+      },
+      "declaration_elements": [
+        "织造方法",
+        "类别",
+        "是否有领",
+        "是否有扣",
+        "是否有拉链",
+        "成分含量",
+        "品牌",
+        "货号"
+      ],
+      "remark": "10位编码6109100021状态显示'过期'（更新2025/1/1），但8位61091000为现行有效编码；另有6109100010（内衣式）；美国对中国棉制服装有原产地证要求",
+      "source": "hsbianma.com（8位61091000确认有效）+ 海关减让表品目61.09（针织或钩编的T恤衫、汗衫及其他背心）",
+      "verified": true,
+      "confidence": "candidate",
+      "element_key": "6109"
+    },
+    {
+      "code": "8544421100",
+      "code_8digit": "85444211",
+      "description": "额定电压≤80伏有接头电缆（有接头电导体，额定电压≤1000V子目下的≤80V）",
+      "official_name": "额定电压≤80伏有接头电缆",
+      "common_names": [
+        "数据线",
+        "充电线",
+        "USB线",
+        "cable",
+        "数据连接线"
+      ],
+      "category": "电子产品",
+      "tariff_rate": "0%",
+      "export_rebate_rate": "13%",
+      "vat_rate": "13%",
+      "unit": "千克/米",
+      "regulatory_code": "无",
+      "supervision_code": "无",
+      "inspection_category": "无",
+      "keywords": [
+        "数据线",
+        "充电线",
+        "USB线",
+        "cable",
+        "数据连接线",
+        "Type-C线",
+        "Lightning线",
+        "data cable"
+      ],
+      "easily_confused_with": {
+        "code": "85444290",
+        "reason": "8544.42.90为其他有接头电导体，非电信用途"
+      },
+      "declaration_elements": [
+        "用途",
+        "结构类型",
+        "品牌",
+        "型号",
+        "额定电压"
+      ],
+      "ciq_code": "8544421100102",
+      "remark": "9610高频品类；CIQ编码8544421100102对应电脑连接线；含认证芯片（如MFi）需关注知识产权合规；编码状态正常（更新2026/8/23）",
+      "source": "hsbianma.com（编码状态：正常，更新2026/8/23）",
+      "verified": true,
+      "confidence": "candidate",
+      "element_key": "8544"
+    },
+    {
+      "code": "9503008900",
+      "code_8digit": "95030089",
+      "description": "其他未列名玩具",
+      "official_name": "其他未列名玩具",
+      "common_names": [
+        "玩具",
+        "儿童玩具",
+        "毛绒玩具",
+        "积木",
+        "toys"
+      ],
+      "category": "玩具",
+      "tariff_rate": "0%",
+      "export_rebate_rate": "13%",
+      "vat_rate": "13%",
+      "unit": "个/千克",
+      "regulatory_code": "A",
+      "supervision_code": "A",
+      "inspection_category": "L/M",
+      "keywords": [
+        "玩具",
+        "儿童玩具",
+        "毛绒玩具",
+        "积木",
+        "拼图",
+        "玩具车",
+        "toys",
+        "益智玩具",
+        "玩偶"
+      ],
+      "easily_confused_with": {
+        "code": "95030083",
+        "reason": "9503.00.83为带动力装置的玩具及模型，需区分是否带动力装置"
+      },
+      "declaration_elements": [
+        "种类",
+        "品牌",
+        "货号"
+      ],
+      "remark": "9610高频品类；出口欧盟需EN71玩具安全认证；美国需CPSC/ASTM F963；含电池玩具另查电池归类；编码状态正常（更新2026/8/23）",
+      "source": "hsbianma.com（编码状态：正常，更新2026/8/23）+ 海关归类决定品目95.03",
+      "verified": true,
+      "confidence": "candidate",
+      "element_key": "9503"
+    },
+    {
+      "code": "9617009000",
+      "code_8digit": "96170090",
+      "description": "其他真空容器及零件（玻璃胆除外）",
+      "official_name": "其他真空容器及零件",
+      "common_names": [
+        "保温杯",
+        "不锈钢保温杯",
+        "真空杯",
+        "thermos",
+        "保温壶"
+      ],
+      "category": "日用品",
+      "tariff_rate": "8%",
+      "export_rebate_rate": "13%",
+      "vat_rate": "13%",
+      "unit": "千克/个",
+      "regulatory_code": "无",
+      "supervision_code": "无",
+      "inspection_category": "无",
+      "keywords": [
+        "保温杯",
+        "不锈钢保温杯",
+        "真空杯",
+        "保温壶",
+        "thermos",
+        "vacuum flask",
+        "保温瓶",
+        "真空保温"
+      ],
+      "easily_confused_with": {
+        "code": "73239300",
+        "reason": "7323.93为钢铁制餐具器皿，非真空容器（9617.00为双层真空结构保温容器）"
+      },
+      "declaration_elements": [
+        "内胆材质",
+        "品牌",
+        "型号"
+      ],
+      "remark": "9610高频品类；印度对华保温瓶反倾销（涉及96170011/96170012/96170090）；非真空普通水杯应归7323.93；编码状态正常（更新2026/8/23）",
+      "source": "hsbianma.com（编码状态：正常，更新2026/8/23）+ 品目96.17注释",
+      "verified": true,
+      "confidence": "candidate",
+      "element_key": "9617"
+    },
+    {
+      "code": "6704200000",
+      "code_8digit": "67042000",
+      "description": "人发制假发,须,眉及类似品（包括整头假发）",
+      "official_name": "人发制假发,须,眉及类似品",
+      "common_names": [
+        "假发",
+        "假发套",
+        "发片",
+        "wig",
+        "假发片"
+      ],
+      "category": "美发用品",
+      "tariff_rate": "6%",
+      "export_rebate_rate": "13%",
+      "vat_rate": "13%",
+      "unit": "千克",
+      "regulatory_code": "无",
+      "supervision_code": "无",
+      "inspection_category": "无",
+      "keywords": [
+        "假发",
+        "假发套",
+        "发片",
+        "wig",
+        "假发片",
+        "人发假发",
+        "接发",
+        "hair extensions",
+        "整头假发"
+      ],
+      "easily_confused_with": {
+        "code": "67041900",
+        "reason": "6704.19为合成纺织材料制假发，材料不同（人发 vs 合成材料）子目不同"
+      },
+      "declaration_elements": [
+        "制作材料",
+        "长度"
+      ],
+      "remark": "9610高频品类；人发制品需关注目的国人发检疫要求；编码状态正常（更新2026/8/23）",
+      "source": "hsbianma.com（编码状态：正常，更新2026/8/23）+ HS品目67.04",
+      "verified": true,
+      "confidence": "candidate",
+      "element_key": "6704"
+    },
+    {
+      "code": "7113191990",
+      "code_8digit": "71131919",
+      "description": "其他黄金制首饰及其零件（不论是否包、镀其他贵金属）",
+      "official_name": "其他黄金制首饰及其零件",
+      "common_names": [
+        "耳环",
+        "饰品耳环",
+        "金耳环",
+        "黄金首饰",
+        "earrings"
+      ],
+      "category": "饰品",
+      "tariff_rate": "8%",
+      "export_rebate_rate": "0%",
+      "vat_rate": "13%",
+      "unit": "克",
+      "regulatory_code": "J",
+      "supervision_code": "J",
+      "inspection_category": "无",
+      "keywords": [
+        "耳环",
+        "饰品",
+        "金耳环",
+        "黄金首饰",
+        "贵金属首饰",
+        "earrings",
+        "耳饰",
+        "首饰",
+        "黄金饰品"
+      ],
+      "easily_confused_with": {
+        "code": "71171900",
+        "reason": "7117.19为仿首饰（贱金属制/非贵金属），7113.19为贵金属（金/银/铂）首饰"
+      },
+      "declaration_elements": [
+        "材质",
+        "加工方法",
+        "首饰种类",
+        "贵金属成分含量",
+        "品牌",
+        "型号"
+      ],
+      "remark": "注意：黄金首饰出口退税率为0%；监管证件J为黄金及其制品进出口准许证或批件；需明确贵金属材质并匹配对应子目；编码状态正常（更新2026/8/23）",
+      "source": "hsbianma.com（编码状态：正常，更新2026/8/23）",
+      "verified": true,
+      "confidence": "candidate",
+      "element_key": "7113"
+    },
+    {
+      "code": "6404110000",
+      "code_8digit": "64041100",
+      "description": "纺织材料制鞋面的运动鞋靴（橡胶或塑料制外底，包括球类、体操、训练鞋及类似鞋）",
+      "official_name": "纺织材料制鞋面的运动鞋靴",
+      "common_names": [
+        "运动鞋",
+        "跑步鞋",
+        "球鞋",
+        "sneakers",
+        "运动跑鞋"
+      ],
+      "category": "鞋类",
+      "tariff_rate": "10%",
+      "export_rebate_rate": "13%",
+      "vat_rate": "13%",
+      "unit": "千克/双",
+      "regulatory_code": "无",
+      "supervision_code": "无",
+      "inspection_category": "无",
+      "keywords": [
+        "运动鞋",
+        "跑步鞋",
+        "球鞋",
+        "sneakers",
+        "运动跑鞋",
+        "纺织面鞋",
+        "网球鞋",
+        "training shoes"
+      ],
+      "easily_confused_with": {
+        "code": "64039900",
+        "reason": "6403.99为皮革制面鞋靴，鞋面材料不同（皮革 vs 纺织材料）章号不同"
+      },
+      "declaration_elements": [
+        "款式",
+        "鞋面材料",
+        "外底材料",
+        "品牌",
+        "货号"
+      ],
+      "remark": "9610高频品类；皮革面运动鞋归6403.99税率不同；欧盟需REACH合规；编码状态正常（更新2026/8/23）",
+      "source": "hsbianma.com（编码状态：正常，更新2026/8/23）",
+      "verified": true,
+      "confidence": "candidate",
+      "element_key": "6404"
+    },
+    {
+      "code": "8518220000",
+      "code_8digit": "85182200",
+      "description": "多喇叭音箱（同一箱体内装有多只扬声器）",
+      "official_name": "多喇叭音箱",
+      "common_names": [
+        "蓝牙音箱",
+        "无线音箱",
+        "便携音箱",
+        "speaker",
+        "bluetooth speaker"
+      ],
+      "category": "音箱",
+      "tariff_rate": null,
+      "export_rebate_rate": null,
+      "vat_rate": null,
+      "unit": "个/千克",
+      "regulatory_code": null,
+      "supervision_code": null,
+      "inspection_category": null,
+      "keywords": [
+        "蓝牙音箱",
+        "音箱",
+        "多喇叭音箱",
+        "扬声器",
+        "speaker",
+        "蓝牙",
+        "音频播放"
+      ],
+      "easily_confused_with": {
+        "code": "8518290000",
+        "reason": "8518.29 为其他扬声器（含单喇叭音箱），8518.22 限同一箱体内多只扬声器；喇叭数量与结构是区分关键"
+      },
+      "declaration_elements": [
+        "品牌类型",
+        "出口享惠情况",
+        "结构类型（是否有箱体）",
+        "用途",
+        "品牌（中文或外文名称）",
+        "型号",
+        "喇叭数量和尺寸",
+        "GTIN",
+        "CAS"
+      ],
+      "declaration_elements_required": [
+        "品牌类型",
+        "出口享惠情况",
+        "结构类型（是否有箱体）",
+        "用途",
+        "品牌（中文或外文名称）",
+        "型号",
+        "喇叭数量和尺寸"
+      ],
+      "element_key": "851822",
+      "split_dimension": "同一箱体内扬声器数量（8518.21 单个 / 8518.22 多个）",
+      "resolution_facts": ["speaker_units", "shared_enclosure"],
+      "resolution_rule": {
+        "tax_heading_note": "品目 85.18 条文：扬声器，不论是否装成音箱（税则条文依据）",
+        "when_facts": {"speaker_units": ">=2", "shared_enclosure": true},
+        "combination_rule": "多功能组合（支架为折叠背夹、无独立功能）→ 归类总规则三（二）：按基本特征归音箱（85.18），不归 39.26 塑料制品",
+        "reject_reason": "组合商品按基本特征归 85.18 音箱；塑料仅为外壳材质，不构成基本特征"
+      },
+      "remark": "9610 若归入本码须能回答喇叭数量与箱体结构；答不出说明按音箱归类证据不足；归类论证须走 品目条文→分列维度→事实匹配，禁止用申报要素差集反推归类（B板块 v2.1 评审结论）；resolution_rule 为数据驱动消解规则，逻辑层通用评估，不针对具体场景",
+      "source": "单一窗口 CusComplex 全量表 + CusMerchElement 参数（2026-10-27 抓取）",
+      "verified": true,
+      "confidence": "candidate",
+      "status_note": "税号存在性 VERIFIED；税率/退税字段未取，禁止在演示中编造"
+    }
+  ]
+}

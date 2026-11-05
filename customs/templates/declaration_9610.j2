@@ -1,0 +1,61 @@
+{# customs/templates/declaration_9610.j2 #}
+{# 跨境电商零售出口（9610）申报清单模板 #}
+{# variables: cargo, hs_code, from_port, dest_port, tonnage, unit_price, total_usd, package_type, gross_weight, net_weight, supervision_code, trade_mode, e-commerce platform, order_id, logistics_no #}
+======================================================
+      跨境电子商务零售出口（9610）申报清单
+======================================================
+
+【申报基本信息】
+监管方式：9610（跨境贸易电子商务）
+跨境电商平台：{{ platform | default("____") }}
+订单编号：{{ order_id | default("____") }}
+物流运单号：{{ logistics_no | default("____") }}
+
+【商品信息】
+商品名称（规范）：{{ hs_code.official_name | default(hs_code.description) | default(cargo) }}
+商品俗称：{{ cargo }}
+HS编码（10位）：{{ hs_code.code | default("____") }}
+商品描述：{{ hs_code.description | default("____") }}
+关税税率：{{ hs_code.tariff_rate | default("未知") }}
+监管证件代码：{{ hs_code.supervision_code | default("无") }}
+
+【数量与价格】
+申报数量：{{ tonnage | default("____") }}
+计量单位：{{ unit | default("千克") }}
+申报单价：{{ unit_price | default("____") }}
+申报总价：{{ total_usd | default("____") }}
+币制：{{ currency | default("USD") }}
+
+【收发货信息】
+境内发货人：{{ shipper | default("____") }}
+境外收货人：{{ consignee | default("____") }}
+起运口岸：{{ from_port | default("____") }}
+目的国/港：{{ dest_port | default("____") }}
+原产地：中国
+
+【包装信息】
+包装方式：{{ package_type | default("____") }}
+毛重：{{ gross_weight | default("____") }} kg
+净重：{{ net_weight | default("____") }} kg
+件数：{{ package_count | default("____") }}
+
+{% if hs_code.remark %}【特殊监管要求】
+{{ hs_code.remark }}
+{% endif %}
+{% if reasoning_chain %}
+【归类推理链】
+{% for step in reasoning_chain %}{{ loop.index }}. {{ step }}
+{% endfor %}{% endif %}
+{% if counterfactual and counterfactual.confused_code %}
+【反事实对比】
+易混编码：{{ counterfactual.confused_code }}
+排除理由：{{ counterfactual.why_not }}
+{% endif %}
+{% if confidence %}
+【置信度评估】
+置信等级：{{ confidence }}
+{% if confidence_reason %}判定依据：{{ confidence_reason }}{% endif %}
+{% endif %}
+======================================================
+注：本清单采用"清单核放、汇总申报"模式，需在次月15日前汇总申报。
+      申报清单与报关单具有同等法律效力。

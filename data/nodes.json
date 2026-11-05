@@ -1,0 +1,32 @@
+{
+  "nodes": [
+    {"id": "义乌", "name": "义乌", "type": "origin", "lng": 120.07, "lat": 29.30},
+    {"id": "义乌西", "name": "义乌西站", "type": "rail_station", "lng": 119.95, "lat": 29.32},
+    {"id": "金华西", "name": "金华西站", "type": "rail_station", "lng": 119.65, "lat": 29.10},
+    {"id": "杭州港", "name": "杭州港", "type": "river_port", "lng": 120.16, "lat": 30.27},
+    {"id": "宁波北仑", "name": "宁波北仑站", "type": "rail_station", "lng": 121.84, "lat": 29.91},
+    {"id": "宁波港", "name": "宁波港", "type": "sea_port", "lng": 121.95, "lat": 29.87},
+    {"id": "成都", "name": "成都", "type": "origin", "lng": 104.07, "lat": 30.57},
+    {"id": "成都东", "name": "成都东站", "type": "rail_station", "lng": 104.15, "lat": 30.63},
+    {"id": "武汉", "name": "武汉港", "type": "river_port", "lng": 114.30, "lat": 30.59},
+    {"id": "南京", "name": "南京港", "type": "river_port", "lng": 118.79, "lat": 32.06},
+    {"id": "上海港", "name": "上海港", "type": "sea_port", "lng": 121.47, "lat": 31.23},
+    {"id": "重庆", "name": "重庆", "type": "origin", "lng": 106.55, "lat": 29.56},
+    {"id": "浦东机场", "name": "浦东国际机场", "type": "airport", "lng": 121.81, "lat": 31.14},
+    {"id": "双流机场", "name": "双流国际机场", "type": "airport", "lng": 103.94, "lat": 30.58},
+    {"id": "洛杉矶机场", "name": "洛杉矶国际机场 (LAX)", "type": "airport", "lng": -118.41, "lat": 33.94},
+    {"id": "苏州", "name": "苏州", "type": "origin", "lng": 120.62, "lat": 31.32},
+    {"id": "广州", "name": "广州", "type": "origin", "lng": 113.26, "lat": 23.13},
+    {"id": "深圳", "name": "深圳", "type": "origin", "lng": 114.06, "lat": 22.55},
+    {"id": "深圳港", "name": "深圳港", "type": "sea_port", "lng": 114.23, "lat": 22.48},
+    {"id": "广州港", "name": "广州港", "type": "sea_port", "lng": 113.51, "lat": 22.95},
+    {"id": "青岛港", "name": "青岛港", "type": "sea_port", "lng": 120.38, "lat": 36.07},
+    {"id": "天津港", "name": "天津港", "type": "sea_port", "lng": 117.78, "lat": 39.02},
+    {"id": "北京", "name": "北京", "type": "origin", "lng": 116.40, "lat": 39.90},
+    {"id": "西安", "name": "西安", "type": "origin", "lng": 108.94, "lat": 34.34},
+    {"id": "郑州", "name": "郑州", "type": "origin", "lng": 113.62, "lat": 34.75},
+    {"id": "郑州东", "name": "郑州东站", "type": "rail_station", "lng": 113.71, "lat": 34.75},
+    {"id": "广州南", "name": "广州南站", "type": "rail_station", "lng": 113.27, "lat": 23.15},
+    {"id": "北京南", "name": "北京南站", "type": "rail_station", "lng": 116.38, "lat": 39.87}
+  ]
+}

@@ -15,3 +15,6 @@ node_modules/
 .deploy_site/
 prd_images/
 secrets/
+
+# 运行时上传目录
+web/uploads/

@@ -24,7 +24,7 @@ from typing import Any, Dict, Optional
 ROOT = Path(__file__).resolve().parent.parent.parent  # /workspace/transport_agent
 sys.path.insert(0, str(ROOT))
 
-from fastapi import FastAPI, File, UploadFile, Form, HTTPException
+from fastapi import FastAPI, File, UploadFile, Form, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse, JSONResponse
@@ -104,6 +104,18 @@ def get_reader():
     return _reader
 
 
+# 法规知识库（RAG，懒加载：首次调用建索引，仅数十毫秒）
+_kb = None
+
+
+def get_kb():
+    global _kb
+    if _kb is None:
+        from customs.kb import KnowledgeBase
+        _kb = KnowledgeBase(ROOT, verbose=False)
+    return _kb
+
+
 # ----------------- 数据模型 -----------------
 class DispatchReq(BaseModel):
     query: str
@@ -140,6 +152,11 @@ class RoutesReq(BaseModel):
     priority: str = "cost"
 
 
+class KBAskReq(BaseModel):
+    question: str
+    top_k: int = 5
+
+
 # ----------------- 接口 -----------------
 @app.get("/")
 async def index():
@@ -162,6 +179,7 @@ async def health():
         "status": "ok",
         "llm_enabled": bool(api_key) and not api_key.startswith("sk-your"),
         "agents": ["transport", "booking", "customs", "tracking"],
+        "kb": get_kb().stats(),
     }
 
 
@@ -195,6 +213,47 @@ async def get_scenarios():
         it["png_url"] = f"/samples/{it['png']}"
         it["json_url"] = f"/samples/{it['json']}"
     return {"scenarios": items}
+
+
+@app.get("/api/kb/stats")
+async def kb_stats():
+    """知识库规模统计（切块数、分词后端、类型分布）。"""
+    return get_kb().stats()
+
+
+@app.get("/api/kb/search")
+async def kb_search(
+    q: str = Query(..., description="检索词或问题"),
+    top_k: int = Query(3, ge=1, le=10),
+):
+    """知识库检索：返回 Top-K 片段与来源，不做生成。
+
+    结果中 text_kind 标明 原文 / 摘要 / 编者注 / 规则说明，
+    前端据此展示引用徽章，避免把摘要当成法条原文。
+    """
+    if not q.strip():
+        raise HTTPException(status_code=400, detail="q 不能为空")
+    return get_kb().search(q, top_k=top_k)
+
+
+@app.post("/api/kb/ask")
+async def kb_ask(req: KBAskReq):
+    """受约束生成：只依据检索片段作答，强制引用，无依据拒答。
+
+    输出固定标记 ADVISORY：不写 risk_flags、不改 tier、不参与硬校验。
+    """
+    if not req.question.strip():
+        raise HTTPException(status_code=400, detail="question 不能为空")
+    search = get_kb().search(req.question, top_k=min(max(req.top_k, 1), 10))
+    api_key = os.getenv("DEEPSEEK_API_KEY", "")
+    use_llm = bool(api_key) and not api_key.startswith("sk-your")
+    from customs.kb import answer_question
+    out = answer_question(req.question, search["hits"], api_key if use_llm else "")
+    # 透出检索侧的可解释信息：命中了哪些片段、查询扩展了哪些词
+    out["coverage"] = search["coverage"]
+    out["expanded_terms"] = search.get("expanded_terms", [])
+    out["retrieved"] = len(search["hits"])
+    return out
 
 
 @app.post("/api/recognize_and_dispatch")

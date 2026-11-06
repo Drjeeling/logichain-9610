@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>出海物流多 Agent 协同系统</title>
-    <link rel="stylesheet" href="/static/css/main.css?v=20261016b">
+    <link rel="stylesheet" href="/static/css/main.css?v=20261106a">
     <!-- 高德地图 JS API -->
     <script src="https://webapi.amap.com/maps?v=2.0&key=8d39dfaf33aaf52311f32c2f5b734811&plugin=AMap.Scale,AMap.ToolBar"></script>
 </head>
@@ -18,9 +18,18 @@
                 <span class="brand-sub">出海物流多 Agent 协同系统</span>
             </div>
         </div>
-        <div class="status-bar" id="statusBar">
-            <span class="status-dot" id="statusDot"></span>
-            <span id="statusText">系统就绪</span>
+        <div class="topbar-right">
+            <button class="kb-trigger" id="kbTrigger" type="button">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+                    <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+                    <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+                </svg>
+                法规问答
+            </button>
+            <div class="status-bar" id="statusBar">
+                <span class="status-dot" id="statusDot"></span>
+                <span id="statusText">系统就绪</span>
+            </div>
         </div>
     </header>
 
@@ -175,6 +184,40 @@
         <div class="trace-flow" id="traceFlow"></div>
     </footer>
 
-    <script src="/static/js/app.js?v=20261016b"></script>
+    <!-- 法规知识库抽屉（RAG） -->
+    <div class="kb-drawer" id="kbDrawer" aria-hidden="true">
+        <div class="kb-backdrop" id="kbBackdrop"></div>
+        <aside class="kb-panel" role="dialog" aria-label="法规知识库问答">
+            <div class="kb-head">
+                <div>
+                    <h3>法规知识库</h3>
+                    <span class="kb-sub">BM25 检索 · 受约束生成 · 强制引用</span>
+                </div>
+                <button class="kb-close" id="kbClose" type="button" aria-label="关闭">×</button>
+            </div>
+            <div class="kb-presets" id="kbPresets">
+                <span class="kb-presets-label">试试：</span>
+                <button type="button" data-q="收款信息是不是必须上传？">换说法：收款信息</button>
+                <button type="button" data-q="汇总申报最晚什么时候？">汇总申报时限</button>
+                <button type="button" data-q="充电宝出口需要什么资料？">充电宝出口资料</button>
+                <button type="button" data-q="出口退运多久内可以免税？">退运免税期限</button>
+                <button type="button" data-q="超期申报会不会产生滞报金？">超期申报后果</button>
+            </div>
+            <form class="kb-ask-row" id="kbForm">
+                <input id="kbInput" type="text" autocomplete="off"
+                       placeholder="例：9610 出口还要不要传收款单？">
+                <button class="kb-ask-btn" id="kbAskBtn" type="submit">提问</button>
+            </form>
+            <div class="kb-hint">
+                只依据现有法规库作答，无依据会直接说明；结果标记为
+                <code>ADVISORY</code>，不参与申报判断、不改分流等级。
+            </div>
+            <div class="kb-result" id="kbResult">
+                <div class="kb-empty">输入问题后，这里会显示「回答 + 引用片段（原文 / 摘要标注）」。</div>
+            </div>
+        </aside>
+    </div>
+
+    <script src="/static/js/app.js?v=20261106a"></script>
 </body>
 </html>

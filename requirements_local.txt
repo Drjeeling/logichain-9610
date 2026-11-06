@@ -19,6 +19,9 @@ pydantic>=2.0
 openpyxl>=3.1
 rapidocr-onnxruntime>=1.2.3
 
+# 中文分词（法规知识库检索；缺失时自动降级为字符 bigram）
+jieba>=0.42
+
 # 选装（地理距离、帕累托前沿；缺失有内置兜底）
 geopy>=2.4
 paretoset>=1.0

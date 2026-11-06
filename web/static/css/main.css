@@ -1477,3 +1477,252 @@ textarea { resize: vertical; }
   border-top: 1px dashed var(--border);
 }
 .ai-rec-tracking { border-left-color: var(--success); }
+
+/* ============================================================
+   法规知识库（RAG）
+   ============================================================ */
+.topbar-right { display: flex; align-items: center; gap: 16px; }
+
+.kb-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 30px;
+  padding: 0 12px;
+  background: transparent;
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  font-family: inherit;
+  font-size: 12px;
+  cursor: pointer;
+  transition: 0.15s;
+}
+.kb-trigger:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  box-shadow: 0 0 12px var(--accent-glow);
+}
+
+.kb-drawer {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  pointer-events: none;
+}
+.kb-drawer.open { pointer-events: auto; }
+
+.kb-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(4, 10, 20, 0.55);
+  opacity: 0;
+  transition: opacity 0.22s ease;
+}
+.kb-drawer.open .kb-backdrop { opacity: 1; }
+
+.kb-panel {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: min(460px, 92vw);
+  height: 100%;
+  background: var(--bg-panel);
+  border-left: 1px solid var(--border);
+  box-shadow: -8px 0 32px rgba(0, 0, 0, 0.5);
+  transform: translateX(100%);
+  transition: transform 0.24s ease;
+  display: flex;
+  flex-direction: column;
+}
+.kb-drawer.open .kb-panel { transform: translateX(0); }
+
+.kb-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 18px 18px 12px;
+  border-bottom: 1px solid var(--border);
+}
+.kb-head h3 { font-size: 15px; font-weight: 600; }
+.kb-sub { display: block; margin-top: 3px; font-size: 11px; color: var(--text-muted); }
+.kb-close {
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0 2px;
+}
+.kb-close:hover { color: var(--accent); }
+
+.kb-ask-row { display: flex; gap: 8px; padding: 14px 18px 6px; }
+
+.kb-presets {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 18px 0;
+}
+.kb-presets-label { font-size: 11px; color: var(--text-muted); }
+.kb-presets button {
+  padding: 3px 9px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-light);
+  border-radius: 10px;
+  color: var(--text-secondary);
+  font-family: inherit;
+  font-size: 11px;
+  cursor: pointer;
+  transition: 0.15s;
+}
+.kb-presets button:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.kb-ask-row input {
+  flex: 1;
+  height: 36px;
+  padding: 0 12px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-family: inherit;
+  font-size: 13px;
+  outline: none;
+}
+.kb-ask-row input:focus { border-color: var(--accent); }
+.kb-ask-btn {
+  height: 36px;
+  padding: 0 16px;
+  background: var(--accent);
+  border: none;
+  border-radius: var(--radius-sm);
+  color: #04121f;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.kb-ask-btn:disabled { opacity: 0.55; cursor: default; }
+
+.kb-hint {
+  padding: 6px 18px 12px;
+  font-size: 11px;
+  color: var(--text-muted);
+  line-height: 1.6;
+}
+.kb-hint code {
+  font-family: var(--font-mono);
+  color: var(--accent);
+  font-size: 10px;
+}
+
+.kb-result {
+  flex: 1;
+  overflow-y: auto;
+  padding: 4px 18px 24px;
+}
+.kb-empty { color: var(--text-muted); font-size: 12px; padding: 24px 4px; line-height: 1.7; }
+
+.kb-answer {
+  background: var(--bg-card);
+  border: 1px solid var(--border-light);
+  border-left: 3px solid var(--accent);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  margin-bottom: 14px;
+  font-size: 13px;
+  line-height: 1.75;
+  white-space: pre-wrap;
+}
+.kb-answer.refused { border-left-color: var(--warning); }
+.kb-answer-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px dashed var(--border);
+}
+
+.kb-badge {
+  font-size: 10px;
+  padding: 1px 7px;
+  border-radius: 3px;
+  border: 1px solid var(--border-light);
+  color: var(--text-secondary);
+}
+.kb-badge.original { color: var(--success); border-color: rgba(0, 232, 160, 0.45); }
+.kb-badge.summary { color: var(--warning); border-color: rgba(255, 181, 71, 0.45); }
+.kb-badge.editorial { color: var(--danger); border-color: rgba(255, 84, 112, 0.4); }
+.kb-badge.rule { color: var(--accent); border-color: rgba(0, 212, 255, 0.4); }
+.kb-badge.hs_note { color: #b39ddb; border-color: rgba(179, 157, 219, 0.4); }
+.kb-badge.via-ref { color: var(--text-muted); border-style: dashed; }
+
+.kb-cite {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 10px 12px;
+  margin-bottom: 10px;
+  background: var(--bg-deep);
+}
+.kb-cite-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: var(--text-secondary);
+  margin-bottom: 6px;
+}
+.kb-cite-title { color: var(--text-primary); font-weight: 600; font-size: 12px; }
+.kb-cite-text { font-size: 12px; line-height: 1.7; color: var(--text-secondary); white-space: pre-wrap; }
+.kb-cite-context {
+  margin-top: 6px;
+  font-size: 11px;
+  color: var(--text-muted);
+  border-top: 1px dashed var(--border);
+  padding-top: 6px;
+}
+.kb-cite-link {
+  display: inline-block;
+  margin-top: 7px;
+  font-size: 11px;
+  color: var(--accent);
+  text-decoration: none;
+}
+.kb-cite-link:hover { text-decoration: underline; }
+
+/* 申报结果内嵌的「依据与解释」 */
+.kb-evidence {
+  margin-top: 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-card);
+  padding: 12px 14px;
+}
+.kb-evidence-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+}
+.kb-evidence-head span { font-size: 10px; font-weight: 400; color: var(--text-muted); }
+.kb-evidence-item {
+  display: flex;
+  gap: 8px;
+  padding: 7px 0;
+  border-top: 1px dashed var(--border);
+  font-size: 11.5px;
+  line-height: 1.65;
+}
+.kb-evidence-item:first-of-type { border-top: none; }
+.kb-evidence-src { color: var(--text-primary); flex: 0 0 auto; max-width: 34%; }
+.kb-evidence-text { color: var(--text-secondary); flex: 1; }

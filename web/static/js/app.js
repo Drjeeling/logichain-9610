@@ -12,6 +12,7 @@ let lastPayload = null;  // 上次提交参数，供"确认订舱"复用
 let lastRun = null;      // 上次"单据识别即跑"的参数（query + 识别要素），供确认订舱二次调用
 let samples = [];        // 示例单据清单
 let lastBanner = '';     // 识别结果横幅，确认订舱后仍保留展示
+let lastQuery = '';      // 最近一次业务需求，供"依据与解释"检索复用
 
 // 口岸配色（散点/条形图共用）
 const PORT_COLORS = {
@@ -118,6 +119,27 @@ function bindEvents() {
     // 手动提交
     document.getElementById('submitBtn').addEventListener('click', submitQuery);
 
+    // 法规知识库抽屉
+    const kbDrawer = document.getElementById('kbDrawer');
+    if (kbDrawer) {
+        document.getElementById('kbTrigger').addEventListener('click', openKb);
+        document.getElementById('kbClose').addEventListener('click', closeKb);
+        document.getElementById('kbBackdrop').addEventListener('click', closeKb);
+        document.getElementById('kbForm').addEventListener('submit', e => {
+            e.preventDefault();
+            askKb();
+        });
+        document.getElementById('kbPresets').addEventListener('click', e => {
+            const btn = e.target.closest('button[data-q]');
+            if (!btn) return;
+            document.getElementById('kbInput').value = btn.dataset.q;
+            askKb();
+        });
+        document.addEventListener('keydown', e => {
+            if (e.key === 'Escape') closeKb();
+        });
+    }
+
     // 复制按钮（订舱指令等，事件委托，兼容动态重渲染）
     document.addEventListener('click', e => {
         const btn = e.target.closest('.copy-btn');
@@ -217,6 +239,7 @@ async function runDocument(file) {
         // 记住识别结果，供"确认订舱"阶段二次调用（无需重传文件）
         lastRun = { query: data.query, doc_fields: data.recognized, interactive: true };
         lastPayload = { query: data.query, month: data.recognized.month || 11, doc_fields: data.recognized };
+        lastQuery = data.query;
 
         const banner = buildRecognizedBanner(data.recognized, data.query, file.name);
         lastBanner = banner;
@@ -269,6 +292,7 @@ async function submitQuery() {
     setLoading(true);
     lastRun = null;
     lastPayload = { query, month };
+    lastQuery = query;
     try {
         const res = await fetch('/api/dispatch', {
             method: 'POST',
@@ -339,7 +363,12 @@ function renderResult(data, bannerHtml = '') {
     });
     html += '</div>';
 
+    // 报关域命中时，追加「依据与解释」（异步检索，不阻塞主流程）
+    const hasCustoms = results.some(r => r.agent === 'customs');
+    html += '<div class="kb-inline" id="kbInline" style="display:none;"></div>';
+
     content.innerHTML = bannerHtml + html;
+    if (hasCustoms) loadKbEvidence(lastQuery);
 
     // 绑定卡片点击
     document.querySelectorAll('.route-card').forEach(card => {
@@ -1144,5 +1173,127 @@ async function confirmBooking(optionId) {
         console.error(e);
         showError(e.message);
         setStatus('error', '确认失败');
+    }
+}
+
+// ============================================================
+// 法规知识库（RAG）：抽屉问答 + 申报结果内嵌依据
+// ============================================================
+const KB_KIND_CN = { original: '原文', summary: '摘要', editorial: '编者注', rule: '规则说明', hs_note: '归类参考' };
+
+function escHtml(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, c => (
+        { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]
+    ));
+}
+
+function openKb() {
+    document.getElementById('kbDrawer').classList.add('open');
+    document.getElementById('kbDrawer').setAttribute('aria-hidden', 'false');
+    setTimeout(() => document.getElementById('kbInput').focus(), 140);
+}
+
+function closeKb() {
+    document.getElementById('kbDrawer').classList.remove('open');
+    document.getElementById('kbDrawer').setAttribute('aria-hidden', 'true');
+}
+
+async function askKb() {
+    const input = document.getElementById('kbInput');
+    const q = input.value.trim();
+    if (!q) { input.focus(); return; }
+
+    const btn = document.getElementById('kbAskBtn');
+    const box = document.getElementById('kbResult');
+    btn.disabled = true;
+    box.innerHTML = '<div class="kb-empty">检索并生成中…</div>';
+
+    try {
+        const res = await fetch('/api/kb/ask', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ question: q, top_k: 5 }),
+        });
+        const data = await res.json();
+        if (data.detail) throw new Error(data.detail);
+        renderKbAnswer(data);
+    } catch (e) {
+        console.error(e);
+        box.innerHTML = `<div class="kb-answer refused">问答失败：${escHtml(e.message)}</div>`;
+    } finally {
+        btn.disabled = false;
+    }
+}
+
+function renderKbAnswer(data) {
+    const refused = data.insufficient || !data.grounded;
+    const meta = [
+        `<span class="kb-badge">${escHtml(data.mode || 'ADVISORY')}</span>`,
+        `<span class="kb-badge">引用 ${(data.citations || []).length} 条</span>`,
+    ];
+    if (data.degraded) {
+        meta.push(`<span class="kb-badge editorial">降级：${escHtml(data.degraded_reason || '')}</span>`);
+    }
+    if (data.expanded_terms && data.expanded_terms.length) {
+        meta.push(`<span class="kb-badge via-ref">查询扩展：${escHtml(data.expanded_terms.join('、'))}</span>`);
+    }
+
+    let html = `<div class="kb-answer ${refused ? 'refused' : ''}">${escHtml(data.answer || '')}
+        <div class="kb-answer-meta">${meta.join('')}</div>
+    </div>`;
+
+    const cites = data.citations || [];
+    if (cites.length) {
+        html += cites.map((c, i) => renderKbCite(c, i + 1)).join('');
+    }
+    document.getElementById('kbResult').innerHTML = html;
+}
+
+function renderKbCite(c, idx) {
+    const kind = c.text_kind || 'summary';
+    const badge = `<span class="kb-badge ${escHtml(kind)}">${escHtml(c.text_kind_cn || KB_KIND_CN[kind] || kind)}</span>`;
+    const via = c.via === 'cross_ref' ? '<span class="kb-badge via-ref">交叉引用</span>' : '';
+    const art = c.article ? ` ${escHtml(c.article)}` : '';
+    const doc = c.doc_no ? `（${escHtml(c.doc_no)}）` : '';
+    const link = c.official_url
+        ? `<a class="kb-cite-link" href="${escHtml(c.official_url)}" target="_blank" rel="noopener">查看官方原文 ↗</a>`
+        : '';
+    const verified = c.verified_at
+        ? `<span class="kb-badge">已核验 ${escHtml(c.verified_at)}</span>`
+        : '';
+    return `<div class="kb-cite">
+        <div class="kb-cite-head">
+            <span class="kb-cite-title">[${idx}] ${escHtml(c.source_title || '')}${art}</span>${doc}${badge}${verified}${via}
+        </div>
+        <div class="kb-cite-text">${escHtml(c.quote || '')}</div>
+        ${link}
+    </div>`;
+}
+
+// 报关结果内嵌：只做检索不做生成，避免每次申报都消耗 token
+async function loadKbEvidence(query) {
+    const box = document.getElementById('kbInline');
+    if (!box || !query) return;
+    try {
+        const res = await fetch(`/api/kb/search?q=${encodeURIComponent(query)}&top_k=3`);
+        const data = await res.json();
+        const hits = (data.hits || []).filter(h => h.score >= 4 && h.text_kind !== 'editorial');
+        if (!hits.length) return;
+
+        box.style.display = 'block';
+        box.innerHTML = `<div class="kb-evidence">
+            <div class="kb-evidence-head">依据与解释
+                <span>来源：法规知识库 · 仅供解释，不参与申报判断</span>
+            </div>
+            ${hits.slice(0, 2).map(h => `<div class="kb-evidence-item">
+                <div class="kb-evidence-src">
+                    ${escHtml(h.source_title || '')}${h.article ? ' ' + escHtml(h.article) : ''}<br>
+                    <span class="kb-badge ${escHtml(h.text_kind)}">${escHtml(h.text_kind_cn || '')}</span>
+                </div>
+                <div class="kb-evidence-text">${escHtml(h.text)}</div>
+            </div>`).join('')}
+        </div>`;
+    } catch (e) {
+        // 静默失败：依据展示不影响主链路
     }
 }

@@ -1,0 +1,12 @@
+id: CATALOG-DECLARATION-2026
+title: 进出口商品涉税规范申报目录（2026年版）· 演示税号要素（参数库替代）
+doc_no: 随年度公告发布
+issuer: 海关总署
+publish_date: None
+effective_date: 2026-01-01
+status: effective
+official_url: 单一窗口参数查询（CusMerchElement）
+source_channel: 单一窗口参数接口直接抓取（D板块）
+fetched_at: 2026-11-06
+has_attachment: false
+note: 目录本体为门户交互式查询页，无法整册下载；以参数库全量数据替代：3926 章级8项/851822 六位级9项已 VERIFIED，3926909010 同源核验。见 D板块_申报要素_核验数据.json

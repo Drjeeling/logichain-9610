@@ -1,0 +1,40 @@
+{
+  "doc_type": "商业发票",
+  "seller": "宁波市步远鞋业有限公司",
+  "seller_en": "NINGBO BUYUAN FOOTWEAR CO., LTD.",
+  "buyer": "GreenLeaf Apparel LLC",
+  "invoice_no": "BY-EXP-20261020-03",
+  "invoice_date": "2026-10-20",
+  "contract_no": "BY-GL-2026-1012",
+  "platform": "Amazon",
+  "order_id": "AMZ-2026-10-9901",
+  "logistics_no": "SF1122334455667",
+  "clear_date": "2026-10-30",
+  "trade_terms": "FOB NINGBO",
+  "origin": "宁波港 Ningbo",
+  "dest": "洛杉矶",
+  "dest_country": "美国",
+  "cargo_name": "纺织材料制面运动鞋（无品牌）",
+  "tonnage": 1.35,
+  "gross_weight": 1350.0,
+  "net_weight": 1200.0,
+  "package_count": 30,
+  "quantity": 6000,
+  "unit": "PCS",
+  "unit_price_usd": 8.5,
+  "total_amount_usd": 51000.0,
+  "currency": "USD",
+  "priority": "time",
+  "month": 11,
+  "special_notes": "合规直通（无品牌/无电/单证齐全）",
+  "items": [
+    {
+      "desc": "纺织材料制面运动鞋（无品牌） / Textile Upper Sports Shoes",
+      "hs": "6404.11",
+      "qty": 6000,
+      "unit": "PCS",
+      "price": 8.5,
+      "amount": 51000.0
+    }
+  ]
+}

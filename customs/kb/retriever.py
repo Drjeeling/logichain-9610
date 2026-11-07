@@ -21,10 +21,11 @@ _LIVE_STATUS = {"effective", "active", "expiring_soon"}
 _KIND_WEIGHT = {"original": 1.0, "rule": 1.0, "summary": 0.9, "hs_note": 0.85, "editorial": 0.45}
 
 # 相关性下限：低于此分数视为"未找到依据"。
-# 由 test_kb_eval.py 在 22 个可回答问题 + 3 个无依据问题上校准：
-#   可回答问题最低分 4.16，无依据问题最高分 3.42，取中间值 3.8。
+# 由 test_kb_eval.py 在 22 个可回答问题 + 3 个无依据问题上校准。
+# 原文入库后（260 个可检索片段）复测：可回答问题最低 top1 6.61，
+# 无依据问题最高 top1 5.07，取中间值 5.8。
 # 语料规模显著变化后必须重新校准，不要当成永久常数。
-MIN_SCORE = 3.8
+MIN_SCORE = 5.8
 
 _DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 

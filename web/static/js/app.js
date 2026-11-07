@@ -13,6 +13,7 @@ let lastRun = null;      // 上次"单据识别即跑"的参数（query + 识别
 let samples = [];        // 示例单据清单
 let lastBanner = '';     // 识别结果横幅，确认订舱后仍保留展示
 let lastQuery = '';      // 最近一次业务需求，供"依据与解释"检索复用
+let declarationCtx = { declaration: null, payload: null, edits: {}, meta: {} };  // 制单上下文
 
 // 口岸配色（散点/条形图共用）
 const PORT_COLORS = {
@@ -337,6 +338,22 @@ function renderResult(data, bannerHtml = '') {
     const results = data.results || [];
     const transportResult = results.find(r => r.agent === 'transport' || (r.data && (r.data.all_routes || r.data.routes)));
 
+    // 制单上下文：报关域的结构化申报 dict 与元信息
+    const customsResult = results.find(r => r.agent === 'customs');
+    declarationCtx = {
+        declaration: (customsResult && customsResult.data && customsResult.data.declaration_dict) || null,
+        payload: null,
+        edits: {},
+        meta: customsResult && customsResult.data ? {
+            tier: customsResult.data.tier,
+            status: customsResult.data.status,
+            risk_flags: customsResult.data.risk_flags || [],
+            decl_compliance: customsResult.data.decl_compliance || {},
+            agent_slots: customsResult.data.agent_slots || {},
+            tier_action: customsResult.data.tier_action || {},
+        } : {},
+    };
+
     let routes = [];
     if (transportResult && transportResult.data) {
         // 优先用 all_routes（完整候选），其次 recommended（帕累托前沿）
@@ -369,6 +386,7 @@ function renderResult(data, bannerHtml = '') {
 
     content.innerHTML = bannerHtml + html;
     if (hasCustoms) loadKbEvidence(lastQuery);
+    if (declarationCtx.declaration) buildDeclaration();
 
     // 绑定卡片点击
     document.querySelectorAll('.route-card').forEach(card => {
@@ -478,8 +496,8 @@ function renderAgentOutput(result) {
         vizHtml = renderTrackingViz(data);
     }
 
-    // 可视化结果 → 分层 AI 建议 → 折叠的计算过程
-    bodyHtml = vizHtml + renderAIAdvice(data, agent) + wrapProcess(summary);
+    // 可视化结果 → 分层 AI 建议 → 制单面板 → 折叠的计算过程
+    bodyHtml = vizHtml + renderAIAdvice(data, agent) + renderDeclarationPanel(data, agent) + wrapProcess(summary);
 
     // 兜底分支
     if (!vizHtml && !summary) {
@@ -676,6 +694,14 @@ function renderCustomsViz(data) {
         }).join('')
         : '<div class="cs-risk none">✓ 未检出风险</div>';
 
+    // A/B/C 分级处置动作
+    const ta = data.tier_action || {};
+    const actionHtml = (ta.actions && ta.actions.length) ? `
+        <div class="cs-action ${tierCls}">
+            <div class="cs-action-head">处置结论：<b>${ta.label || tier}</b>${ta.blocked ? '（禁止申报）' : (ta.can_auto_declare ? '（可自动拟单）' : '')}</div>
+            <ol class="cs-action-list">${ta.actions.map(a => `<li>${a}</li>`).join('')}</ol>
+        </div>` : '';
+
     return `
     <div class="customs-viz">
         <div class="cs-top">
@@ -684,6 +710,7 @@ function renderCustomsViz(data) {
         </div>
         <div class="cs-slots">${slotHtml}</div>
         <div class="cs-risks">${flagHtml}</div>
+        ${actionHtml}
     </div>`;
 }
 
@@ -762,6 +789,8 @@ function renderTrackingAdvice(data) {
                 <div class="tax-head"><span class="tax-name">${icon} ${t.name}</span><span class="tax-days">${days}</span></div>
                 <div class="tax-desc">${t.desc}</div>
                 <div class="tax-foot"><span>截止 ${t.deadline}</span><span class="tax-penalty">逾期：${t.penalty}</span></div>
+                ${t.basis ? `<div class="tax-basis">依据：${t.basis}</div>` : ''}
+                ${t.clear_date_estimated ? `<div class="tax-basis">注：单据未提供结关日，按发票日+30天估算（${t.clear_date}），实际以报关单结关日为准</div>` : ''}
             </div>`;
         });
         html += '</div></div>';
@@ -1295,5 +1324,170 @@ async function loadKbEvidence(query) {
         </div>`;
     } catch (e) {
         // 静默失败：依据展示不影响主链路
+    }
+}
+
+// ============================================================ //
+// 制单：9610 申报清单（字段字典驱动，逐栏可溯源）
+// ============================================================ //
+function renderDeclarationPanel(data, agent) {
+    if (agent !== 'customs') return '';
+    const has = !!(declarationCtx.declaration || (data && data.declaration_dict));
+    return `
+    <div class="ai-rec ai-rec-customs" id="declPanel">
+        <div class="ai-rec-label">🧾 9610 申报清单 · 制单</div>
+        <div id="declBody" style="font-size:12px;color:var(--text-muted);margin-top:6px">
+            ${has ? '正在按字段字典组装…' : '本次未生成结构化申报数据'}
+        </div>
+        <div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap">
+            <button type="button" class="btn-ghost" onclick="buildDeclaration()" ${has ? '' : 'disabled'}>重新生成</button>
+            <button type="button" class="btn-ghost" id="declDownload" onclick="downloadDeclaration()" disabled>下载 Excel</button>
+        </div>
+    </div>`;
+}
+
+async function buildDeclaration() {
+    if (!declarationCtx.declaration) return;
+    const body = document.getElementById('declBody');
+    if (body) body.textContent = '正在组装…';
+    try {
+        const res = await fetch('/api/declaration/build', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                declaration: declarationCtx.declaration,
+                edits: declarationCtx.edits,
+                meta: declarationCtx.meta,
+            }),
+        });
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        const data = await res.json();
+        declarationCtx.payload = data.payload;
+        renderDeclarationBody(data.payload);
+        const btn = document.getElementById('declDownload');
+        if (btn) btn.disabled = false;
+    } catch (e) {
+        if (body) body.innerHTML = `<span style="color:#f56c6c">制单失败：${escHtml(String(e.message || e))}</span>`;
+    }
+}
+
+function declStatusColor(status) {
+    if (status === 'BLOCK') return '#f56c6c';
+    if (status === 'NEED_INPUT' || status === 'WARN') return '#e6a23c';
+    if (status === 'DEFAULTED' || status === 'DERIVED') return '#409eff';
+    if (status === 'EMPTY') return '#909399';
+    return '#67c23a';
+}
+
+function renderDeclarationBody(payload) {
+    const body = document.getElementById('declBody');
+    if (!body || !payload) return;
+    const counts = payload.counts || {};
+    const stateText = payload.blocked
+        ? `阻断 ${counts.BLOCK || 0} 项，补齐前不可定稿`
+        : (payload.ready ? '字段完整，可定稿' : `待补填 ${counts.NEED_INPUT || 0} 项`);
+    const stateColor = payload.blocked ? '#f56c6c' : (payload.ready ? '#67c23a' : '#e6a23c');
+
+    const rowHtml = (rows) => rows.map(r => {
+        const val = (r.value === null || r.value === '' || r.value === undefined) ? '—' : String(r.value);
+        const color = declStatusColor(r.status);
+        return `<tr>
+            <td style="padding:3px 6px;color:#8a94a6;white-space:nowrap">${escHtml(r.label)}</td>
+            <td style="padding:3px 6px;color:#e8eef8">${escHtml(val)}</td>
+            <td style="padding:3px 6px;color:${color};white-space:nowrap;font-size:11px">${escHtml(r.status_label)}</td>
+        </tr>`;
+    }).join('');
+
+    const itemRows = (payload.items && payload.items[0] && payload.items[0].rows) || [];
+    const gaps = payload.gaps || [];
+    const meta = payload.meta || {};
+    const tierAction = meta.tier_action || {};
+    const riskCount = (meta.risk_flags || []).length;
+    const complianceCount = ((meta.decl_compliance || {}).issues || []).length;
+    const metaHtml = meta.tier ? `
+        <div style="margin:2px 0 8px;padding:6px 8px;background:#0f1520;border:1px solid #222a38;border-radius:6px;font-size:11px">
+            <b style="color:${tierAction.blocked ? '#f56c6c' : (tierAction.can_auto_declare ? '#67c23a' : '#e6a23c')}">
+                报关分流 ${escHtml(String(meta.tier))} · ${escHtml(tierAction.label || '')}
+            </b>
+            <span style="color:#8a94a6">　风险 ${riskCount} 项 · 合规问题 ${complianceCount} 项</span>
+            ${tierAction.blocked ? '<span style="color:#f56c6c">　禁止申报，需整改后重跑</span>' : ''}
+        </div>` : '';
+    const gapHtml = gaps.length ? `
+        <div style="margin-top:10px;padding-top:8px;border-top:1px dashed #2a3242">
+            <div style="font-size:12px;color:#e6a23c;margin-bottom:6px">待补字段（${gaps.length}）</div>
+            <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:6px">
+                ${gaps.map(g => `<label style="font-size:11px;color:#8a94a6">${escHtml(g.label)}
+                    <input data-decl-key="${escHtml(g.key)}" placeholder="${escHtml(g.status_label)}"
+                        style="width:100%;margin-top:2px;padding:4px 6px;background:#0f1520;border:1px solid #2a3242;border-radius:4px;color:#e8eef8;font-size:12px">
+                </label>`).join('')}
+            </div>
+            <button type="button" class="btn-ghost" style="margin-top:8px" onclick="applyDeclarationEdits()">补全并重新生成</button>
+        </div>` : '';
+
+    body.innerHTML = `
+        <div style="font-size:12px;margin:6px 0 8px">
+            <strong style="color:${stateColor}">${escHtml(stateText)}</strong>
+            <span style="color:#8a94a6">　已填 ${counts.FILLED || 0} · 默认 ${counts.DEFAULTED || 0} · 派生 ${counts.DERIVED || 0}</span>
+            <span style="color:#8a94a6">　字段字典 v${escHtml(String(payload.field_dict_version || ''))}</span>
+        </div>
+        ${metaHtml}
+        <div style="max-height:300px;overflow:auto;border:1px solid #222a38;border-radius:6px">
+            <table style="width:100%;border-collapse:collapse;font-size:12px">
+                <thead><tr style="background:#141b28">
+                    <th style="text-align:left;padding:4px 6px;color:#8a94a6;font-weight:500">表头栏目</th>
+                    <th style="text-align:left;padding:4px 6px;color:#8a94a6;font-weight:500">值</th>
+                    <th style="text-align:left;padding:4px 6px;color:#8a94a6;font-weight:500">状态</th>
+                </tr></thead>
+                <tbody>${rowHtml(payload.header || [])}</tbody>
+            </table>
+        </div>
+        <div style="max-height:300px;overflow:auto;border:1px solid #222a38;border-radius:6px;margin-top:8px">
+            <table style="width:100%;border-collapse:collapse;font-size:12px">
+                <thead><tr style="background:#141b28">
+                    <th style="text-align:left;padding:4px 6px;color:#8a94a6;font-weight:500">表体栏目</th>
+                    <th style="text-align:left;padding:4px 6px;color:#8a94a6;font-weight:500">值</th>
+                    <th style="text-align:left;padding:4px 6px;color:#8a94a6;font-weight:500">状态</th>
+                </tr></thead>
+                <tbody>${rowHtml(itemRows)}</tbody>
+            </table>
+        </div>
+        ${gapHtml}`;
+}
+
+function applyDeclarationEdits() {
+    const inputs = document.querySelectorAll('[data-decl-key]');
+    inputs.forEach(inp => {
+        const key = inp.getAttribute('data-decl-key');
+        const val = inp.value.trim();
+        if (key && val) {
+            declarationCtx.declaration[key] = val;
+            declarationCtx.edits[key] = val;
+        }
+    });
+    buildDeclaration();
+}
+
+async function downloadDeclaration() {
+    if (!declarationCtx.declaration) return;
+    try {
+        const res = await fetch('/api/declaration/xlsx', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                declaration: declarationCtx.declaration,
+                edits: declarationCtx.edits,
+                meta: declarationCtx.meta,
+            }),
+        });
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        const blob = await res.blob();
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = '9610申报清单.xlsx';
+        a.click();
+        setTimeout(() => URL.revokeObjectURL(a.href), 3000);
+    } catch (e) {
+        const body = document.getElementById('declBody');
+        if (body) body.innerHTML = `<span style="color:#f56c6c">导出失败：${escHtml(String(e.message || e))}</span>`;
     }
 }

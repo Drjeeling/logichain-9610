@@ -149,6 +149,8 @@ class ShipmentState:
             "degraded": self.degraded,
             "hs_code": self.hs_code,
             "field_gaps": self.field_gaps,
+            "declaration_dict": self.declaration_dict,
+            "declaration": self.declaration_draft,
             "risk_flags": self.risk_flags,
             "three_doc_status": self.three_doc_status,
             "decl_compliance": self.decl_compliance,

@@ -1,8 +1,10 @@
 """真实业务场景单据生成器。
 
-生成两个"甩进去就能跑"的真实单据：
-- 场景一 · IP侵权类：深圳 3C 配件出口 → 洛杉矶（触发品牌 IP 风险）
-- 场景二 · 危险品类：义乌 电子配件出口 → 汉堡（触发锂电池危险品通道）
+生成四个"甩进去就能跑"的真实单据，覆盖 A/B/C 三档分流：
+- 场景一 · IP侵权类（C）：3C 配件出口 → 洛杉矶（品牌 IP critical）
+- 场景二 · 危险品类（C）：电子配件出口 → 汉堡（锂电池危险品 critical）
+- 场景三 · 合规直通（A）：运动鞋出口 → 洛杉矶（字段齐全、无风险）
+- 场景四 · 低报预警（B）：硅胶手机壳出口 → 洛杉矶（低单价 warning）
 
 每个场景输出两种载体：
 - 商业发票图片 PNG（真实排版，走 OCR 识别路径）
@@ -33,12 +35,12 @@ BG_SOFT = (240, 244, 250)
 
 
 # ------------------------------------------------------------------ #
-# 两个真实业务场景（数据）
+# 四个真实业务场景（数据）
 # ------------------------------------------------------------------ #
 SCENARIOS = [
     {
         "id": "scene1_ip",
-        "name": "场景一 · IP侵权类",
+        "name": "场景一 · IP侵权类（C级）",
         "subtitle": "3C配件出口 · 深圳 → 洛杉矶",
         "doc_type": "商业发票",
         "seller": "深圳市锐讯科技有限公司",
@@ -49,9 +51,13 @@ SCENARIOS = [
         "buyer": "TechGear Trading Inc.",
         "buyer_addr": "2450 S Atlantic Blvd, Commerce, CA 90040, USA",
         "buyer_tel": "Tel: +1-323-5700 2210",
-        "invoice_no": "RX-INV-20251015-01",
-        "invoice_date": "2025-10-15",
-        "contract_no": "RX-TG-2025-1008",
+        "invoice_no": "RX-INV-20261015-01",
+        "invoice_date": "2026-10-15",
+        "contract_no": "RX-TG-2026-1008",
+        "platform": "Amazon",
+        "order_id": "AMZ-2026-10-8842",
+        "logistics_no": "SF1234567890123",
+        "clear_date": "2026-10-25",
         "trade_terms": "FOB SHENZHEN",
         "origin": "深圳港 Shenzhen",
         "dest": "LOS ANGELES, USA",
@@ -66,13 +72,14 @@ SCENARIOS = [
         ],
         "total_qty": 12000, "total_amount": 12600.00,
         "net_weight": "4,800 KGS", "gross_weight": "5,200 KGS", "ctns": "3 CTNS",
+        "net_kg": 4800, "gross_kg": 5200, "pkgs": 3,
         "remark": "货物含第三方品牌标识（iPhone / Apple），出口前须提供品牌授权证明。\nMarks: N/M  " + "3 CTNS  Made in China",
         "priority": "cost", "month": 11,
         "risk_tag": "IP 侵权风险（品牌词：iPhone / Apple）",
     },
     {
         "id": "scene2_dg",
-        "name": "场景二 · 危险品类",
+        "name": "场景二 · 危险品类（C级）",
         "subtitle": "电子配件出口 · 义乌 → 汉堡",
         "doc_type": "商业发票",
         "seller": "义乌市恒通电子配件有限公司",
@@ -83,9 +90,13 @@ SCENARIOS = [
         "buyer": "EuroTech Handels GmbH",
         "buyer_addr": "Hafenstrasse 45, 20359 Hamburg, Germany",
         "buyer_tel": "Tel: +49-40-3006 7788",
-        "invoice_no": "HT-EXP-20251015-02",
-        "invoice_date": "2025-10-15",
-        "contract_no": "HT-EU-2025-0918",
+        "invoice_no": "HT-EXP-20261015-02",
+        "invoice_date": "2026-10-15",
+        "contract_no": "HT-EU-2026-0918",
+        "platform": "AliExpress",
+        "order_id": "AE-2026-10-7719",
+        "logistics_no": "YT9876543210987",
+        "clear_date": "2026-10-28",
         "trade_terms": "CIF HAMBURG",
         "origin": "义乌 Yiwu",
         "dest": "HAMBURG, GERMANY",
@@ -100,9 +111,84 @@ SCENARIOS = [
         ],
         "total_qty": 14000, "total_amount": 44000.00,
         "net_weight": "5,200 KGS", "gross_weight": "6,000 KGS", "ctns": "20 CTNS",
+        "net_kg": 5200, "gross_kg": 6000, "pkgs": 20,
         "remark": "货物含锂电池，属危险品（UN3480 / UN3481），须提供 UN38.3 测试报告与 MSDS。\nMarks: N/M  " + "20 CTNS  Made in China",
         "priority": "time", "month": 11,
         "risk_tag": "危险品风险（UN3480 / UN3481 锂电池）",
+    },
+    {
+        "id": "scene3_green",
+        "name": "场景三 · 合规直通（A级）",
+        "subtitle": "运动鞋出口 · 宁波 → 洛杉矶",
+        "doc_type": "商业发票",
+        "seller": "宁波市步远鞋业有限公司",
+        "seller_en": "NINGBO BUYUAN FOOTWEAR CO., LTD.",
+        "seller_addr": "浙江省宁波市鄞州区姜山镇科技路 99 号",
+        "seller_tel": "Tel: +86-574-8822 3366",
+        "seller_id": "统一社会信用代码: 91330212MA2JXXXX8Q",
+        "buyer": "GreenLeaf Apparel LLC",
+        "buyer_addr": "1200 S Santa Fe Ave, Los Angeles, CA 90021, USA",
+        "buyer_tel": "Tel: +1-213-8800 5517",
+        "invoice_no": "BY-EXP-20261020-03",
+        "invoice_date": "2026-10-20",
+        "contract_no": "BY-GL-2026-1012",
+        "platform": "Amazon",
+        "order_id": "AMZ-2026-10-9901",
+        "logistics_no": "SF1122334455667",
+        "clear_date": "2026-10-30",
+        "trade_terms": "FOB NINGBO",
+        "origin": "宁波港 Ningbo",
+        "dest": "LOS ANGELES, USA",
+        "dest_cn": "洛杉矶 · 美国",
+        "payment": "T/T 100% before shipment",
+        "currency": "USD",
+        "items": [
+            {"no": 1, "desc": "纺织材料制面运动鞋（无品牌）", "desc_en": "Textile Upper Sports Shoes",
+             "hs": "6404.11", "qty": 6000, "unit": "PCS", "price": 8.50, "amount": 51000.00},
+        ],
+        "total_qty": 6000, "total_amount": 51000.00,
+        "net_weight": "1,200 KGS", "gross_weight": "1,350 KGS", "ctns": "30 CTNS",
+        "net_kg": 1200, "gross_kg": 1350, "pkgs": 30,
+        "remark": "无品牌、无电池、无第三方知识产权；随附装箱单与订舱确认。\nMarks: N/M  " + "30 CTNS  Made in China",
+        "priority": "time", "month": 11,
+        "risk_tag": "合规直通（无品牌/无电/单证齐全）",
+    },
+    {
+        "id": "scene4_lowvalue",
+        "name": "场景四 · 低报预警（B级）",
+        "subtitle": "硅胶手机壳出口 · 东莞 → 洛杉矶",
+        "doc_type": "商业发票",
+        "seller": "东莞市柔盾塑胶制品有限公司",
+        "seller_en": "DONGGUAN ROUDUN PLASTIC PRODUCTS CO., LTD.",
+        "seller_addr": "广东省东莞市长安镇乌沙工业区兴发路 18 号",
+        "seller_tel": "Tel: +86-769-8123 6677",
+        "seller_id": "统一社会信用代码: 91441900MA4WXXXX3R",
+        "buyer": "SoftCase Direct Inc.",
+        "buyer_addr": "3850 S Alameda St, Los Angeles, CA 90058, USA",
+        "buyer_tel": "Tel: +1-323-6600 1188",
+        "invoice_no": "RD-EXP-20261022-04",
+        "invoice_date": "2026-10-22",
+        "contract_no": "RD-SC-2026-1016",
+        "platform": "Shopify",
+        "order_id": "SHF-2026-10-5521",
+        "logistics_no": "YT5566778899001",
+        "clear_date": "2026-10-27",
+        "trade_terms": "FOB SHENZHEN",
+        "origin": "深圳港 Shenzhen",
+        "dest": "LOS ANGELES, USA",
+        "dest_cn": "洛杉矶 · 美国",
+        "payment": "T/T 70% / 30% B/L",
+        "currency": "USD",
+        "items": [
+            {"no": 1, "desc": "硅胶手机保护壳（无品牌）", "desc_en": "Silicone Phone Case (No Brand)",
+             "hs": "3926.90", "qty": 20000, "unit": "PCS", "price": 0.18, "amount": 3600.00},
+        ],
+        "total_qty": 20000, "total_amount": 3600.00,
+        "net_weight": "760 KGS", "gross_weight": "850 KGS", "ctns": "15 CTNS",
+        "net_kg": 760, "gross_kg": 850, "pkgs": 15,
+        "remark": "无品牌、无电池；申报单价明显低于同类商品，需准备价格构成说明。\nMarks: N/M  " + "15 CTNS  Made in China",
+        "priority": "cost", "month": 11,
+        "risk_tag": "货值异常（申报单价低于同类阈值）",
     },
 ]
 
@@ -200,7 +286,7 @@ def render_invoice(sc: dict) -> Image.Image:
         ("起运港 From", sc["origin"]),
         ("目的港 To", sc["dest"]),
         ("目的国 Country", sc["dest_cn"]),
-        ("装运月份 Ship Month", f"2025-{sc['month']:02d}"),
+        ("装运月份 Ship Month", f"2026-{sc['month']:02d}"),
     ]
     rw = (W - 2 * MARGIN) // 4
     for i, (k, v) in enumerate(route):
@@ -209,6 +295,21 @@ def render_invoice(sc: dict) -> Image.Image:
         _draw_text(d, (bx + 10, y + 5), k, _font(True, 14), MUTED)
         _draw_text(d, (bx + 10, y + 24), v, _font(True, 17), ACCENT)
     y += 60
+
+    # ---- 跨境电商订单信息（9610 清单必填）----
+    order_row = [
+        ("平台 Platform", sc["platform"]),
+        ("订单编号 Order No", sc["order_id"]),
+        ("物流运单号 Tracking No", sc["logistics_no"]),
+        ("结关日 Clear Date", sc["clear_date"]),
+    ]
+    ow = (W - 2 * MARGIN) // 4
+    for i, (k, v) in enumerate(order_row):
+        bx = MARGIN + i * ow
+        d.rectangle([bx, y, bx + ow, y + 46], outline=LINE, width=1)
+        _draw_text(d, (bx + 8, y + 4), k, _font(True, 12), MUTED)
+        _draw_text(d, (bx + 8, y + 24), v, _font(True, 15), INK)
+    y += 62
 
     # ---- 商品明细表 ----
     cols = [
@@ -322,12 +423,19 @@ def to_json_doc(sc: dict) -> dict:
         "invoice_no": sc["invoice_no"],
         "invoice_date": sc["invoice_date"],
         "contract_no": sc["contract_no"],
+        "platform": sc["platform"],
+        "order_id": sc["order_id"],
+        "logistics_no": sc["logistics_no"],
+        "clear_date": sc["clear_date"],
         "trade_terms": sc["trade_terms"],
         "origin": sc["origin"],
         "dest": sc["dest_cn"].split("·")[0].strip(),
         "dest_country": sc["dest_cn"].split("·")[-1].strip(),
         "cargo_name": sc["items"][0]["desc"],
         "tonnage": float(sc["gross_weight"].replace(",", "").split()[0]) / 1000.0,
+        "gross_weight": float(sc["gross_kg"]),
+        "net_weight": float(sc["net_kg"]),
+        "package_count": int(sc["pkgs"]),
         "quantity": sc["total_qty"],
         "unit": "PCS",
         "unit_price_usd": sc["items"][0]["price"],

@@ -38,20 +38,24 @@ EXTREME_WEATHER_KEYWORDS = [
 ]
 
 # 税务节点规则
+# 依据：国家税务总局公告2012年第24号（出口退（免）税申报期限与备案单证要求）
 TAX_WINDOWS = [
     {
-        "name": "免税登记",
+        "name": "综试区无票免税登记",
         "from_event": "clear_date",
-        "desc": "深圳跨境电商无票免税登记（提前2天预约 + T+2确认）",
+        "desc": "跨境电商综试区无票免税登记（以主管税务机关口径为准）",
+        "deadline_mode": "days",
         "deadline_days": 15,        # 结关后15天内
-        "penalty": "逾期视同内销，补征增值税13%",
+        "penalty": "逾期可能视同内销补征增值税，具体以主管税务机关认定为准",
+        "basis": "综试区无票免税政策",
     },
     {
-        "name": "退税申报",
+        "name": "出口退税申报",
         "from_event": "clear_date",
-        "desc": "出口退税申报（36个月内，越早越好）",
-        "deadline_days": 365 * 3,   # 36个月
-        "penalty": "逾期无法退税",
+        "desc": "货物报关出口之日次月起至次年4月30日前的各增值税纳税申报期内申报退（免）税",
+        "deadline_mode": "next_year_0430",
+        "penalty": "逾期不得申报免退税；已确定免税的应及时转免税申报，避免视同内销",
+        "basis": "国家税务总局公告2012年第24号 第四、五条",
     },
 ]
 
@@ -89,7 +93,7 @@ class TrackingAgent(BaseAgent):
         # ---- T3 税务节点监控 ----
         order = ctx.get("order") or {}
         timeline = ctx.get("timeline") or {}
-        tax_reminders = self._monitor_tax_nodes(order, timeline)
+        tax_reminders = self._monitor_tax_nodes(order, timeline, ctx)
 
         # ---- 处理建议 ----
         suggestions = self._gen_suggestions(anomaly, current_state, tax_reminders, weather_report)
@@ -117,6 +121,11 @@ class TrackingAgent(BaseAgent):
                     f"（{'已逾期' + str(-t['days_left']) + '天' if t['days_left'] < 0 else '剩余' + str(t['days_left']) + '天'}）"
                 )
                 summary_lines.append(f"    → {t['desc']}")
+                summary_lines.append(f"    → 依据：{t['basis']}；逾期后果：{t['penalty']}")
+            if any(t.get("clear_date_estimated") for t in tax_reminders):
+                summary_lines.append(
+                    "    → 注：单据未提供结关日，以上期限按发票日+30天估算，实际以报关单结关日为准"
+                )
         if suggestions:
             summary_lines.append("\n**处理建议**：")
             for s in suggestions:
@@ -237,28 +246,44 @@ class TrackingAgent(BaseAgent):
     # T3 税务节点监控
     # ----------------------------------------------------------------- #
     @staticmethod
-    def _monitor_tax_nodes(order: Dict, timeline: Dict) -> List[Dict]:
-        """监控免税/退税登记窗口。"""
-        clear_date_str = order.get("clear_date")
+    def _monitor_tax_nodes(order: Dict, timeline: Dict, ctx: Optional[Dict] = None) -> List[Dict]:
+        """监控免税/退税申报窗口，并在缺失结关日时给出可追溯的估算。"""
+        ctx = ctx or {}
+        clear_date_str = order.get("clear_date") or ctx.get("clear_date")
         # 也从 timeline 取
         if not clear_date_str and isinstance(timeline, dict):
             manifests = timeline.get("manifests") or []
             if manifests:
                 clear_date_str = manifests[0].get("clear_date")
 
+        estimated = False
         if not clear_date_str:
-            return []
-
-        try:
-            clear_date = datetime.strptime(clear_date_str, "%Y-%m-%d")
-        except (ValueError, TypeError):
-            return []
+            # 单据未给结关日时，按发票日+30天估算，并在结果中显式标注
+            invoice_date_str = order.get("invoice_date") or ctx.get("invoice_date")
+            if not invoice_date_str:
+                return []
+            try:
+                invoice_date = datetime.strptime(invoice_date_str, "%Y-%m-%d")
+            except (ValueError, TypeError):
+                return []
+            clear_date = invoice_date + timedelta(days=30)
+            estimated = True
+        else:
+            try:
+                clear_date = datetime.strptime(clear_date_str, "%Y-%m-%d")
+            except (ValueError, TypeError):
+                return []
 
         now = datetime.now()
         reminders: List[Dict] = []
 
         for rule in TAX_WINDOWS:
-            deadline = clear_date + timedelta(days=rule["deadline_days"])
+            if rule.get("deadline_mode") == "next_year_0430":
+                # 报关出口之日次月起至次年 4 月 30 日前
+                deadline = datetime(clear_date.year + 1, 4, 30)
+            else:
+                deadline = clear_date + timedelta(days=rule["deadline_days"])
+
             days_left = (deadline - now).days
             if days_left < 0:
                 level = "urgent"
@@ -276,6 +301,10 @@ class TrackingAgent(BaseAgent):
                 "days_left": days_left,
                 "level": level,
                 "penalty": rule["penalty"],
+                "basis": rule["basis"],
+                "clear_date": clear_date.strftime("%Y-%m-%d"),
+                "clear_date_estimated": estimated,
+                "expired": days_left < 0,
             })
 
         return reminders

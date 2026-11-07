@@ -17,6 +17,7 @@ import io
 import os
 import sys
 import json
+import time
 from pathlib import Path
 from typing import Any, Dict, Optional
 
@@ -27,7 +28,7 @@ sys.path.insert(0, str(ROOT))
 from fastapi import FastAPI, File, UploadFile, Form, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import FileResponse, JSONResponse
+from fastapi.responses import FileResponse, JSONResponse, Response
 from pydantic import BaseModel
 
 # 加载 .env（DeepSeek API Key）
@@ -328,6 +329,50 @@ async def dispatch(req: DispatchReq):
         import traceback
         traceback.print_exc()
         raise HTTPException(status_code=500, detail=f"Agent 执行失败: {e}")
+
+
+class DeclarationReq(BaseModel):
+    """制单入参。edits 为补填值，只覆盖非空项。"""
+
+    declaration: Dict[str, Any] = {}
+    edits: Dict[str, Any] = {}
+    meta: Dict[str, Any] = {}
+    doc_type: str = "9610_list"
+
+
+@app.post("/api/declaration/build")
+async def declaration_build(req: DeclarationReq):
+    """制单：按字段字典组装结构化申报清单，返回逐栏值与缺口。"""
+    try:
+        from customs.declaration_export import build_payload
+
+        return {"status": "ok", "payload": build_payload(
+            req.declaration, req.edits, req.meta, req.doc_type
+        )}
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=f"制单失败: {e}")
+
+
+@app.post("/api/declaration/xlsx")
+async def declaration_xlsx(req: DeclarationReq):
+    """制单：导出 Excel（申报清单 / 字段溯源 / 缺口与依据）。"""
+    try:
+        from customs.declaration_export import build_payload, export_xlsx
+
+        payload = build_payload(req.declaration, req.edits, req.meta, req.doc_type)
+        content = export_xlsx(payload)
+        filename = f"9610_declaration_{time.strftime('%Y%m%d_%H%M')}.xlsx"
+        return Response(
+            content=content,
+            media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            headers={"Content-Disposition": f'attachment; filename="{filename}"'},
+        )
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=f"Excel 导出失败: {e}")
 
 
 @app.post("/api/routes")

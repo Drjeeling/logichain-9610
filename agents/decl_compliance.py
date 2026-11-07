@@ -369,7 +369,7 @@ class DeclarationComplianceAgent(BaseAgent):
                 "境内发货人": d.get("shipper"),
                 "境外收货人": d.get("consignee"),
                 "起运口岸": d.get("from_port"),
-                "目的国": d.get("dest_port"),
+                "目的国": d.get("dest_country") or d.get("dest_port"),
                 "毛重": d.get("gross_weight"),
                 "净重": d.get("net_weight"),
             }

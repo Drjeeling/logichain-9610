@@ -656,13 +656,17 @@ class CustomsAgent(BaseAgent):
             # 收发货
             "shipper": ctx.get("shipper") or None,
             "consignee": ctx.get("consignee") or None,
-            "from_port": ctx.get("from_port") or ctx.get("destination_port") or None,
+            "from_port": ctx.get("from_port") or ctx.get("origin") or ctx.get("destination_port") or None,
             "dest_port": ctx.get("dest_port") or None,
+            "dest_country": ctx.get("dest_country") or None,
             "origin_country": "中国",
+            "invoice_date": ctx.get("invoice_date") or None,
+            "clear_date": ctx.get("clear_date") or None,
 
             # 包装
             "package_type": info.get("package_type") or ctx.get("package_type") or "纸箱",
-            "gross_weight": info.get("gross_weight") or ctx.get("gross_weight") or None,
+            "gross_weight": info.get("gross_weight") or ctx.get("gross_weight")
+            or ((ctx.get("tonnage") or 0) * 1000 or None),
             "net_weight": info.get("net_weight") or ctx.get("net_weight") or None,
             "package_count": ctx.get("package_count") or 1,
         }

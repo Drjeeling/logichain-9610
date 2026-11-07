@@ -577,21 +577,39 @@ Agent 4: Tracking
 </div>
 
 <!-- 4.5 追踪 -->
-<h3 id="fr-tracking">4.5 追踪 Agent <span class="tag tag-p0">P0</span> <span class="tag tag-stub">占位版</span></h3>
+<h3 id="fr-tracking">4.5 追踪 Agent <span class="tag tag-p0">P0</span> <span class="tag tag-p1">退税提醒已落地</span></h3>
 
 <h4>目的</h4>
-<p>创建运单号，查询运输状态，检测异常并给出处理建议。</p>
+<p>创建运单号，查询运输状态，检测异常并给出处理建议；同时盯住结关后的税务节点，帮助企业在限期内完成免税登记与出口退税申报。</p>
 
 <h4>当前实现</h4>
 <ul>
   <li>用 hash 生成模拟运单号（SF/YT 前缀）</li>
   <li>模拟状态机：国内运输中→港口集结→装船→在途→目的港→派送</li>
   <li>关键词触发异常检测（"延误""扣关"）</li>
+  <li><b>退税期限警示</b>：按结关日自动计算
+    <ul>
+      <li>综试区无票免税登记：结关后 15 天内</li>
+      <li>出口退税申报：报关出口之日次月起至次年 4 月 30 日前的纳税申报期</li>
+    </ul>
+  </li>
+  <li>单据未提供结关日时，按"发票日 + 30 天"估算，并在输出中显式标注"估算值，以报关单结关日为准"</li>
+  <li>每条提醒带政策依据（国家税务总局公告 2012 年第 24 号）与逾期后果，避免"只提醒、不讲依据"</li>
+</ul>
+
+<h4>展望（答辩可讲）</h4>
+<ul>
+  <li><b>从"到期提醒"走向"退税金额测算"</b>：结合 HS 编码、离岸价、退税率目录，预估可退税额，帮助企业判断"这票到底值不值得退"</li>
+  <li><b>备案单证清单自动化</b>：申报退税后 15 日内需整理购货合同、装货单、运输单据等；系统按单据类型自动生成归档清单并检查缺件</li>
+  <li><b>退税进度闭环</b>：对接企业退税申报状态（未申报/已申报/已审核/已退库），在看板上一屏展示"哪些票快到期、哪些票卡在审核"</li>
+  <li><b>与制单/结关联动</b>：结关日一旦回填，立即刷新退税倒计时；清单制单时同步提示"该票退税截止日"</li>
+  <li><b>风险联动</b>：C 级拦截的票不进入退税流程，避免"带病申报"；B 级复核通过后再启动退税倒计时</li>
 </ul>
 <div class="callout">
-  <div class="label">设计说明</div>
-  真实物流 API（顺丰/中远）需商业签约，比赛演示用占位版可接受。留好 API 接入点，后续可替换。
+  <div class="label">边界说明</div>
+  真实退税申报需通过电子税务局/单一窗口办理，本系统只做期限监控与材料准备，不替代企业申报，也不承诺退税额；最终以主管税务机关认定为准。
 </div>
+
 
 <!-- 4.6 前端 -->
 <h3 id="fr-web">4.6 可视化前端 <span class="tag tag-p0">P0</span> <span class="tag tag-p1">开发中</span></h3>
@@ -625,8 +643,30 @@ Agent 4: Tracking
   <tr><td>/api/nodes</td><td>GET</td><td>—</td><td>节点列表（含经纬度）</td></tr>
   <tr><td>/api/edges</td><td>GET</td><td>—</td><td>边列表</td></tr>
   <tr><td>/api/ocr</td><td>POST</td><td>file</td><td>CargoInfo JSON</td></tr>
+  <tr><td>/api/recognize_and_dispatch</td><td>POST</td><td>file, interactive?</td><td>识别结果 + 全链路 DispatchResult</td></tr>
+  <tr><td>/api/declaration/build</td><td>POST</td><td>declaration, edits?, meta?</td><td>结构化申报清单 + 缺口 + 溯源</td></tr>
+  <tr><td>/api/declaration/xlsx</td><td>POST</td><td>declaration, edits?, meta?</td><td>Excel（申报清单/字段溯源/缺口与依据/风险与分流）</td></tr>
   <tr><td>/api/health</td><td>GET</td><td>—</td><td>系统状态 + LLM 启用状态</td></tr>
 </table>
+
+<!-- 4.7 性能基线 -->
+<h3 id="perf-baseline">4.7 性能基线（本地 CPU 实测） <span class="tag tag-p0">P0</span></h3>
+<p>测试环境：本地 CPU、Python 3.11、BM25 本地检索、RapidOCR 本地推理、LLM 关闭/开启分别标注。</p>
+<table>
+  <tr><th>环节</th><th>实测耗时</th><th>说明</th></tr>
+  <tr><td>RAG 法规检索（BM25）</td><td>约 0.3 ms/次</td><td>260+ 可检索片段，纯本地，无网络</td></tr>
+  <tr><td>电子单据 JSON 解析</td><td>约 0.2 ms</td><td>结构化单据直接解析</td></tr>
+  <tr><td>申报清单组装</td><td>约 0.05 ms</td><td>字段字典驱动，37 栏</td></tr>
+  <tr><td>Excel 导出（4 张表）</td><td>约 49 ms</td><td>openpyxl，含逐栏溯源与缺口</td></tr>
+  <tr><td>发票 OCR（PNG）</td><td>约 9 s</td><td>RapidOCR CPU 推理，是端到端主要瓶颈</td></tr>
+  <tr><td>报关 6 槽编排</td><td>约 4.3 s</td><td>含 LLM 归类与语义校验</td></tr>
+  <tr><td><b>端到端（上传发票 → 制单 Excel）</b></td><td><b>约 14-16 s</b></td><td>OCR + 四 Agent 协同 + 制单</td></tr>
+</table>
+<div class="callout">
+  <div class="label">答辩口径</div>
+  本地演示建议提前预热一次（OCR 首次加载模型较慢）；如现场时间紧，可直接用"电子单据 JSON"路径，跳过 OCR，端到端约 5-6 s。性能不是本系统的主要卖点，<b>可解释、可追溯、可拦截</b>才是。
+</div>
+
 
 <hr>
 
@@ -685,7 +725,7 @@ L4 = 旺季风险准备金率 × L1</code></pre>
   <tr><th>编号</th><th>问题</th><th>影响</th><th>当前处理</th></tr>
   <tr><td>Q1</td><td>HS 知识库扩展到多少条？</td><td>影响报关 Agent 的品类覆盖率和演示效果</td><td>[Assumption] 先扩到 20 条</td></tr>
   <tr><td>Q2</td><td>报关单证生成几张？</td><td>影响开发工作量和演示完整度</td><td>[Assumption] 先做报关单+申报要素 2 张，商业发票+装箱单 P1</td></tr>
-  <tr><td>Q3</td><td>是否加出口退税计算？</td><td>影响成本模型完整度</td><td>[TBD] 取决于退税率数据获取</td></tr>
+  <tr><td>Q3</td><td>是否加出口退税计算？</td><td>影响成本模型完整度</td><td>已落地"退税期限警示"；退税额测算列入 4.5 展望，取决于退税率目录数据</td></tr>
   <tr><td>Q4</td><td>是否加 RCEP/FTA 优惠判定？</td><td>影响关税准确度和专业性展示</td><td>[TBD] 评委是否关注关税优惠</td></tr>
   <tr><td>Q5</td><td>订舱 Agent 是否接真实 API？</td><td>船公司 API 基本不开放</td><td>[Assumption] 继续用模拟数据，扩展航线覆盖</td></tr>
   <tr><td>Q6</td><td>追踪 Agent 是否接真实 API？</td><td>顺丰/中远需商业签约</td><td>[Assumption] 留接入点，继续用占位版</td></tr>

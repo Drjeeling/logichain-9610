@@ -71,12 +71,19 @@ class DocFields:
     invoice_no: str = ""
     invoice_date: str = ""
     contract_no: str = ""
+    platform: str = ""            # 跨境电商平台
+    order_id: str = ""            # 订单编号
+    logistics_no: str = ""        # 物流运单号
+    clear_date: str = ""          # 结关日（用于退税/免税期限倒计时）
     origin: str = ""              # 国内起运地（城市/口岸）
     dest: str = ""                # 境外目的港/城市
     dest_country: str = ""        # 目的国
     trade_terms: str = ""         # 贸易条款 FOB/CIF/EXW
     cargo_name: str = ""          # 主货名
     tonnage: float = 0.0          # 总毛重（吨）
+    gross_weight: float = 0.0     # 毛重（千克）
+    net_weight: float = 0.0       # 净重（千克）
+    package_count: int = 0        # 件数/箱数
     quantity: float = 0.0         # 总数量（件/箱）
     unit: str = ""
     unit_price_usd: float = 0.0   # 代表单价
@@ -99,12 +106,19 @@ class DocFields:
             "invoice_no": self.invoice_no,
             "invoice_date": self.invoice_date,
             "contract_no": self.contract_no,
+            "platform": self.platform,
+            "order_id": self.order_id,
+            "logistics_no": self.logistics_no,
+            "clear_date": self.clear_date,
             "origin": self.origin,
             "dest": self.dest,
             "dest_country": self.dest_country,
             "trade_terms": self.trade_terms,
             "cargo_name": self.cargo_name,
             "tonnage": self.tonnage,
+            "gross_weight": self.gross_weight,
+            "net_weight": self.net_weight,
+            "package_count": self.package_count,
             "quantity": self.quantity,
             "unit": self.unit,
             "unit_price_usd": self.unit_price_usd,
@@ -138,12 +152,29 @@ class DocFields:
             "doc_type": self.doc_type,
             "cargo_name": self.cargo_name,
             "tonnage": self.tonnage,
+            # 收发货人：单据上的 seller/buyer 直接对应制单的境内发货人/境外收货人
+            "shipper": self.seller or None,
+            "consignee": self.buyer or None,
+            "quantity": self.quantity or None,
+            "unit": self.unit or None,
+            "unit_price": self.unit_price_usd or None,
+            "total_amount": self.total_amount_usd or None,
+            "currency": self.currency or "USD",
             "unit_price_usd": self.unit_price_usd,
             "dest_country": self.dest_country,
-            "dest_port": self.dest,
+            "dest_port": self.dest or self.dest_country,
             "origin": self.origin,
             "trade_terms": self.trade_terms,
             "priority": self.priority,
+            # 制单/合规必填项：单据里带就透传，缺失时由下游标记待补
+            "platform": self.platform or None,
+            "order_id": self.order_id or None,
+            "logistics_no": self.logistics_no or None,
+            "gross_weight": self.gross_weight or None,
+            "net_weight": self.net_weight or None,
+            "package_count": self.package_count or None,
+            "invoice_date": self.invoice_date or None,
+            "clear_date": self.clear_date or None,
             "sku_info": {
                 "cargo_name": self.cargo_name,
                 "tonnage": self.tonnage,
@@ -155,6 +186,8 @@ class DocFields:
                 "dest_port": self.dest,
                 "unit_price_usd": self.unit_price_usd,
                 "invoice_no": self.invoice_no,
+                "invoice_date": self.invoice_date or None,
+                "clear_date": self.clear_date or None,
                 "trade_terms": self.trade_terms,
             },
             "doc_fields": self.to_dict(),
@@ -254,12 +287,19 @@ class DocumentReader:
         f.invoice_no = str(data.get("invoice_no") or data.get("发票号") or "")
         f.invoice_date = str(data.get("invoice_date") or data.get("日期") or "")
         f.contract_no = str(data.get("contract_no") or data.get("合同号") or "")
+        f.platform = str(data.get("platform") or data.get("跨境电商平台") or "")
+        f.order_id = str(data.get("order_id") or data.get("订单编号") or data.get("订单号") or "")
+        f.logistics_no = str(data.get("logistics_no") or data.get("物流运单号") or data.get("运单号") or "")
+        f.clear_date = str(data.get("clear_date") or data.get("结关日") or "")
         f.origin = str(data.get("origin") or data.get("起运地") or "")
         f.dest = str(data.get("dest") or data.get("目的港") or "")
         f.dest_country = str(data.get("dest_country") or data.get("目的国") or "")
         f.trade_terms = str(data.get("trade_terms") or data.get("贸易条款") or "")
         f.cargo_name = str(data.get("cargo_name") or data.get("货名") or "")
         f.tonnage = _to_float(data.get("tonnage") or data.get("总毛重吨"))
+        f.gross_weight = _to_float(data.get("gross_weight") or data.get("毛重"))
+        f.net_weight = _to_float(data.get("net_weight") or data.get("净重"))
+        f.package_count = int(_to_float(data.get("package_count") or data.get("件数") or data.get("箱数")))
         f.quantity = _to_float(data.get("quantity") or data.get("总数量"))
         f.unit = str(data.get("unit") or data.get("单位") or "")
         f.unit_price_usd = _to_float(data.get("unit_price_usd") or data.get("单价"))
@@ -324,12 +364,19 @@ class DocumentReader:
                 '  "invoice_no": "发票号",\n'
                 '  "invoice_date": "日期(YYYY-MM-DD)",\n'
                 '  "contract_no": "合同号",\n'
+                '  "platform": "跨境电商平台",\n'
+                '  "order_id": "订单编号",\n'
+                '  "logistics_no": "物流运单号",\n'
+                '  "clear_date": "结关日(YYYY-MM-DD,没有则空)",\n'
                 '  "origin": "国内起运地(城市或口岸,中文)",\n'
                 '  "dest": "境外目的港/城市(中文,如洛杉矶/汉堡)",\n'
                 '  "dest_country": "目的国(中文,如美国/德国)",\n'
                 '  "trade_terms": "贸易条款(如FOB/CIF/EXW)",\n'
                 '  "cargo_name": "主货名(若含品牌/带电属性请保留原文,如iPhone手机壳、锂电池充电宝)",\n'
                 '  "tonnage": 总毛重吨数(数字,千克请除以1000),\n'
+                '  "gross_weight": 毛重千克数(数字),\n'
+                '  "net_weight": 净重千克数(数字),\n'
+                '  "package_count": 件数/箱数(数字),\n'
                 '  "quantity": 总数量(数字),\n'
                 '  "unit": "单位(PCS/CTN/SET)",\n'
                 '  "unit_price_usd": 代表单价(数字,美元),\n'
@@ -385,6 +432,31 @@ class DocumentReader:
         m = re.search(r"(?:contract|合同号|合同编号)[.：:\s]*([A-Za-z0-9\-]+)", text, re.I)
         if m:
             out["contract_no"] = m.group(1)
+        m = re.search(r"(?:跨境电商平台|平台|platform)[.：:\s]*([A-Za-z\u4e00-\u9fa5]{2,20})", text, re.I)
+        if m:
+            out["platform"] = m.group(1).strip()
+        m = re.search(r"(?:订单编号|订单号|order\s*(?:no|id))[.：:\s]*([A-Za-z0-9\-_]{4,})", text, re.I)
+        if m:
+            out["order_id"] = m.group(1)
+        m = re.search(r"(?:物流运单号|运单号|tracking\s*(?:no|number))[.：:\s]*([A-Za-z0-9\-_]{4,})", text, re.I)
+        if m:
+            out["logistics_no"] = m.group(1)
+        m = re.search(r"(?:结关日|结关日期|clearance\s*date)[.：:\s]*(20\d{2}[-/.年]\d{1,2}[-/.月]\d{1,2})", text, re.I)
+        if m:
+            out["clear_date"] = re.sub(r"[年月/.]", "-", m.group(1)).rstrip("-")
+
+        # 毛重/净重/件数（千克口径）
+        gw = re.search(r"(?:毛重|gross\s*weight|G\.?W\.?)[.：:\s]*([\d,]*\.?\d+)\s*(KGS?|千克|公斤|吨)?", text, re.I)
+        if gw:
+            val = _to_float(gw.group(1).replace(",", ""))
+            out["gross_weight"] = round(val * 1000, 2) if (gw.group(2) or "").startswith("吨") else val
+        nw = re.search(r"(?:净重|net\s*weight|N\.?W\.?)[.：:\s]*([\d,]*\.?\d+)\s*(KGS?|千克|公斤|吨)?", text, re.I)
+        if nw:
+            val = _to_float(nw.group(1).replace(",", ""))
+            out["net_weight"] = round(val * 1000, 2) if (nw.group(2) or "").startswith("吨") else val
+        pc = re.search(r"(?:件数|箱数|总箱数|packages?|ctns?)[.：:\s]*(\d[\d,]*)", text, re.I)
+        if pc:
+            out["package_count"] = int(_to_float(pc.group(1).replace(",", "")))
 
         # 起运地：命中系统节点
         for node in self._nodes:

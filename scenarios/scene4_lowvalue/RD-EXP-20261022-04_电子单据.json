@@ -1,0 +1,40 @@
+{
+  "doc_type": "商业发票",
+  "seller": "东莞市柔盾塑胶制品有限公司",
+  "seller_en": "DONGGUAN ROUDUN PLASTIC PRODUCTS CO., LTD.",
+  "buyer": "SoftCase Direct Inc.",
+  "invoice_no": "RD-EXP-20261022-04",
+  "invoice_date": "2026-10-22",
+  "contract_no": "RD-SC-2026-1016",
+  "platform": "Shopify",
+  "order_id": "SHF-2026-10-5521",
+  "logistics_no": "YT5566778899001",
+  "clear_date": "2026-10-27",
+  "trade_terms": "FOB SHENZHEN",
+  "origin": "深圳港 Shenzhen",
+  "dest": "洛杉矶",
+  "dest_country": "美国",
+  "cargo_name": "硅胶手机保护壳（无品牌）",
+  "tonnage": 0.85,
+  "gross_weight": 850.0,
+  "net_weight": 760.0,
+  "package_count": 15,
+  "quantity": 20000,
+  "unit": "PCS",
+  "unit_price_usd": 0.18,
+  "total_amount_usd": 3600.0,
+  "currency": "USD",
+  "priority": "cost",
+  "month": 11,
+  "special_notes": "货值异常（申报单价低于同类阈值）",
+  "items": [
+    {
+      "desc": "硅胶手机保护壳（无品牌） / Silicone Phone Case (No Brand)",
+      "hs": "3926.90",
+      "qty": 20000,
+      "unit": "PCS",
+      "price": 0.18,
+      "amount": 3600.0
+    }
+  ]
+}

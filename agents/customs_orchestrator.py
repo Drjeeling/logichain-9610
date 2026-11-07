@@ -285,15 +285,87 @@ class CustomsOrchestrator(BaseAgent):
     # ----------------------------------------------------------------- #
     @staticmethod
     def _finalize(state: ShipmentState) -> None:
-        # 无风险槽位产出时，保留归类 Agent 给出的 tier
-        if not state.risk_flags:
-            return
-        severities = {rf.get("severity") for rf in state.risk_flags}
-        types = {rf.get("type") for rf in state.risk_flags}
-        if "critical" in severities or "ip" in types:
+        """按硬边界汇总分流等级：只认规则与数据资产，不认 LLM 自评。
+
+        - C：critical 风险 / IP / 低置信
+        - B：warning 风险 / 降级 / 归类争议
+        - A：无硬风险，可自动拟单
+        info 级提示（如关税提示）不改变分流等级。
+        """
+        severities = {rf.get("severity") for rf in (state.risk_flags or [])}
+        types = {rf.get("type") for rf in (state.risk_flags or [])}
+        dispute = getattr(state, "dispute", None)
+        if "critical" in severities or "ip" in types or state.confidence == "low":
             state.tier = "C"
-        elif "warning" in severities and state.tier in ("", "A"):
+        elif "warning" in severities or state.degraded or dispute:
             state.tier = "B"
+        else:
+            state.tier = "A"
+
+    # ----------------------------------------------------------------- #
+    # A/B/C 分级处置动作：分级必须落到"下一步做什么"
+    # ----------------------------------------------------------------- #
+    @staticmethod
+    def _build_tier_action(state: ShipmentState) -> Dict:
+        tier = state.tier or "A"
+        flags = state.risk_flags or []
+        dc = state.decl_compliance or {}
+        issues = dc.get("issues") or []
+
+        critical_reasons: List[str] = []
+        review_fields: List[str] = []
+        for rf in flags:
+            if rf.get("severity") != "critical":
+                continue
+            detail = rf.get("detail", "")
+            if detail and detail not in critical_reasons:
+                critical_reasons.append(detail)
+        for issue in issues:
+            field = issue.get("field") or ""
+            if issue.get("severity") == "critical" and field and field not in review_fields:
+                review_fields.append(field)
+            if issue.get("severity") == "warning" and field and field not in review_fields:
+                review_fields.append(field)
+        for rf in flags:
+            if rf.get("severity") == "warning" and rf.get("type") not in ("compliance",):
+                review_fields.append(rf.get("type", ""))
+
+        review_fields = [f for f in dict.fromkeys(review_fields) if f]
+
+        if tier == "C":
+            label = "拦截待整改"
+            actions = [
+                "禁止申报：先处置 critical 风险与必填缺失，不得静默放行",
+                "逐项整改：" + ("；".join(critical_reasons[:5]) or "按下方合规问题清单补正"),
+                "整改完成后重跑全链路，确认 critical 清零后再提交",
+            ]
+            if review_fields:
+                actions.insert(1, "重点补正字段：" + "、".join(review_fields[:10]))
+        elif tier == "B":
+            label = "人工复核后放行"
+            actions = [
+                "暂停自动申报，人工复核 warning 项与待补字段",
+                "重点复核：" + ("、".join(review_fields[:10]) or "低报、单证一致性、监管证件"),
+                "补正后重新运行三单对碰与清单合规校验；复核通过可降为 A",
+            ]
+        else:
+            label = "自动拟单直通"
+            actions = [
+                "自动生成 9610 申报清单，进入内部抽检",
+                "申报前抽查三单一致性，随附品牌授权/检测报告等单证",
+                "结关后 15 日内完成备案单证归档，次年 4 月 30 日前完成退税申报",
+            ]
+
+        return {
+            "tier": tier,
+            "label": label,
+            "can_auto_declare": tier == "A",
+            "blocked": tier == "C",
+            "needs_manual_review": tier in ("B", "C") or state.degraded,
+            "review_fields": review_fields,
+            "reasons": critical_reasons,
+            "actions": actions,
+        }
 
     # ----------------------------------------------------------------- #
     # 输出拼装
@@ -322,6 +394,11 @@ class CustomsOrchestrator(BaseAgent):
             for rf in state.risk_flags:
                 lines.append(f"  - [{rf.get('type')}/{rf.get('severity')}] {rf.get('detail', '')}")
 
+        tier_action = self._build_tier_action(state)
+        lines.append(f"- **处置结论**：{tier_action['label']}")
+        for act in tier_action["actions"]:
+            lines.append(f"  - {act}")
+
         dispute = getattr(state, "dispute", None)
         if dispute:
             lines.append(
@@ -345,6 +422,7 @@ class CustomsOrchestrator(BaseAgent):
             data["dispute"] = dispute
         if resolution:
             data["dispute_resolution"] = resolution
+        data["tier_action"] = tier_action
         return AgentResult(
             agent_name=self.name,
             summary=summary,

@@ -1,11 +1,11 @@
 [
   {
     "id": "scene1_ip",
-    "name": "场景一 · IP侵权类",
+    "name": "场景一 · IP侵权类（C级）",
     "subtitle": "3C配件出口 · 深圳 → 洛杉矶",
     "risk_tag": "IP 侵权风险（品牌词：iPhone / Apple）",
     "doc_type": "商业发票",
-    "invoice_no": "RX-INV-20251015-01",
+    "invoice_no": "RX-INV-20261015-01",
     "seller": "深圳市锐讯科技有限公司",
     "buyer": "TechGear Trading Inc.",
     "origin": "深圳港 Shenzhen",
@@ -13,16 +13,16 @@
     "month": 11,
     "gross_weight": "5,200 KGS",
     "total_amount": 12600.0,
-    "png": "scene1_ip/RX-INV-20251015-01_商业发票.png",
-    "json": "scene1_ip/RX-INV-20251015-01_电子单据.json"
+    "png": "scene1_ip/RX-INV-20261015-01_商业发票.png",
+    "json": "scene1_ip/RX-INV-20261015-01_电子单据.json"
   },
   {
     "id": "scene2_dg",
-    "name": "场景二 · 危险品类",
+    "name": "场景二 · 危险品类（C级）",
     "subtitle": "电子配件出口 · 义乌 → 汉堡",
     "risk_tag": "危险品风险（UN3480 / UN3481 锂电池）",
     "doc_type": "商业发票",
-    "invoice_no": "HT-EXP-20251015-02",
+    "invoice_no": "HT-EXP-20261015-02",
     "seller": "义乌市恒通电子配件有限公司",
     "buyer": "EuroTech Handels GmbH",
     "origin": "义乌 Yiwu",
@@ -30,7 +30,41 @@
     "month": 11,
     "gross_weight": "6,000 KGS",
     "total_amount": 44000.0,
-    "png": "scene2_dg/HT-EXP-20251015-02_商业发票.png",
-    "json": "scene2_dg/HT-EXP-20251015-02_电子单据.json"
+    "png": "scene2_dg/HT-EXP-20261015-02_商业发票.png",
+    "json": "scene2_dg/HT-EXP-20261015-02_电子单据.json"
+  },
+  {
+    "id": "scene3_green",
+    "name": "场景三 · 合规直通（A级）",
+    "subtitle": "运动鞋出口 · 宁波 → 洛杉矶",
+    "risk_tag": "合规直通（无品牌/无电/单证齐全）",
+    "doc_type": "商业发票",
+    "invoice_no": "BY-EXP-20261020-03",
+    "seller": "宁波市步远鞋业有限公司",
+    "buyer": "GreenLeaf Apparel LLC",
+    "origin": "宁波港 Ningbo",
+    "dest": "洛杉矶 · 美国",
+    "month": 11,
+    "gross_weight": "1,350 KGS",
+    "total_amount": 51000.0,
+    "png": "scene3_green/BY-EXP-20261020-03_商业发票.png",
+    "json": "scene3_green/BY-EXP-20261020-03_电子单据.json"
+  },
+  {
+    "id": "scene4_lowvalue",
+    "name": "场景四 · 低报预警（B级）",
+    "subtitle": "硅胶手机壳出口 · 东莞 → 洛杉矶",
+    "risk_tag": "货值异常（申报单价低于同类阈值）",
+    "doc_type": "商业发票",
+    "invoice_no": "RD-EXP-20261022-04",
+    "seller": "东莞市柔盾塑胶制品有限公司",
+    "buyer": "SoftCase Direct Inc.",
+    "origin": "深圳港 Shenzhen",
+    "dest": "洛杉矶 · 美国",
+    "month": 11,
+    "gross_weight": "850 KGS",
+    "total_amount": 3600.0,
+    "png": "scene4_lowvalue/RD-EXP-20261022-04_商业发票.png",
+    "json": "scene4_lowvalue/RD-EXP-20261022-04_电子单据.json"
   }
 ]

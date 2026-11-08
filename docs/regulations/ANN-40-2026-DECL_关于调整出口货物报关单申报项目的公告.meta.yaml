@@ -5,8 +5,12 @@ issuer: 海关总署
 publish_date: 2026-04-15
 effective_date: 2026-04-15
 status: effective
-official_url: http://www.customs.gov.cn/customs/2026-04/17/article_2026041709292265703.html
-source_channel: 海关12360互动平台镜像页（含公告全文引用+黄埔海关答复），总署官网正文逐字核对一致
-fetched_at: 2026-11-06
+official_url: http://www.customs.gov.cn/customs/2026-04/16/article_2026041610330222871.html
+source_channel: 总署官网发布页原件（attachDir .doc 211字 + 同源 .pdf 199字），2026-11-08 交付替换原 12360 问答镜像
+fetched_at: 2026-11-08
 has_attachment: false
-note: 正文已完整（两个新增栏位定义）；doc/pdf 附件仅是正文排版版被反爬拦截；参数子集已在 E 板块交付（标注子集非全量）
+note: >-
+  官方正文不分条（无"一、二、三"编号），共两段：新增"禁限管制识别码"与"禁限管制申报要素"两个申报项目，
+  均为有条件必填项，填制说明指向单一窗口参数查询页。公告本身不含参数表；
+  参数落点=单一窗口禁限管制参数（识别码707条/230编码/34识别码 + 申报要素128条/16类，已交付并完成交叉验证）。
+  RAG 入库按段落切分，不生成不存在的条款号。

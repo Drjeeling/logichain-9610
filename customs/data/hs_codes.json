@@ -1,9 +1,9 @@
 {
   "_meta": {
-    "version": "3.1",
-    "description": "跨境电商 9610 出口 HS 编码知识库（11 品类；3926909090/8518220000 申报要素经单一窗口核验）",
-    "source": "进出口税则(2026) + 单一窗口 CusComplex/CusMerchElement（2026-10-27）+ hsbianma.com 逐条核实",
-    "verified_date": "2026-10",
+    "version": "3.2",
+    "description": "跨境电商9610出口HS编码知识库（13条；含8507600090→8507600099承继链；8518220000税率/监管已按2026税则补齐）",
+    "source": "进出口税则(2026) + 单一窗口 CusComplex/CusMerchElement（2026-10-27）+ hsbianma.com 逐条核实 + 2026-11-08交付（税则2026/申报目录2026/退税率文库2026C/海关126号公告/财税2号公告）",
+    "verified_date": "2026-11-08",
     "extension_hint": "新增条目按下面字段格式追加到 hs_codes 数组即可；每条均需经 hsbianma.com / 海关税则官网核实，并填写 source 与 verified 字段",
     "fields": {
       "code": "HS 编码（10 位，以海关税则为准）",
@@ -26,7 +26,8 @@
       "remark": "备注（特殊监管要求/反倾销/认证/危险品/政策调整等）",
       "source": "来源（hsbianma.com / 海关税则官网 / 归类决定 / 公告等）",
       "verified": "核实状态（true=已逐条核实）"
-    }
+    },
+    "version_chain": "status字段：active/superseded/expired；valid_from/valid_to划定生效区间；superseded_by/supersedes记录承继关系；与declaration.py法规规则版本链（superseded>expired>expiring_soon>active）同一机制，lookup自动跳过superseded条目"
   },
   "hs_codes": [
     {
@@ -42,7 +43,7 @@
       ],
       "category": "锂电池",
       "tariff_rate": "10%",
-      "export_rebate_rate": "6%",
+      "export_rebate_rate": "6%（2026-04-01～2026-12-31；2027-01-01起取消）",
       "vat_rate": "13%",
       "unit": "个/千克",
       "regulatory_code": "A",
@@ -76,11 +77,15 @@
         "额定电压"
       ],
       "ciq_code": "8507600090302",
-      "remark": "危险品；需UN38.3测试报告+MSDS；2025年起重量能量密度≥300Wh/kg的锂离子电池实施出口管制（商务部/海关总署公告2025年第58号）；10位编码8507600090状态显示'过期'（2026年电池消费税政策调整/财政部公告2026年第20号重新组织10位编码），8位85076000仍为现行有效编码",
-      "source": "hsbianma.com + 财政部电池产品清单 + 商务部公告2025年第58号",
+      "remark": "危险品；需UN38.3测试报告+MSDS；重量能量密度≥300Wh/kg的锂离子电池实施出口管制（商务部/海关总署公告2025年第58号）；本编码有效期2026-01-01～2026-08-31，2026-09-01起由8507600099承继（海关总署公告2026年第126号）；出口退税率2026-04-01起由9%降至6%，2027-01-01起取消（财政部 税务总局公告2026年第2号）",
+      "source": "hsbianma.com + 海关总署公告2026年第126号 + 财政部税务总局公告2026年第2号 + 2026-11-08税则明细交付",
       "verified": true,
       "confidence": "candidate",
-      "element_key": "8507"
+      "element_key": "8507",
+      "status": "superseded",
+      "valid_from": "2026-01-01",
+      "valid_to": "2026-08-31",
+      "superseded_by": "8507600099"
     },
     {
       "code": "3926909090",
@@ -234,11 +239,12 @@
         "品牌",
         "货号"
       ],
-      "remark": "10位编码6109100021状态显示'过期'（更新2025/1/1），但8位61091000为现行有效编码；另有6109100010（内衣式）；美国对中国棉制服装有原产地证要求",
-      "source": "hsbianma.com（8位61091000确认有效）+ 海关减让表品目61.09（针织或钩编的T恤衫、汗衫及其他背心）",
+      "remark": "10位编码在第三方库（hsbianma）标\"过期\"，但系该站61章10位码2025-01-01批次更新后整章停滞所致，非官方作废；官方2026税则8位6109.1000在册、2026申报目录在册、退税率文库2026C按61091000给13%；10位原件无公开页，保守标记待复核（以单一窗口为准），演示场景暂避开；另有6109100010（内衣式）；美国对中国棉制服装有原产地证要求",
+      "source": "hsbianma.com（8位61091000确认有效）+ 海关减让表品目61.09（针织或钩编的T恤衫、汗衫及其他背心） + 2026-11-08税则明细交付（差异4）",
       "verified": true,
       "confidence": "candidate",
-      "element_key": "6109"
+      "element_key": "6109",
+      "review_status": "needs_review"
     },
     {
       "code": "8544421100",
@@ -533,13 +539,13 @@
         "bluetooth speaker"
       ],
       "category": "音箱",
-      "tariff_rate": null,
-      "export_rebate_rate": null,
-      "vat_rate": null,
+      "tariff_rate": "0%",
+      "export_rebate_rate": "13%",
+      "vat_rate": "13%",
       "unit": "个/千克",
-      "regulatory_code": null,
-      "supervision_code": null,
-      "inspection_category": null,
+      "regulatory_code": "无",
+      "supervision_code": "无",
+      "inspection_category": "无",
       "keywords": [
         "蓝牙音箱",
         "音箱",
@@ -575,18 +581,136 @@
       ],
       "element_key": "851822",
       "split_dimension": "同一箱体内扬声器数量（8518.21 单个 / 8518.22 多个）",
-      "resolution_facts": ["speaker_units", "shared_enclosure"],
+      "resolution_facts": [
+        "speaker_units",
+        "shared_enclosure"
+      ],
       "resolution_rule": {
         "tax_heading_note": "品目 85.18 条文：扬声器，不论是否装成音箱（税则条文依据）",
-        "when_facts": {"speaker_units": ">=2", "shared_enclosure": true},
+        "when_facts": {
+          "speaker_units": ">=2",
+          "shared_enclosure": true
+        },
         "combination_rule": "多功能组合（支架为折叠背夹、无独立功能）→ 归类总规则三（二）：按基本特征归音箱（85.18），不归 39.26 塑料制品",
         "reject_reason": "组合商品按基本特征归 85.18 音箱；塑料仅为外壳材质，不构成基本特征"
       },
       "remark": "9610 若归入本码须能回答喇叭数量与箱体结构；答不出说明按音箱归类证据不足；归类论证须走 品目条文→分列维度→事实匹配，禁止用申报要素差集反推归类（B板块 v2.1 评审结论）；resolution_rule 为数据驱动消解规则，逻辑层通用评估，不针对具体场景",
-      "source": "单一窗口 CusComplex 全量表 + CusMerchElement 参数（2026-10-27 抓取）",
+      "source": "单一窗口 CusComplex 全量表 + CusMerchElement 参数（2026-10-27 抓取） + 2026-11-08税则明细交付",
       "verified": true,
       "confidence": "candidate",
-      "status_note": "税号存在性 VERIFIED；税率/退税字段未取，禁止在演示中编造"
+      "status_note": "税率/监管字段2026-11-08按《进出口税则（2026）》+退税率文库2026C补齐；检验检疫类别站点间有\"L/无\"差异，取\"无\"，以单一窗口为准"
+    },
+    {
+      "code": "8507600099",
+      "code_8digit": "85076000",
+      "description": "其他锂离子蓄电池",
+      "official_name": "锂离子蓄电池",
+      "common_names": [
+        "充电宝",
+        "移动电源",
+        "power bank",
+        "portable charger"
+      ],
+      "category": "锂电池",
+      "tariff_rate": "10%",
+      "export_rebate_rate": "6%（2026-04-01～2026-12-31；2027-01-01起取消）",
+      "vat_rate": "13%",
+      "unit": "个/千克",
+      "regulatory_code": "A",
+      "supervision_code": "A",
+      "inspection_category": "M/L",
+      "keywords": [
+        "锂电池",
+        "蓄电池",
+        "锂离子电池",
+        "充电电池",
+        "电池组",
+        "lithium battery",
+        "Li-ion",
+        "充电宝",
+        "移动电源",
+        "power bank",
+        "便携式电池"
+      ],
+      "easily_confused_with": {
+        "code": "85071000",
+        "reason": "8507.10为启动用铅酸蓄电池，电解质为硫酸而非锂离子"
+      },
+      "declaration_elements": [
+        "用途",
+        "电极材质",
+        "比能量",
+        "品牌",
+        "型号",
+        "容量",
+        "是否含汞",
+        "额定电压"
+      ],
+      "remark": "危险品；需UN38.3测试报告+MSDS；重量能量密度≥300Wh/kg的锂离子电池实施出口管制（商务部/海关总署公告2025年第58号）；2026-09-01起启用，承继8507600090（海关总署公告2026年第126号），名称/税率/监管条件与原码一致",
+      "source": "海关总署公告2026年第126号 + 《进出口税则（2026）》 + 2026-11-08税则明细交付",
+      "verified": true,
+      "confidence": "candidate",
+      "element_key": "850760",
+      "status": "active",
+      "valid_from": "2026-09-01",
+      "supersedes": "8507600090"
+    },
+    {
+      "code": "8518300000",
+      "code_8digit": "85183000",
+      "description": "耳机、耳塞机（包括传声器与扬声器的组合机）",
+      "official_name": "耳机、耳塞机",
+      "common_names": [
+        "蓝牙耳机",
+        "耳机",
+        "耳塞",
+        "earphone",
+        "earbuds",
+        "headset",
+        "bluetooth earphone"
+      ],
+      "category": "耳机",
+      "tariff_rate": "0%",
+      "export_rebate_rate": "13%",
+      "vat_rate": "13%",
+      "unit": "个/千克",
+      "regulatory_code": "无",
+      "supervision_code": "无",
+      "inspection_category": "无",
+      "keywords": [
+        "耳机",
+        "蓝牙耳机",
+        "耳塞机",
+        "耳麦",
+        "headphone",
+        "earphone",
+        "earbuds",
+        "headset",
+        "TWS",
+        "无线耳机"
+      ],
+      "easily_confused_with": {
+        "code": "85176299",
+        "reason": "含蓝牙模块的耳机按基本特征（音频输出）归8518.30；8517.62为纯数据通信设备"
+      },
+      "declaration_elements": [
+        "品牌类型",
+        "出口享惠情况",
+        "品牌（中文或外文名称）",
+        "型号"
+      ],
+      "declaration_elements_required": [
+        "品牌类型",
+        "出口享惠情况",
+        "品牌（中文或外文名称）",
+        "型号"
+      ],
+      "element_key": "851830",
+      "remark": "编码本身无监管条件/检验检疫；含锂电池的蓝牙耳机在运输环节按UN3481（设备内置电池）危险品管理，需UN38.3+MSDS",
+      "source": "《进出口税则（2026）》 + 出口退税率文库2026C + 2026-11-08税则明细交付",
+      "verified": true,
+      "confidence": "candidate",
+      "status": "active"
     }
   ]
 }

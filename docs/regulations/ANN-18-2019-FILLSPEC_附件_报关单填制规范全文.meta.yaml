@@ -1,0 +1,15 @@
+id: ANN-18-2019-FILLSPEC-FULLTEXT
+title: 中华人民共和国海关进出口货物报关单填制规范（全文，49个栏目口径）
+doc_no: 海关总署公告2019年第18号附件
+issuer: 海关总署
+publish_date: 2019-01-22
+effective_date: 2019-02-01
+status: effective
+official_url: http://www.gov.cn/gongbao/content/2019/content_5363173.htm
+source_channel: 官网公告页唯一附件（.doc 原件），2026-11-08 交付；49 个栏目口径在同一份 doc 内（非 49 个独立附件）
+fetched_at: 2026-11-08
+has_attachment: true
+note: >-
+  49 个栏目逐条拆分件见 docs/regulations/ANN-18-2019-FILLSPEC_49栏目/（含索引 tsv，起止行与字数可核对）；
+  本 txt 为 doc 全文提取，供 RAG 检索"报关单栏目填制口径"；代码表全表（监管方式/币制/包装种类等）在栏目条目中为引用口径，
+  全表数据以单一窗口参数为准。

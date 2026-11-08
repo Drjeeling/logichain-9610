@@ -42,11 +42,13 @@ FILE_MAP = {
     "TARIFF-COMMITTEE-11-2025": "CUSTOMS-TARIFF-2026",
     "ANN-40-2026-DECL": "ANN-40-2026",
     "RULES-GENERAL-INTERP": "HARMONIZED-RULES",
+    # 注意：长前缀必须排在短前缀之前（first match wins）
+    "ANN-18-2019-FILLSPEC_附件": "FILLSPEC-2019-FULLTEXT",
+    "ANN-18-2019-FILLSPEC": "FILLSPEC-2019-ANN",
 }
 
 # 这些文件不导入：内容不是公告正文（问答页 / 空文件）
 SKIP_FILES = {
-    "ANN-40-2026-DECL": "页面是 12360 问答，不含公告正文",
     "CATALOG-DECLARATION-2026": "文件为空，申报要素目录未采到",
 }
 
@@ -219,7 +221,11 @@ def import_all(write: bool = False) -> Dict:
         })
         old = card.get("clauses", [])
         used_by = {c.get("article"): c.get("used_by", []) for c in old if c.get("used_by")}
-        extra = [c for c in old if not ARTICLE_RE.match(str(c.get("article", "")) + " ")]
+        # extra 只保留"本次未重新解析出"的手工条款，避免「全文/规则X」类条款在重复导入时翻倍
+        new_articles = {a["article"] for a in arts}
+        extra = [c for c in old
+                 if not ARTICLE_RE.match(str(c.get("article", "")) + " ")
+                 and c.get("article") not in new_articles]
 
         new_clauses = []
         for a in arts:

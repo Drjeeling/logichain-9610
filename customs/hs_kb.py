@@ -209,9 +209,13 @@ class HSKnowledgeBase:
             return [self._entries[int(i)] for i in ids]
 
         # 关键词匹配打分（权重重排：category/common_names > keyword > description）
+        # 版本链：superseded/expired 条目不参与新单归类（如 8507600090→8507600099），
+        # 旧码仍可通过 find_by_code 查到并给出承继提示
         scored = []
         q_lower = query.lower()
         for entry in self._entries:
+            if entry.get("status") in ("expired", "superseded"):
+                continue
             score = 0
             # keyword：封顶 6，长词权重高但不垄断
             for kw in entry.get("keywords", []):

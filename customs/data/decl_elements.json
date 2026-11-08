@@ -1,13 +1,14 @@
 {
   "_meta": {
-    "version": "1.0",
+    "version": "1.1",
     "description": "申报要素（涉税规范申报目录）按税号前缀组织的官方核验表；用于报关单/规范申报要素完备性校验，不用于 9610 清单栏目校验",
-    "source": "中国国际贸易单一窗口 CusMerchElement 参数（m.singlewindow.cn，#/pages/parameterDetail/index?pqcode=CusMerchElement）",
+    "source": "中国国际贸易单一窗口 CusMerchElement 参数（m.singlewindow.cn，#/pages/parameterDetail/index?pqcode=CusMerchElement）；2026-11-08 新增 850760/851830/610910 三键（《进出口商品涉税规范申报目录（2026年版）》+ 税则明细交付，无 rowno，含 example），3926/851822 补 example",
     "fetched_at": "2026-10-27",
     "coverage": "交付抓取 9,250 行 / 1,202 个编码键（官方 totalRows=32,785，部分分页被限流）；本文件仅含已交付的 10 个键位",
     "matching": "longest_prefix：税号逐位截短，取最长可命中键（如 3926909090 命中 3926；8518220000 命中 851822）",
     "required_flag": "ELEMENT_NULL=1 表示必填，0 表示非必填",
-    "disclaimer": "申报要素适用于报关单（含汇总申报），9610 清单栏目体系为 CEB603；两者不得混用"
+    "disclaimer": "申报要素适用于报关单（含汇总申报），9610 清单栏目体系为 CEB603；两者不得混用",
+    "example_note": "example 为填报示例值；GTIN/CAS/其他为选填，其余要素按单一窗口 ELEMENT_NULL=1 口径标必填"
   },
   "elements": {
     "3926": [
@@ -15,49 +16,57 @@
         "seq": 1,
         "element": "品牌类型",
         "required": true,
-        "rowno": 11699
+        "rowno": 11699,
+        "example": "无品牌"
       },
       {
         "seq": 2,
         "element": "出口享惠情况",
         "required": true,
-        "rowno": 11700
+        "rowno": 11700,
+        "example": "出口不享惠"
       },
       {
         "seq": 3,
         "element": "用途",
         "required": true,
-        "rowno": 11701
+        "rowno": 11701,
+        "example": "手机保护壳"
       },
       {
         "seq": 4,
         "element": "材质（塑料品种）",
         "required": true,
-        "rowno": 11702
+        "rowno": 11702,
+        "example": "硅胶"
       },
       {
         "seq": 5,
         "element": "品牌（中文或外文名称）",
         "required": true,
-        "rowno": 11703
+        "rowno": 11703,
+        "example": "无品牌"
       },
       {
         "seq": 6,
         "element": "型号",
         "required": true,
-        "rowno": 11704
+        "rowno": 11704,
+        "example": "适用 iPhone 17 Pro"
       },
       {
         "seq": 7,
         "element": "GTIN",
         "required": false,
-        "rowno": 11705
+        "rowno": 11705,
+        "example": "（选填）"
       },
       {
         "seq": 8,
         "element": "CAS",
         "required": false,
-        "rowno": 11706
+        "rowno": 11706,
+        "example": "（选填）"
       }
     ],
     "851822": [
@@ -65,55 +74,64 @@
         "seq": 1,
         "element": "品牌类型",
         "required": true,
-        "rowno": 26903
+        "rowno": 26903,
+        "example": "无品牌"
       },
       {
         "seq": 2,
         "element": "出口享惠情况",
         "required": true,
-        "rowno": 26904
+        "rowno": 26904,
+        "example": "出口不享惠"
       },
       {
         "seq": 3,
         "element": "结构类型（是否有箱体）",
         "required": true,
-        "rowno": 26905
+        "rowno": 26905,
+        "example": "有箱体"
       },
       {
         "seq": 4,
         "element": "用途",
         "required": true,
-        "rowno": 26906
+        "rowno": 26906,
+        "example": "音频播放"
       },
       {
         "seq": 5,
         "element": "品牌（中文或外文名称）",
         "required": true,
-        "rowno": 26907
+        "rowno": 26907,
+        "example": "EDIFIER"
       },
       {
         "seq": 6,
         "element": "型号",
         "required": true,
-        "rowno": 26908
+        "rowno": 26908,
+        "example": "R1280T"
       },
       {
         "seq": 7,
         "element": "喇叭数量和尺寸",
         "required": true,
-        "rowno": 26909
+        "rowno": 26909,
+        "example": "2个喇叭，4英寸"
       },
       {
         "seq": 8,
         "element": "GTIN",
         "required": false,
-        "rowno": 26910
+        "rowno": 26910,
+        "example": "（选填）"
       },
       {
         "seq": 9,
         "element": "CAS",
         "required": false,
-        "rowno": 26911
+        "rowno": 26911,
+        "example": "（选填）"
       }
     ],
     "85459": [
@@ -509,11 +527,215 @@
         "required": false,
         "rowno": 26894
       }
+    ],
+    "850760": [
+      {
+        "seq": 1,
+        "element": "品牌类型",
+        "required": true,
+        "example": "无品牌"
+      },
+      {
+        "seq": 2,
+        "element": "出口享惠情况",
+        "required": true,
+        "example": "出口不享惠"
+      },
+      {
+        "seq": 3,
+        "element": "用途",
+        "required": true,
+        "example": "便携式电子设备供电"
+      },
+      {
+        "seq": 4,
+        "element": "电极材质（铅酸、镍镉、镍铁、镍氢、锂离子等）",
+        "required": true,
+        "example": "锂离子"
+      },
+      {
+        "seq": 5,
+        "element": "比能量",
+        "required": true,
+        "example": "120Wh/kg"
+      },
+      {
+        "seq": 6,
+        "element": "品牌（中文或外文名称）",
+        "required": true,
+        "example": "无品牌"
+      },
+      {
+        "seq": 7,
+        "element": "型号",
+        "required": true,
+        "example": "PB-10000"
+      },
+      {
+        "seq": 8,
+        "element": "容量",
+        "required": true,
+        "example": "10000mAh"
+      },
+      {
+        "seq": 9,
+        "element": "是否含汞",
+        "required": true,
+        "example": "否"
+      },
+      {
+        "seq": 10,
+        "element": "额定电压",
+        "required": true,
+        "example": "3.7V"
+      },
+      {
+        "seq": 11,
+        "element": "GTIN",
+        "required": false,
+        "example": "（选填）"
+      },
+      {
+        "seq": 12,
+        "element": "CAS",
+        "required": false,
+        "example": "（选填）"
+      },
+      {
+        "seq": 13,
+        "element": "其他",
+        "required": false,
+        "example": "（选填）"
+      }
+    ],
+    "851830": [
+      {
+        "seq": 1,
+        "element": "品牌类型",
+        "required": true,
+        "example": "无品牌"
+      },
+      {
+        "seq": 2,
+        "element": "出口享惠情况",
+        "required": true,
+        "example": "出口不享惠"
+      },
+      {
+        "seq": 3,
+        "element": "品牌（中文或外文名称）",
+        "required": true,
+        "example": "无品牌"
+      },
+      {
+        "seq": 4,
+        "element": "型号",
+        "required": true,
+        "example": "BT-E20"
+      },
+      {
+        "seq": 5,
+        "element": "GTIN",
+        "required": false,
+        "example": "（选填）"
+      },
+      {
+        "seq": 6,
+        "element": "CAS",
+        "required": false,
+        "example": "（选填）"
+      },
+      {
+        "seq": 7,
+        "element": "其他",
+        "required": false,
+        "example": "（选填）"
+      }
+    ],
+    "610910": [
+      {
+        "seq": 1,
+        "element": "品牌类型",
+        "required": true,
+        "example": "无品牌"
+      },
+      {
+        "seq": 2,
+        "element": "出口享惠情况",
+        "required": true,
+        "example": "出口不享惠"
+      },
+      {
+        "seq": 3,
+        "element": "织造方法（针织、钩编）",
+        "required": true,
+        "example": "针织"
+      },
+      {
+        "seq": 4,
+        "element": "类别（男式、女式、男女同款）",
+        "required": true,
+        "example": "男式"
+      },
+      {
+        "seq": 5,
+        "element": "是否有领",
+        "required": true,
+        "example": "有领"
+      },
+      {
+        "seq": 6,
+        "element": "是否有扣",
+        "required": true,
+        "example": "无扣"
+      },
+      {
+        "seq": 7,
+        "element": "是否有拉链",
+        "required": true,
+        "example": "无拉链"
+      },
+      {
+        "seq": 8,
+        "element": "成分含量",
+        "required": true,
+        "example": "棉100%"
+      },
+      {
+        "seq": 9,
+        "element": "品牌（中文或外文名称）",
+        "required": true,
+        "example": "无品牌"
+      },
+      {
+        "seq": 10,
+        "element": "货号",
+        "required": true,
+        "example": "TS-2026-001"
+      },
+      {
+        "seq": 11,
+        "element": "GTIN",
+        "required": false,
+        "example": "（选填）"
+      },
+      {
+        "seq": 12,
+        "element": "CAS",
+        "required": false,
+        "example": "（选填）"
+      },
+      {
+        "seq": 13,
+        "element": "其他",
+        "required": false,
+        "example": "（选填）"
+      }
     ]
   },
   "stats": {
-    "keys": 10,
-    "total_elements": 80,
-    "required_elements": 60
+    "keys": 13,
+    "total_elements": 113,
+    "required_elements": 84
   }
 }

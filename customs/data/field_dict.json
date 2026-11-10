@@ -486,12 +486,12 @@
           "type": "string",
           "required_condition": "always",
           "source": "context",
-          "source_field": "production_sales_unit",
+          "source_field": "production_sales_unit / shipper",
           "transform": "须填境内生产厂家或销售单位；不得填电商平台、代理企业名称（ANN-78-2026；该公告原文针对无人机物项，跨境电商清单适用性需人工复核）",
           "missing_action": "block",
           "default_value": null,
           "template_var": "production_sales_unit",
-          "notes": "场景 3 错误设计：原填平台名 → 拦截"
+          "notes": "须填境内生产厂家或销售单位；不得填电商平台、代理企业名称。清单场景缺省取境内发货人"
         }
       ]
     },

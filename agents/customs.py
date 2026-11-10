@@ -127,15 +127,16 @@ class CustomsAgent(BaseAgent):
         if info_gap and self.verbose:
             print(f"[CustomsAgent] 信息缺口检测: {info_gap['question']}")
 
-        # 2.5 知识产权风险独立检测（P1 修正：跨境电商高频触发条件）
+        # 2.5 商标线索提示：命中知名品牌词 → 返回线索，不做侵权判定
         t_ip = time.time()
         ip_risk = self.hs_kb.detect_ip_risk(cargo_name)
         if ip_risk and self.verbose:
-            print(f"[CustomsAgent] IP_RISK 命中品牌词: {ip_risk['matched_brands']}")
+            print(f"[CustomsAgent] 商标线索命中: {ip_risk['matched_brands']}")
         audit_steps.append({
-            "step": "知识产权风险检测",
-            "ip_risky": bool(ip_risk and ip_risk.get("is_risky")),
+            "step": "商标线索检测",
+            "has_trademark_cue": bool(ip_risk and ip_risk.get("has_trademark_cue")),
             "matched_brands": (ip_risk or {}).get("matched_brands", []),
+            "note": (ip_risk or {}).get("note", ""),
             "elapsed_ms": int((time.time() - t_ip) * 1000),
         })
 
@@ -281,6 +282,25 @@ class CustomsAgent(BaseAgent):
             "elapsed_ms": int((time.time() - t3) * 1000),
         })
 
+        # 7.5 低报检查：单价低于同类阈值 → warning（升级到 B 级）
+        unit_price = (
+            context.get("unit_price_usd") if context and context.get("unit_price_usd") is not None
+            else (context.get("unit_price") if context else None)
+        )
+        if unit_price is not None and float(unit_price) > 0:
+            price_val = float(unit_price)
+            # 简单阈值：低于 0.5 USD/PCS 视为低报预警（可按品类扩展）
+            LOW_PRICE_THRESHOLD = 0.5
+            if price_val < LOW_PRICE_THRESHOLD:
+                risks.append({
+                    "rule_id": "LOW_PRICE",
+                    "rule_name": "低报预警",
+                    "risk": f"申报单价 {price_val:.2f} USD 低于同类阈值 {LOW_PRICE_THRESHOLD} USD，"
+                            f"可能触发海关查验",
+                    "advice": "核查三单一致性（订单/支付/物流）；若确属薄利商品，建议在备注中说明定价依据",
+                    "severity": "warning",
+                })
+
         # 8. 留痕
         self._audit_trail.append({
             "timestamp": time.strftime("%Y-%m-%d %H:%M:%S"),
@@ -350,7 +370,6 @@ class CustomsAgent(BaseAgent):
 
         needs_review = (
             tier in ("B", "C")
-            or bool(ip_risk and ip_risk.get("is_risky"))
             or bool(field_gaps and field_gaps["ask_user"])
             or any(r["severity"] in ("warning", "critical") for r in risks)
         )
@@ -369,8 +388,8 @@ class CustomsAgent(BaseAgent):
             )
             if risks:
                 next_hint += f"；注意：{risks[0]['risk']}"
-            if ip_risk and ip_risk.get("is_risky"):
-                next_hint += f"；知识产权风险：{ip_risk['advice'][:30]}..."
+            if ip_risk and ip_risk.get("has_trademark_cue"):
+                next_hint += f"；商标线索命中 {','.join(ip_risk.get('matched_brands', []))}，建议核查授权"
 
         return AgentResult(
             agent_name=self.name,
@@ -519,25 +538,18 @@ class CustomsAgent(BaseAgent):
         degraded: bool = False,
         dispute: Optional[Dict] = None,
     ) -> str:
-        """三级分流：A=自动拟单 / B=强制确认 / C=挂起提问。
+        """三级分流：A=自动拟单 / B=人工复核 / C=拦截整改。
 
-        P1 修正：
-        - IP_RISK（命中品牌词）→ C 级（强制人工审核知识产权）
-        - degraded=True（无 LLM 推理链）→ 至少 B 级（禁止 A 级自动拟单）
-
-        判定逻辑：
-        - A 级：高置信 + 非高风险品类 + 非反倾销/出口管制 + 非 IP_RISK + 非 degraded
-        - B 级：中置信，或 degraded=True，或涉及中等风险
-        - C 级：低置信，或涉及反倾销/出口管制/归类争议/IP_RISK
+        设计原则：不做侵权判定，商标线索仅作升级提示。
+        - 硬边界触发（管制参数 / 要素必填缺失 / 三单容差超限 / 低置信 / 归类争议） → C
+        - 商标线索命中 → 升级到 B 级（提示人工核查授权，不强制拦截）
+        - degraded=True（推理链缺失）→ 至少 B 级
+        - 高置信 + 非高风险 → A 级
         """
         ctx = context or {}
         dest = ctx.get("dest_port") or ctx.get("dest_country") or ""
 
-        # C 级：IP_RISK 命中品牌词 → 强制人工审核知识产权
-        if ip_risk and ip_risk.get("is_risky"):
-            return "C"
-
-        # C 级：低置信 或 涉及高风险
+        # C 级：低置信 或 涉及硬边界
         if confidence == "low":
             return "C"
 
@@ -561,11 +573,25 @@ class CustomsAgent(BaseAgent):
         if degraded:
             return "B"
 
-        # B 级：中置信 或 有风险提示
+        # B 级：中置信
         if confidence == "medium":
             return "B"
 
-        # A 级：高置信 + 低风险
+        # 商标线索命中：从 A 级升级到 B 级（提示人工核查授权，不做侵权判定）
+        if ip_risk and ip_risk.get("has_trademark_cue"):
+            return "B"
+
+        # 低报预警：单价低于同类阈值 → B 级人工复核
+        ctx = context or {}
+        up = ctx.get("unit_price_usd") or ctx.get("unit_price")
+        if up is not None:
+            try:
+                if float(up) > 0 and float(up) < 0.5:
+                    return "B"
+            except (TypeError, ValueError):
+                pass
+
+        # A 级：高置信 + 低风险 + 无商标线索 + 无低报
         return "A"
 
     # ----------------------------------------------------------------- #
@@ -644,7 +670,9 @@ class CustomsAgent(BaseAgent):
             "structure_type": ctx.get("structure_type"),
             "speaker_spec": ctx.get("speaker_spec"),
             "appearance": ctx.get("appearance"),
-            "production_sales_unit": ctx.get("production_sales_unit"),
+            "production_sales_unit": (ctx.get("production_sales_unit")
+                                      or ctx.get("shipper")
+                                      or ctx.get("seller")),
 
             # 数量与价格
             "quantity": qty,
@@ -785,12 +813,12 @@ class CustomsAgent(BaseAgent):
             if info_gap.get("why_matters"):
                 lines.append(f"**为什么重要**：{info_gap['why_matters']}")
 
-        # 知识产权风险（IP_RISK）
-        if ip_risk and ip_risk.get("is_risky"):
-            lines.append(f"\n### 🚨 知识产权风险（IP_RISK）")
+        # 商标线索提示（不做侵权判定）
+        if ip_risk and ip_risk.get("has_trademark_cue"):
+            lines.append(f"\n### ⚠️ 商标线索提示")
             lines.append(f"- **命中品牌词**：{', '.join(ip_risk.get('matched_brands', []))}")
-            lines.append(f"- **处理建议**：{ip_risk.get('advice', '')}")
-            lines.append(f"- **强制分流**：已进入 C 级人工审核，禁止 A 级自动拟单")
+            lines.append(f"- **建议人工核查**：{ip_risk.get('note', '')}")
+            lines.append(f"- **分流**：已升级到 B 级人工复核；线索命中不自动判定侵权")
 
         # 申报清单
         lines.append(f"\n### 9610 申报清单草稿")

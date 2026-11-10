@@ -618,8 +618,17 @@ class HSKnowledgeBase:
         if slot.startswith("是否"):
             return False
 
-        # 用途/种类/款式/加工方法/首饰种类/贵金属成分含量等：
-        # 无明确关键词，保守视为未填（避免误判归类错误）
+        # 款式槽位：运动鞋/服饰类款式关键词匹配
+        if slot == "款式":
+            _STYLE_KEYWORDS = (
+                "低帮", "高帮", "休闲", "跑步", "篮球", "足球", "网球",
+                "板鞋", "老爹鞋", "帆布", "越野", "训练", "通勤", "轻便",
+                "户外", "马丁靴", "切尔西", "乐福", "德比", "牛津", "僧侣",
+                "连帽", "圆领", "V领", "翻领", "立领", "套头", "拉链",
+            )
+            return any(k in query for k in _STYLE_KEYWORDS)
+
+        # 其他无明确关键词的槽位：保守视为未填
         return False
 
     @staticmethod
@@ -642,22 +651,23 @@ class HSKnowledgeBase:
         return options
 
     # ---------------------------------------------------------------- #
-    # 知识产权风险独立检测（P1 修正：跨境电商高频触发条件）
+    # 商标线索提示：命中知名品牌词，返回风险线索，不做侵权判定
     # ---------------------------------------------------------------- #
     @staticmethod
     def detect_ip_risk(cargo_query: str) -> Optional[Dict]:
-        """检测商品描述是否涉及知名品牌，触发知识产权侵权风险提示。
+        """检测商品描述是否命中知名品牌词，返回商标线索。
 
-        跨境电商 9610 高频触发条件：
-        - 商品名/品牌词命中 KNOWN_BRANDS 词表 → 视为 IP_RISK
-        - 由 customs.py _determine_tier 强制进入 C 级分流（挂起人工审核）
+        设计边界：
+        - 品牌词命中 ≠ 侵权：兼容描述（"适用于 iPhone"）、配件描述、正品授权货物
+          都可能合法包含品牌词；系统只负责提示，不做侵权判定
+        - 命中后升级分流（A→B），要求人工核查是否有授权文件，不强制拦截
 
         返回：
-            - 无风险 → None
-            - 有风险 → {
-                "is_risky": True,
+            - 无线索 → None
+            - 有线索 → {
+                "has_trademark_cue": True,
                 "matched_brands": ["apple", "iphone"],
-                "advice": "..."
+                "note": "..."
               }
         """
         if not cargo_query:
@@ -667,13 +677,11 @@ class HSKnowledgeBase:
         if not matched:
             return None
         return {
-            "is_risky": True,
+            "has_trademark_cue": True,
             "matched_brands": matched,
-            "advice": (
-                "跨境电商 9610 出口高频触发知识产权侵权风险："
-                "命中知名品牌词，需核查 (1) 是否为正品授权货物 "
-                "(2) 是否有商标/外观专利授权文件 "
-                "(3) 是否涉及目的国商标注册。"
-                "未提供授权证明前，归类结果强制进入 C 级人工审核。"
+            "note": (
+                "商品描述命中知名品牌词，建议人工核查："
+                "(1) 是否为正品授权货物 (2) 是否提供授权文件 (3) 是否涉及目的国商标注册。"
+                "线索命中不自动判定侵权。"
             ),
         }

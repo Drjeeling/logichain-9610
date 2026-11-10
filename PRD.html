@@ -232,9 +232,9 @@ hr { border: none; border-top: 1px solid var(--border); margin: 32px 0; }
   <h1>LogiChain 出海物流多 Agent 协同系统</h1>
   <div class="subtitle">Product Requirements Document</div>
   <div class="meta">
-    <span><span class="dot"></span> 版本 1.0</span>
-    <span><span class="dot"></span> 2026-10</span>
-    <span><span class="dot"></span> 状态：开发中</span>
+    <span><span class="dot"></span> 版本 2.0</span>
+    <span><span class="dot"></span> 2026-11-09</span>
+    <span><span class="dot"></span> 状态：答辩就绪（P0 全部落地）</span>
   </div>
 </div>
 
@@ -257,6 +257,7 @@ hr { border: none; border-top: 1px solid var(--border); margin: 32px 0; }
     </li>
     <li><a href="#rules">共享规则与计算模型</a></li>
     <li><a href="#open">待定问题</a></li>
+    <li><a href="#progress">项目进度快照（2026-11-09）</a></li>
   </ol>
 </div>
 
@@ -500,10 +501,10 @@ Agent 4: Tracking
 </table>
 
 <!-- 4.3 报关 -->
-<h3 id="fr-customs">4.3 报关单证 Agent <span class="tag tag-p0">P0</span> <span class="tag tag-done">已实现</span> <span class="tag tag-p1">升级中</span></h3>
+<h3 id="fr-customs">4.3 报关单证 Agent <span class="tag tag-p0">P0</span> <span class="tag tag-done">已实现</span> <span class="tag tag-done">9610 特化完成</span></h3>
 
 <h4>目的</h4>
-<p>从发票/文字提取商品信息，完成 HS 编码归类，生成报关单草稿，校验合规风险。当前为升级阶段——扩展 HS 知识库和单证种类。</p>
+<p>从发票/文字提取商品信息，完成 HS 编码归类，生成 9610 申报清单与 Excel 四表，校验合规风险并按 A/B/C 三级分流处置。六槽闭环（归类 → 三单预检 → 清单合规 → 风险预判 → 归并 → 节点监控）已全部打通。</p>
 
 <h4>处理流程</h4>
 <pre><code>输入（文字/图片路径/context）
@@ -522,28 +523,24 @@ Agent 4: Tracking
     │  → LLM 不可用时返回首个候选
     │
     ▼
-3. 报关单生成
-    │  Jinja2 模板渲染 → 出口货物报关单草稿
-    │  [TBD] 扩展为 4 张单：报关单 + 商业发票 + 装箱单 + 申报要素清单
+3. 申报清单生成
+    │  字段字典（37 栏 / 6 段）驱动组装 → 9610 申报清单 dict
+    │  → 文本清单 + Excel 四表（申报清单/字段溯源/缺口与依据/风险与分流）
     │
     ▼
-4. 合规规则引擎校验
-    │  JSON 规则匹配 → 返回 risks[]
-    │  [TBD] 扩展为 15+ 条规则</code></pre>
+4. 合规规则引擎校验 + A/B/C 分流
+    │  18 条规则 + 16 张规则卡 + 禁限管制参数 → risks[]
+    │  → _finalize 规则定级：A 自动拟单 / B 人工复核 / C 拦截整改</code></pre>
 
-<h4>HS 知识库当前状态</h4>
+<h4>HS 知识库当前状态（v3.2，2026-11-08 落库）</h4>
 <table>
-  <tr><th>品类</th><th>HS 编码</th><th>税率</th><th>监管</th><th>备注</th></tr>
-  <tr><td>锂电池</td><td>8507.60.00</td><td>0%</td><td>无</td><td>UN38.3+MSDS，美国 301 关税</td></tr>
-  <tr><td>服装</td><td>6203.42.00</td><td>8%</td><td>无</td><td>原产地证要求，反倾销</td></tr>
-  <tr><td>家具</td><td>9403.50.00</td><td>0%</td><td>无</td><td>反倾销税最高 198%</td></tr>
-  <tr><td>日用百货</td><td>3924.90.00</td><td>10%</td><td>无</td><td>FDA 食品级认证</td></tr>
-  <tr><td>机电产品</td><td>8517.62.00</td><td>0%</td><td>B</td><td>3C+FCC/CE 认证</td></tr>
+  <tr><th>指标</th><th>当前值</th><th>说明</th></tr>
+  <tr><td>收录税号</td><td>13 条</td><td>11 条 active + 1 条 superseded（8507600090）+ 1 条 needs_review（6109100021，第三方数据源停滞，非官方作废，已标记回避）</td></tr>
+  <tr><td>税号承继链</td><td>8507600090 → 8507600099</td><td>2026-09-01 起生效；归类检索自动跳过失效码命中新码，旧码仍可溯源并提示承继关系</td></tr>
+  <tr><td>申报要素库</td><td>13 键 / 113 要素 / 必填 84</td><td>decl_elements v1.1，每项含填报示例</td></tr>
+  <tr><td>禁限管制参数</td><td>识别码 707 条（230 编码 / 34 识别码）+ 申报要素 128 条 / 16 类</td><td>单一窗口 2026-11-08 官方重采交付；与 hs_control_map（6,812 编码）交叉验证 230/230 一致</td></tr>
+  <tr><td>品类覆盖</td><td colspan="2">充电宝、耳机、音箱、数据线、LED 灯、T 恤、玩具、保温杯、假发、首饰、运动鞋、塑料制品等演示品类全覆盖</td></tr>
 </table>
-<div class="callout warning">
-  <div class="label">[TBD] 待扩展</div>
-  计划扩展至 20-30 条 HS 编码，新增 LED 灯具、纺织品、鞋类、陶瓷、自行车、玩具、茶叶、钢铁制品、塑料包装、口罩等品类。
-</div>
 <div class="callout success">
   <div class="label">版本链自动更新（答辩点 · 已落地）</div>
   知识资产层支持"新版替代旧版"的自我更新：法规链（2023年4号 → 34号延续 → 2026年16号）与税号承继链（8507600090 → 8507600099，海关总署2026年第126号公告）共用同一套 status 机制（active / superseded / expired + valid_from/valid_to）。
@@ -551,17 +548,37 @@ Agent 4: Tracking
 </div>
 
 <h4>合规规则当前状态</h4>
-<p>7 条规则覆盖：锂电池危险品、服装原产地证、家具反倾销、关税非零提示、机电 3C 认证、日用品 FDA、美国 301 关税。</p>
-<div class="callout warning">
-  <div class="label">[TBD] 待扩展</div>
-  计划新增：RCEP 优惠关税、欧盟 CBAM 碳关税、出口退税、危险品运输鉴定、木质包装 ISPM15、食品级接触认证等规则。
-</div>
+<p>三层合规体系已全部落地：</p>
+<ul>
+  <li><strong>规则引擎</strong>：18 条 JSON 规则，覆盖危险品、原产地证、反倾销、关税、认证、知识产权、低报等场景。</li>
+  <li><strong>法规规则卡</strong>：16 张规则卡 / 256 条款，RAG 索引 324 检索块（315 可检索），BM25 + 同义词扩展 + 状态过滤，检索约 0.3 ms/次。</li>
+  <li><strong>禁限管制参数</strong>：识别码 707 条 + 申报要素 128 条，涉管制物项申报时逐项必答，非管制物项不触发。</li>
+</ul>
 
-<h4>报关单模板当前状态</h4>
-<p>当前仅 1 张"出口货物报关单"（Jinja2 模板），字段含商品名、HS 编码、起运港/目的港、数量/单价/总额、包装/毛重/净重。</p>
+<h4>五条 AI 硬边界（规则驱动，不看模型自评）</h4>
+<table>
+  <tr><th>#</th><th>边界</th><th>触发后果</th></tr>
+  <tr><td>1</td><td>管制参数触发</td><td>命中禁限管制识别码 → 强制升级，不得自动放行</td></tr>
+  <tr><td>2</td><td>要素必填缺失</td><td>申报要素必填项缺失 → 阻断（block），不得降级为提示</td></tr>
+  <tr><td>3</td><td>三单容差超限</td><td>订单/支付/物流三单对碰超容差 → 转人工复核</td></tr>
+  <tr><td>4</td><td>A/B/C 分流定级</td><td>由 _finalize 规则定级，模型置信度仅作参考</td></tr>
+  <tr><td>5</td><td>降级链</td><td>OCR/LLM/检索任一降级必须显式留痕，不得静默跳过</td></tr>
+</table>
+
+<h4>四个演示场景（全链路实拍）</h4>
+<table>
+  <tr><th>场景</th><th>商品</th><th>分流</th><th>演示点</th></tr>
+  <tr><td>scene1_ip</td><td>iPhone 配件（侵权）</td><td><span class="tag tag-stub">C 拦截</span></td><td>知识产权风险独立检测，强制阻断</td></tr>
+  <tr><td>scene2_dg</td><td>充电宝（锂电池）</td><td><span class="tag tag-stub">C 拦截</span></td><td>危险品 + 命中承继码 8507600099</td></tr>
+  <tr><td>scene3_green</td><td>普货（绿色低碳）</td><td><span class="tag tag-done">A 直通</span></td><td>字段完整、0 阻断，自动拟单</td></tr>
+  <tr><td>scene4_lowvalue</td><td>低报价格</td><td><span class="tag tag-p1">B 复核</span></td><td>三单容差超限，转人工</td></tr>
+</table>
+
+<h4>制单产出当前状态</h4>
+<p>已实现 9610 申报清单结构化组装与 Excel 四表导出（申报清单 / 字段溯源 / 缺口与依据 / 风险与分流），由字段字典驱动（6 段 37 栏，含 2026 年第 40 号公告新增的 2 个申报项）。</p>
 <div class="callout warning">
-  <div class="label">[TBD] 待扩展</div>
-  计划新增商业发票（Commercial Invoice）、装箱单（Packing List）、申报要素清单 3 张模板。
+  <div class="label">未覆盖（列入局限）</div>
+  商业发票（Commercial Invoice）、装箱单（Packing List）两张单证未实现，列入项目局限与下一阶段计划。
 </div>
 
 <!-- 4.4 订舱 -->
@@ -617,7 +634,7 @@ Agent 4: Tracking
 
 
 <!-- 4.6 前端 -->
-<h3 id="fr-web">4.6 可视化前端 <span class="tag tag-p0">P0</span> <span class="tag tag-p1">开发中</span></h3>
+<h3 id="fr-web">4.6 可视化前端 <span class="tag tag-p0">P0</span> <span class="tag tag-done">已实现</span></h3>
 
 <h4>布局</h4>
 <p>三栏布局 + 顶栏 + 底栏：</p>
@@ -637,6 +654,10 @@ Agent 4: Tracking
   <li>输入目的港含"洛杉矶/汉堡/新加坡"等国外地名 → 自动加"全流程"关键词触发 pipeline</li>
   <li>上传发票图片 → 走 dispatch_image 接口（OCR 预处理 + 全流程）</li>
   <li>地图路线颜色按运输方式区分：公路蓝、铁路橙、河运绿、海运紫、空运黄</li>
+  <li>示例单据卡片一键"识别并跑"：甩入发票 → OCR → 全链路四 Agent 协同</li>
+  <li>申报清单面板：逐栏展示取值来源（默认/派生/识别）+ 字段缺口 + 校验口径统计，支持在线修订后重导出</li>
+  <li>法规知识库抽屉：自然语言提问 → 结论 + 依据条款 + 原文引用 + 官方链接回溯；内置预设问题一键演示</li>
+  <li>Excel 一键导出：申报清单/字段溯源/缺口与依据/风险与分流四表</li>
 </ul>
 
 <h4>API 接口</h4>
@@ -659,7 +680,7 @@ Agent 4: Tracking
 <p>测试环境：本地 CPU、Python 3.11、BM25 本地检索、RapidOCR 本地推理、LLM 关闭/开启分别标注。</p>
 <table>
   <tr><th>环节</th><th>实测耗时</th><th>说明</th></tr>
-  <tr><td>RAG 法规检索（BM25）</td><td>约 0.3 ms/次</td><td>260+ 可检索片段，纯本地，无网络</td></tr>
+  <tr><td>RAG 法规检索（BM25）</td><td>约 0.3 ms/次</td><td>324 检索块 / 315 可检索，纯本地，无网络</td></tr>
   <tr><td>电子单据 JSON 解析</td><td>约 0.2 ms</td><td>结构化单据直接解析</td></tr>
   <tr><td>申报清单组装</td><td>约 0.05 ms</td><td>字段字典驱动，37 栏</td></tr>
   <tr><td>Excel 导出（4 张表）</td><td>约 49 ms</td><td>openpyxl，含逐栏溯源与缺口</td></tr>
@@ -728,14 +749,70 @@ L4 = 旺季风险准备金率 × L1</code></pre>
 
 <table>
   <tr><th>编号</th><th>问题</th><th>影响</th><th>当前处理</th></tr>
-  <tr><td>Q1</td><td>HS 知识库扩展到多少条？</td><td>影响报关 Agent 的品类覆盖率和演示效果</td><td>[Assumption] 先扩到 20 条</td></tr>
-  <tr><td>Q2</td><td>报关单证生成几张？</td><td>影响开发工作量和演示完整度</td><td>[Assumption] 先做报关单+申报要素 2 张，商业发票+装箱单 P1</td></tr>
+  <tr><td>Q1</td><td>HS 知识库扩展到多少条？</td><td>影响报关 Agent 的品类覆盖率和演示效果</td><td><span class="tag tag-done">已解决</span> 已落库 13 条（含承继链），演示品类全覆盖；20-30 条全量扩展列入下一阶段</td></tr>
+  <tr><td>Q2</td><td>报关单证生成几张？</td><td>影响开发工作量和演示完整度</td><td><span class="tag tag-done">已解决</span> Excel 四表（申报清单/字段溯源/缺口与依据/风险与分流）；商业发票/装箱单列入局限</td></tr>
   <tr><td>Q3</td><td>是否加出口退税计算？</td><td>影响成本模型完整度</td><td>已落地"退税期限警示"；退税率数据已于 2026-11-08 到位（退税率文库 2026C，如 8518220000/8518300000 均 13%），退税额测算列入 4.5 展望</td></tr>
   <tr><td>Q4</td><td>是否加 RCEP/FTA 优惠判定？</td><td>影响关税准确度和专业性展示</td><td>[TBD] 评委是否关注关税优惠</td></tr>
   <tr><td>Q5</td><td>订舱 Agent 是否接真实 API？</td><td>船公司 API 基本不开放</td><td>[Assumption] 继续用模拟数据，扩展航线覆盖</td></tr>
   <tr><td>Q6</td><td>追踪 Agent 是否接真实 API？</td><td>顺丰/中远需商业签约</td><td>[Assumption] 留接入点，继续用占位版</td></tr>
-  <tr><td>Q7</td><td>前端按钮点击后渲染是否正常？</td><td>当前浏览器自动化测试遇到 input 事件触发问题</td><td>[TBD] 需手动验证</td></tr>
+  <tr><td>Q7</td><td>前端按钮点击后渲染是否正常？</td><td>当前浏览器自动化测试遇到 input 事件触发问题</td><td><span class="tag tag-done">已解决</span> Playwright 实拍验证通过，答辩 PPT 全部截图来自真实运行（按钮/拖拽/知识库抽屉均正常）</td></tr>
+  <tr><td>Q8</td><td>出口地报关（国外段清关）是否纳入？</td><td>影响"全链路"叙事完整性</td><td>[TBD] 当前未覆盖，列入局限；可行性调研列入答辩后第一阶段</td></tr>
 </table>
+
+<hr>
+
+<!-- 7. 项目进度快照 -->
+<h2 id="progress">7. 项目进度快照（2026-11-09）</h2>
+
+<h3>7.1 已交付清单</h3>
+<table>
+  <tr><th>模块</th><th>状态</th><th>证据</th></tr>
+  <tr><td>协调器 + 四业务域（运输/订舱/报关/追踪）</td><td><span class="tag tag-done">完成</span></td><td>pipeline 全链路跑通，单 Agent 异常不阻断</td></tr>
+  <tr><td>报关六槽闭环（归类→三单预检→清单合规→风险预判→归并→节点监控）</td><td><span class="tag tag-done">完成</span></td><td>A/B/C 分流由 _finalize 规则定级，不看模型自评</td></tr>
+  <tr><td>知识资产层（16 规则卡 / 256 条款 / 324 检索块）</td><td><span class="tag tag-done">完成</span></td><td>BM25 本地检索 0.3 ms/次；状态过滤自动跳过失效条目</td></tr>
+  <tr><td>三批海关文件交付验收（四税号 / 40 号公告 + 管制参数 / 填制规范 49 栏目）</td><td><span class="tag tag-done">完成</span></td><td>全部落库；管制参数交叉验证 230/230 一致</td></tr>
+  <tr><td>版本链自动更新（法规链 + 税号承继链）</td><td><span class="tag tag-done">完成</span></td><td>8507600090→099 命中新码、旧码可溯源（答辩点）</td></tr>
+  <tr><td>9610 制单 + Excel 四表导出</td><td><span class="tag tag-done">完成</span></td><td>字段字典 6 段 37 栏；含 40 号公告新增 2 栏</td></tr>
+  <tr><td>法规知识库抽屉（RAG 问答 + 引用回溯）</td><td><span class="tag tag-done">完成</span></td><td>结论 + 依据条款 + 原文 + 官方链接</td></tr>
+  <tr><td>退税期限警示（综试区免税登记 15 天 / 退税申报截止）</td><td><span class="tag tag-done">完成</span></td><td>带政策依据与逾期后果；结关日缺失时显式标注估算</td></tr>
+  <tr><td>GitHub 开源</td><td><span class="tag tag-done">完成</span></td><td>main @ 9b6800e</td></tr>
+  <tr><td>答辩材料</td><td><span class="tag tag-done">完成</span></td><td>21 页 PPT，全部截图为真实运行实拍（四场景 A/B/C 覆盖）</td></tr>
+</table>
+
+<h3>7.2 回归测试矩阵（2026-11-09 复跑，全绿）</h3>
+<table>
+  <tr><th>测试</th><th>结果</th><th>覆盖</th></tr>
+  <tr><td>test_kb_rag.py</td><td>16/16</td><td>RAG 检索：状态过滤、同义词扩展、引用回溯、版本链</td></tr>
+  <tr><td>test_golden_v21.py</td><td>18/18</td><td>四场景金样本：归类、分流、硬边界、留痕</td></tr>
+  <tr><td>test_declaration_export.py</td><td>6/6</td><td>Excel 四表导出、字段溯源、缺口分析</td></tr>
+</table>
+
+<h3>7.3 覆盖度与局限（答辩口径）</h3>
+<table>
+  <tr><th>维度</th><th>已覆盖</th><th>未覆盖</th></tr>
+  <tr><td>监管方式</td><td>9610 清单核放（零售出口）</td><td>1210 / 9710 / 9810、一般贸易</td></tr>
+  <tr><td>单证种类</td><td>9610 申报清单 + Excel 四表</td><td>商业发票、装箱单</td></tr>
+  <tr><td>链路环节</td><td>国内运输 + 订舱 + 出口报关 + 追踪 + 退税提醒</td><td>出口地报关（国外段清关），可行性待调研</td></tr>
+  <tr><td>演示场景</td><td>4 个（2C 拦截 / 1B 复核 / 1A 直通）</td><td>查验布控、删改单、退运等长尾场景</td></tr>
+  <tr><td>RAG 知识面</td><td>9610 / 退运 / 退税 / 填制规范 / 管制参数</td><td>RCEP 优惠、CBAM、长尾品类归类（依赖人工复核）</td></tr>
+  <tr><td>外部对接</td><td>—</td><td>真实单一窗口 / 船公司 / 物流追踪 API（均为模拟数据）</td></tr>
+</table>
+
+<h3>7.4 下一阶段计划</h3>
+<ol>
+  <li><strong>出口地报关可行性调研</strong>：美国 CBP ACE / 欧盟 ICS2 申报模式与数据接口，评估是否可纳入链路</li>
+  <li><strong>自训物流垂直大模型</strong>：基于已沉淀的 256 条款 + 324 检索块 + 四场景留痕数据做指令微调</li>
+  <li><strong>单证补全</strong>：商业发票、装箱单模板，与申报清单三单一致性互校验</li>
+  <li><strong>HS 库扩展</strong>：13 → 30 条，覆盖纺织/鞋类/陶瓷/自行车等高频出海品类</li>
+  <li><strong>退税额测算</strong>：退税率文库已到位（2026C），结合离岸价估算可退税额</li>
+  <li><strong>RCEP/FTA 优惠关税判定</strong>（对应 Q4）</li>
+</ol>
+
+<h3>7.5 最近修复</h3>
+<ul>
+  <li><strong>A 级场景"阻断 1 项"矛盾</strong>：<code>production_sales_unit</code> 恒为 None 导致该栏永远 block，与 A 级"自动拟单"冲突。已修复为回退取 <code>shipper / seller</code>，field_dict 同步补充填报说明；重截验证显示"字段完整，可定稿 / 报关分流 A · 自动拟单直通"。</li>
+  <li><strong>知识库重复导入</strong>：<code>import_originals.py</code> 的 extra 保留逻辑按 article 去重，避免条款翻倍；长前缀映射优先匹配修复。</li>
+</ul>
 
 </div>
 </body>

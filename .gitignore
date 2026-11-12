@@ -18,3 +18,5 @@ secrets/
 
 # 运行时上传目录
 web/uploads/
+assets/ppt/deck.js
+assets/ppt/package*.json

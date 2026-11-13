@@ -1,20 +1,18 @@
-__pycache__
-*.pyc
-*.pyo
-*.egg-info
-.eggs
-.env
-.venv
-venv
+# 构建上下文瘦身：只进运行必需的代码与数据
 .git
 .gitignore
-.github
+.venv
+.env
 node_modules
-.deploy_site
-prd_images
-*.log
-.DS_Store
-.idea
-.vscode
+__pycache__
+*.pyc
+
+# 大体积非运行资产（截图 / 录屏 / PPT / 生成脚本）
+assets/
+
+# 开发文档与测试（运行不需要）
 *.md
-!README.md
+PRD.html
+test_*.py
+Dockerfile
+.dockerignore

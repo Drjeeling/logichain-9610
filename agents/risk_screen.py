@@ -139,12 +139,12 @@ class RiskScreenAgent(BaseAgent):
         try:
             from customs.hs_kb import HSKnowledgeBase
             ip = HSKnowledgeBase.detect_ip_risk(cargo_name)
-            if ip and ip.get("is_risky"):
+            if ip and ip.get("has_trademark_cue"):
                 return {
                     "type": "ip",
-                    "severity": "critical",
-                    "detail": f"命中品牌词：{', '.join(ip.get('matched_brands', []))}",
-                    "advice": ip.get("advice", "需提供品牌授权证明"),
+                    "severity": "warning",
+                    "detail": f"商标线索：{', '.join(ip.get('matched_brands', []))}",
+                    "advice": ip.get("note", "建议人工核查品牌授权文件；线索命中不自动判定侵权"),
                 }
         except Exception:
             pass

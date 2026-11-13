@@ -256,9 +256,9 @@ class CustomsOrchestrator(BaseAgent):
             if data.get("ip_risk"):
                 state.risk_flags.append({
                     "type": "ip",
-                    "detail": "命中品牌词：" + ", ".join(data["ip_risk"].get("matched_brands", [])),
-                    "severity": "critical",
-                    "advice": data["ip_risk"].get("advice", ""),
+                    "detail": "商标线索：" + ", ".join(data["ip_risk"].get("matched_brands", [])),
+                    "severity": "warning",
+                    "advice": data["ip_risk"].get("note", "建议人工核查品牌授权文件"),
                 })
 
         # K2 修复：C 槽（合规校验）的 critical 必须汇入统一 risk_flags，
@@ -287,15 +287,15 @@ class CustomsOrchestrator(BaseAgent):
     def _finalize(state: ShipmentState) -> None:
         """按硬边界汇总分流等级：只认规则与数据资产，不认 LLM 自评。
 
-        - C：critical 风险 / IP / 低置信
-        - B：warning 风险 / 降级 / 归类争议
+        - C：critical 风险 / 低置信
+        - B：warning 风险（含商标线索）/ 降级 / 归类争议
         - A：无硬风险，可自动拟单
         info 级提示（如关税提示）不改变分流等级。
+        商标线索只作 warning 提示人工核查授权，不单独判 C 级。
         """
         severities = {rf.get("severity") for rf in (state.risk_flags or [])}
-        types = {rf.get("type") for rf in (state.risk_flags or [])}
         dispute = getattr(state, "dispute", None)
-        if "critical" in severities or "ip" in types or state.confidence == "low":
+        if "critical" in severities or state.confidence == "low":
             state.tier = "C"
         elif "warning" in severities or state.degraded or dispute:
             state.tier = "B"

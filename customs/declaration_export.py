@@ -185,7 +185,18 @@ def build_payload(
         "ready": ready,
         "field_dict_version": FIELD_DICT.get("_meta", {}).get("schema_version"),
         "meta": meta or {},
+        "form": _build_form(decl, header_rows, meta or {}, totals),
     }
+
+
+def _build_form(decl: Dict, header_rows: List[Dict], meta: Dict, totals: Dict) -> Dict[str, Any]:
+    """单证视图数据（附件 2 版式）；版式或取值异常时降级为空，不影响主链路。"""
+    try:
+        from customs.form_layout import build_form
+
+        return build_form(decl, header_rows, meta, totals)
+    except Exception:  # noqa: BLE001 - 单证视图失败不应阻断下单/导出
+        return {}
 
 
 # ------------------------------------------------------------------ #

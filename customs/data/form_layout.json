@@ -1,0 +1,83 @@
+{
+  "schema_version": "1.0",
+  "doc_title": "跨境电子商务零售出口商品申报清单",
+  "basis": "海关总署公告 2016 年第 26 号 · 附件 2（表头 42 项 / 表体 16 项）",
+  "code_sets": "JGS/T 18《海关关区代码》、JGS-20《海关业务代码集》",
+  "header_rows": [
+    [
+      {"no": 1, "label": "申报海关代码", "from": "rule", "rule": "customs_code", "note": "取出口口岸关区代码"},
+      {"no": 12, "label": "出口口岸代码", "from": "rule", "rule": "export_port", "note": "单据起运口岸"},
+      {"no": 13, "label": "出口日期", "from": "rule", "rule": "exit_date", "note": "格式 YYYYMMDD"},
+      {"no": 2, "label": "申报日期", "from": "rule", "rule": "declaration_datetime", "note": "格式 YYYYMMDDhhmmss"}
+    ],
+    [
+      {"no": 4, "label": "订单编号", "from": "decl", "key": "order_id", "field": "column_order_id", "note": "电商平台原始订单号"},
+      {"no": 19, "label": "报关企业名称", "from": "decl", "key": "shipper", "note": "按申报单位取境内发货人"},
+      {"no": 18, "label": "报关企业代码", "from": "sim", "value": "3302961234", "note": "10 位海关备案编码；演示模拟值，需与企业备案一致"},
+      {"no": 30, "label": "运抵国（地区）", "from": "rule", "rule": "dest_country_code", "note": "JGS-20 国家（地区）代码"}
+    ],
+    [
+      {"no": 31, "label": "指运港代码", "from": "rule", "rule": "dest_port_code", "note": "境外最终目的港标识代码"},
+      {"no": 17, "label": "收发货人名称", "from": "decl", "key": "shipper", "field": "column_shipper", "note": "境内发货人"},
+      {"no": 16, "label": "收发货人代码", "from": "sim", "value": "3302961234", "note": "电商企业海关注册登记编码（10 位）；演示模拟值"},
+      {"no": 15, "label": "生产销售单位名称", "from": "decl", "key": "production_sales_unit", "field": "column_production_sales_unit", "note": "不得填平台或代理"}
+    ],
+    [
+      {"no": 14, "label": "生产销售单位代码", "from": "sim", "value": "3302961234", "note": "出口发货人海关企业代码（10 位）；演示模拟值"},
+      {"no": 23, "label": "运输方式", "from": "rule", "rule": "transport_mode", "required": true, "note": "JGS-20 运输方式代码"},
+      {"no": 24, "label": "运输工具名称", "from": "na", "value": "—", "note": "本票无独立运输工具名称"},
+      {"no": 25, "label": "航班航次号", "from": "rule", "rule": "voyage_no", "note": "支线/航班号；无则 —"}
+    ],
+    [
+      {"no": 26, "label": "提（运）单号", "from": "decl", "key": "logistics_no", "field": "column_logistics_no", "note": "物流运单号"},
+      {"no": 27, "label": "总包号", "from": "na", "value": "—", "note": "非必填；本票无总包"},
+      {"no": 28, "label": "监管场所代码", "from": "need", "value": "待补", "note": "必填：按实际出境地监管场所补录"},
+      {"no": 29, "label": "许可证号", "from": "rule", "rule": "licence_no", "note": "无许可证填“无”"}
+    ],
+    [
+      {"no": 38, "label": "包装种类代码", "from": "rule", "rule": "package_code", "field": "column_package_type", "note": "1 位代码，2 = 纸箱"},
+      {"no": 39, "label": "件数", "from": "decl", "key": "package_count", "field": "column_package_count", "note": ""},
+      {"no": 40, "label": "毛重（公斤）", "from": "decl", "key": "gross_weight", "field": "column_gross_weight", "kind": "decimal", "note": ""},
+      {"no": 41, "label": "净重（公斤）", "from": "decl", "key": "net_weight", "field": "column_net_weight", "kind": "decimal", "note": ""}
+    ],
+    [
+      {"no": 42, "label": "备注", "span": 4, "from": "rule", "rule": "remark", "note": "申报备注与合规结论"}
+    ]
+  ],
+  "strip": [
+    {"no": 11, "label": "进出口标记", "from": "const", "value": "E", "note": "E = 出口"},
+    {"no": 22, "label": "贸易方式", "from": "decl", "key": "trade_mode", "field": "column_trade_mode", "note": "9610 跨境电商零售出口"},
+    {"no": 5, "label": "电商平台代码", "from": "sim", "value": "3110660001", "note": "电商平台海关注册登记编码（10 位）；演示模拟值"},
+    {"no": 6, "label": "电商平台名称", "from": "decl", "key": "platform", "field": "column_platform", "note": ""},
+    {"no": 8, "label": "物流企业代码", "from": "sim", "value": "4403960001", "note": "物流企业海关注册登记编码（10 位）；演示模拟值"},
+    {"no": 9, "label": "物流企业名称", "from": "sim", "value": "顺丰速运有限公司", "note": "演示模拟值"},
+    {"no": 7, "label": "物流运单编号", "from": "decl", "key": "logistics_no", "field": "column_logistics_no", "note": ""},
+    {"no": 3, "label": "预录入编号", "from": "rule", "rule": "pre_entry_no", "status": "sim", "note": "B + 8 位日期 + 9 位流水；系统生成的演示值"},
+    {"no": 32, "label": "运费", "from": "na", "value": "—", "note": "本票未申报运费"},
+    {"no": 33, "label": "运费币制", "from": "rule", "rule": "freight_currency", "note": ""},
+    {"no": 34, "label": "运费标志", "from": "na", "value": "—", "note": ""},
+    {"no": 35, "label": "保费", "from": "na", "value": "—", "note": "本票未申报保费"},
+    {"no": 36, "label": "保费币制", "from": "rule", "rule": "insurance_currency", "note": ""},
+    {"no": 37, "label": "保费标志", "from": "na", "value": "—", "note": ""},
+    {"no": 20, "label": "区内企业代码", "from": "na", "value": "— 仅保税模式", "note": "非保税业务不适用"},
+    {"no": 21, "label": "区内企业名称", "from": "na", "value": "— 仅保税模式", "note": "非保税业务不适用"}
+  ],
+  "body_columns": [
+    {"no": 43, "label": "项号", "width": "3%", "from": "rule", "rule": "item_no", "align": "center"},
+    {"no": 44, "label": "企业商品编号", "width": "9%", "from": "sim", "value": "BY-SC-001", "note": "企业自编商品号；演示模拟值"},
+    {"no": 45, "label": "海关商品编码", "width": "8%", "from": "decl", "key": "hs_code", "field": "column_hs_code", "align": "code"},
+    {"no": 46, "label": "商品名称", "width": "13%", "from": "decl", "key": "cargo_spec", "field": "column_cargo_spec", "align": "left"},
+    {"no": 47, "label": "规格型号", "width": "11%", "from": "rule", "rule": "spec_model", "align": "left"},
+    {"no": 48, "label": "条形码", "width": "3%", "from": "rule", "rule": "barcode", "align": "center"},
+    {"no": 49, "label": "最终目的国（地区）", "width": "4%", "from": "rule", "rule": "dest_country_code", "align": "center"},
+    {"no": 50, "label": "币制", "width": "5%", "from": "rule", "rule": "currency_code", "align": "center"},
+    {"no": 51, "label": "申报数量", "width": "5%", "from": "decl", "key": "quantity", "field": "column_quantity", "kind": "int", "align": "num"},
+    {"no": 52, "label": "法定数量", "width": "5%", "from": "rule", "rule": "legal_quantity", "kind": "int", "align": "num"},
+    {"no": 53, "label": "第二数量", "width": "3%", "from": "na", "value": "—", "align": "center"},
+    {"no": 54, "label": "申报计量单位", "width": "7%", "from": "rule", "rule": "unit_code", "align": "unit"},
+    {"no": 55, "label": "法定计量单位", "width": "7%", "from": "rule", "rule": "legal_unit_code", "align": "unit"},
+    {"no": 56, "label": "第二计量单位", "width": "4%", "from": "na", "value": "—", "align": "center"},
+    {"no": 57, "label": "单价", "width": "4%", "from": "decl", "key": "unit_price", "field": "column_unit_price", "kind": "decimal", "align": "num"},
+    {"no": 58, "label": "总价", "width": "9%", "from": "decl", "key": "total_price", "field": "column_total_price", "kind": "decimal", "align": "num"}
+  ]
+}

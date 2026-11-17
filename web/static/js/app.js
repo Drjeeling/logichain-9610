@@ -32,6 +32,10 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function initMap() {
+    if (typeof AMap === 'undefined') {
+        console.warn('AMap JS API 未加载，地图面板不可用');
+        return;
+    }
     map = new AMap.Map('mapContainer', {
         zoom: 5,
         center: [114, 32],
@@ -110,6 +114,19 @@ function bindEvents() {
     window.addEventListener('drop', e => {
         if (!dropZone.contains(e.target)) e.preventDefault();
     });
+
+    // 地图折叠/展开
+    const mapToggle = document.getElementById('mapToggle');
+    const layout = document.querySelector('.layout');
+    if (mapToggle && layout) {
+        mapToggle.addEventListener('click', () => {
+            layout.classList.toggle('map-collapsed');
+            // 折叠后触发地图 resize（高德 API 需要）
+            if (!layout.classList.contains('map-collapsed') && window.map) {
+                setTimeout(() => window.map && window.map.resize && window.map.resize(), 350);
+            }
+        });
+    }
 
     // 示例单据按钮（事件委托）
     document.getElementById('samplesList').addEventListener('click', e => {
@@ -1341,6 +1358,7 @@ function renderDeclarationPanel(data, agent) {
         </div>
         <div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap">
             <button type="button" class="btn-ghost" onclick="buildDeclaration()" ${has ? '' : 'disabled'}>重新生成</button>
+            <button type="button" class="btn-ghost" id="declFormBtn" onclick="openDeclFormView()" disabled>单证视图</button>
             <button type="button" class="btn-ghost" id="declDownload" onclick="downloadDeclaration()" disabled>下载 Excel</button>
         </div>
     </div>`;
@@ -1366,6 +1384,8 @@ async function buildDeclaration() {
         renderDeclarationBody(data.payload);
         const btn = document.getElementById('declDownload');
         if (btn) btn.disabled = false;
+        const formBtn = document.getElementById('declFormBtn');
+        if (formBtn) formBtn.disabled = !(data.payload && data.payload.form);
     } catch (e) {
         if (body) body.innerHTML = `<span style="color:#f56c6c">制单失败：${escHtml(String(e.message || e))}</span>`;
     }
@@ -1388,29 +1408,90 @@ function renderDeclarationBody(payload) {
         : (payload.ready ? '字段完整，可定稿' : `待补填 ${counts.NEED_INPUT || 0} 项`);
     const stateColor = payload.blocked ? '#f56c6c' : (payload.ready ? '#67c23a' : '#e6a23c');
 
+    // === 从 payload.form 构建 provenance 查找表（按 label 归一化） ===
+    const form = payload.form || {};
+    const provByLabel = {};
+    const norm = s => String(s || '').replace(/\s+/g, '').trim();
+    const collectProvs = arr => (arr || []).forEach(row => {
+        const cells = Array.isArray(row) ? row : [row];
+        cells.forEach(c => {
+            if (c && c.provenance) provByLabel[norm(c.label)] = c.provenance;
+        });
+    });
+    collectProvs(form.header);
+    collectProvs(form.strip);
+    collectProvs(form.columns);
+    (form.items || []).forEach(it => collectProvs(it.cells));
+
+    // 注册到全局 provenance 列表，点击时传索引
+    window.__provStore = window.__provStore || [];
+    const provIdx = (prov) => {
+        window.__provStore.push(prov);
+        return window.__provStore.length - 1;
+    };
+
+    // 把 provenance 附加到每一行
+    const enrichRow = r => {
+        const prov = provByLabel[norm(r.label)];
+        return { ...r, _prov: prov };
+    };
+
     const rowHtml = (rows) => rows.map(r => {
         const val = (r.value === null || r.value === '' || r.value === undefined) ? '—' : String(r.value);
         const color = declStatusColor(r.status);
+        const clickable = r._prov && r._prov.source_type !== 'na';
+        const valueCell = clickable
+            ? `<span class="decl-val-clickable" onclick="showProvenance(${provIdx(r._prov)}, event)" title="点我看这个值怎么来的" style="cursor:pointer;border-bottom:1px dotted ${color};color:${color}">${escHtml(val)} <span style="font-size:9px;opacity:.6">ⓘ</span></span>`
+            : escHtml(val);
         return `<tr>
             <td style="padding:3px 6px;color:#8a94a6;white-space:nowrap">${escHtml(r.label)}</td>
-            <td style="padding:3px 6px;color:#e8eef8">${escHtml(val)}</td>
+            <td style="padding:3px 6px">${valueCell}</td>
             <td style="padding:3px 6px;color:${color};white-space:nowrap;font-size:11px">${escHtml(r.status_label)}</td>
         </tr>`;
     }).join('');
 
-    const itemRows = (payload.items && payload.items[0] && payload.items[0].rows) || [];
+    const itemRows = ((payload.items && payload.items[0] && payload.items[0].rows) || []).map(enrichRow);
+    const headerRows = (payload.header || []).map(enrichRow);
     const gaps = payload.gaps || [];
     const meta = payload.meta || {};
     const tierAction = meta.tier_action || {};
-    const riskCount = (meta.risk_flags || []).length;
-    const complianceCount = ((meta.decl_compliance || {}).issues || []).length;
+    const riskFlags = meta.risk_flags || [];
+    const complianceIssues = ((meta.decl_compliance || {}).issues || []);
+    const riskCount = riskFlags.length;
+    const complianceCount = complianceIssues.length;
+    const sevColor = s => s === 'critical' ? '#f56c6c' : (s === 'warning' ? '#e6a23c' : '#8a94a6');
+    const riskDetailHtml = riskCount ? `
+        <div id="riskDetail" style="display:none;margin-top:6px;border-top:1px dashed #2a3242;padding-top:6px">
+            ${riskFlags.map(f => `
+                <div style="margin-bottom:6px">
+                    <span style="color:${sevColor(f.severity)}">● [${escHtml(f.severity || 'info')}/${escHtml(f.type || '')}]</span>
+                    <span style="color:#c6cfdd">${escHtml(f.detail || '')}</span>
+                    ${f.advice ? `<div style="color:#8a94a6;margin-left:14px">建议：${escHtml(f.advice)}</div>` : ''}
+                </div>`).join('')}
+        </div>` : '';
+    const complianceDetailHtml = complianceCount ? `
+        <div id="complianceDetail" style="display:none;margin-top:6px;border-top:1px dashed #2a3242;padding-top:6px">
+            ${complianceIssues.map(i => `
+                <div style="margin-bottom:6px">
+                    <span style="color:${sevColor(i.severity)}">● [${escHtml(i.severity || 'warning')}] ${escHtml(i.field || '')}</span>
+                    <span style="color:#c6cfdd">${escHtml(i.message || '')}</span>
+                    ${i.source ? `<div style="color:#8a94a6;margin-left:14px">依据：${escHtml(i.source)}</div>` : ''}
+                </div>`).join('')}
+        </div>` : '';
     const metaHtml = meta.tier ? `
         <div style="margin:2px 0 8px;padding:6px 8px;background:#0f1520;border:1px solid #222a38;border-radius:6px;font-size:11px">
             <b style="color:${tierAction.blocked ? '#f56c6c' : (tierAction.can_auto_declare ? '#67c23a' : '#e6a23c')}">
                 报关分流 ${escHtml(String(meta.tier))} · ${escHtml(tierAction.label || '')}
             </b>
-            <span style="color:#8a94a6">　风险 ${riskCount} 项 · 合规问题 ${complianceCount} 项</span>
+            <span style="color:#8a94a6">　</span>${riskCount
+                ? `<span class="risk-toggle" onclick="toggleRiskDetail('riskDetail', this)" style="color:#e6a23c;cursor:pointer;border-bottom:1px dotted #e6a23c" title="点开看风险明细">风险 ${riskCount} 项 ▾</span>`
+                : `<span style="color:#8a94a6">风险 0 项</span>`}
+            <span style="color:#8a94a6"> · </span>${complianceCount
+                ? `<span class="risk-toggle" onclick="toggleRiskDetail('complianceDetail', this)" style="color:#e6a23c;cursor:pointer;border-bottom:1px dotted #e6a23c" title="点开看合规问题明细">合规问题 ${complianceCount} 项 ▾</span>`
+                : `<span style="color:#8a94a6">合规问题 0 项</span>`}
             ${tierAction.blocked ? '<span style="color:#f56c6c">　禁止申报，需整改后重跑</span>' : ''}
+            ${riskDetailHtml}
+            ${complianceDetailHtml}
         </div>` : '';
     const gapHtml = gaps.length ? `
         <div style="margin-top:10px;padding-top:8px;border-top:1px dashed #2a3242">
@@ -1429,6 +1510,7 @@ function renderDeclarationBody(payload) {
             <strong style="color:${stateColor}">${escHtml(stateText)}</strong>
             <span style="color:#8a94a6">　已填 ${counts.FILLED || 0} · 默认 ${counts.DEFAULTED || 0} · 派生 ${counts.DERIVED || 0}</span>
             <span style="color:#8a94a6">　字段字典 v${escHtml(String(payload.field_dict_version || ''))}</span>
+            <span style="color:#8a94a6;margin-left:6px">　<span style="color:#d97706">💡 点带虚线的值看溯源</span></span>
         </div>
         ${metaHtml}
         <div style="max-height:300px;overflow:auto;border:1px solid #222a38;border-radius:6px">
@@ -1438,7 +1520,7 @@ function renderDeclarationBody(payload) {
                     <th style="text-align:left;padding:4px 6px;color:#8a94a6;font-weight:500">值</th>
                     <th style="text-align:left;padding:4px 6px;color:#8a94a6;font-weight:500">状态</th>
                 </tr></thead>
-                <tbody>${rowHtml(payload.header || [])}</tbody>
+                <tbody>${rowHtml(headerRows)}</tbody>
             </table>
         </div>
         <div style="max-height:300px;overflow:auto;border:1px solid #222a38;border-radius:6px;margin-top:8px">
@@ -1451,8 +1533,99 @@ function renderDeclarationBody(payload) {
                 <tbody>${rowHtml(itemRows)}</tbody>
             </table>
         </div>
-        ${gapHtml}`;
+        ${gapHtml}
+        <!-- 溯源弹卡容器 -->
+        <div id="provPopover" style="display:none"></div>`;
 }
+
+/** 溯源弹卡：点值时弹出，三色分块 + 拟人化说明 */
+function showProvenance(idx, clickEvent) {
+    const prov = (window.__provStore || [])[idx];
+    if (!prov) return;
+    const pop = document.getElementById('provPopover');
+    if (!pop) return;
+
+    // 颜色按 source_type 区分
+    const type = prov.source_type || '';
+    const typeColor = type === 'decl' ? '#16a34a'        // 绿 = 直接读到
+                    : type === 'rule' ? '#2563eb'          // 蓝 = 规则派生
+                    : type === 'sim' ? '#d97706'           // 橙 = 模拟
+                    : type === 'need' ? '#dc2626'          // 红 = 待补
+                    : type === 'const' ? '#7c3aed'         // 紫 = 常量
+                    : '#6b7280';
+    const typeLabel = { decl: 'OCR 读取', rule: '规则派生', sim: '模拟值',
+                        need: '待补', const: '常量', na: '不适用' }[type] || type;
+
+    const sourceBlock = prov.source_loc
+        ? `<div class="prov-block prov-source" style="--c:#16a34a"><div class="prov-hd">🟢 来源</div><div class="prov-bd">${escHtml(prov.source_loc)}</div></div>`
+        : '';
+    const ruleBlock = prov.rule_explain
+        ? `<div class="prov-block prov-rule" style="--c:#2563eb"><div class="prov-hd">🔵 规则</div><div class="prov-bd">${escHtml(prov.rule_explain)}</div>${prov.rule_name ? `<div class="prov-rule-tag">${escHtml(prov.rule_name)}</div>` : ''}</div>`
+        : '';
+    const rawBlock = prov.raw_value !== undefined && prov.raw_value !== null && prov.raw_value !== prov.final_value
+        ? `<div class="prov-raw">原始值 <code>${escHtml(String(prov.raw_value))}</code></div>`
+        : '';
+
+    pop.innerHTML = `
+        <div class="prov-card">
+            <div class="prov-head">
+                <span class="prov-type" style="background:${typeColor}">${typeLabel}</span>
+                <button class="prov-close" onclick="hideProvenance()">×</button>
+            </div>
+            ${sourceBlock}
+            ${ruleBlock}
+            <div class="prov-block prov-value" style="--c:#d97706">
+                <div class="prov-hd">🟠 清单值</div>
+                <div class="prov-bd prov-final">${escHtml(prov.final_value || '—')}</div>
+                ${rawBlock}
+            </div>
+            <div class="prov-persona">
+                <div class="prov-persona-hd">🤖 智关 9610 这么说：</div>
+                <div class="prov-persona-bd">${escHtml(prov.persona || '—')}</div>
+            </div>
+        </div>`;
+    pop.style.display = 'block';
+
+    // 定位：贴在触发元素下方
+    setTimeout(() => {
+        const rect = (clickEvent && clickEvent.target && clickEvent.target.closest('.decl-val-clickable'))
+            ? clickEvent.target.closest('.decl-val-clickable').getBoundingClientRect() : null;
+        if (rect) {
+            const container = document.getElementById('declBody').getBoundingClientRect();
+            pop.style.position = 'absolute';
+            pop.style.left = (rect.left - container.left) + 'px';
+            pop.style.top = (rect.bottom - container.top + 4) + 'px';
+            // 防止超出右边
+            const popW = pop.offsetWidth;
+            if (rect.left - container.left + popW > container.width) {
+                pop.style.left = Math.max(0, rect.right - container.left - popW) + 'px';
+            }
+        } else {
+            pop.style.position = 'relative';
+        }
+    }, 0);
+}
+
+function hideProvenance() {
+    const pop = document.getElementById('provPopover');
+    if (pop) { pop.style.display = 'none'; pop.innerHTML = ''; }
+}
+
+/** 风险/合规问题计数点击展开/收起明细 */
+function toggleRiskDetail(id, el) {
+    const box = document.getElementById(id);
+    if (!box) return;
+    const show = box.style.display === 'none';
+    box.style.display = show ? 'block' : 'none';
+    if (el) el.textContent = el.textContent.replace(show ? '▾' : '▴', show ? '▴' : '▾');
+}
+
+// 点击弹卡外部关闭
+document.addEventListener('click', e => {
+    const pop = document.getElementById('provPopover');
+    if (!pop || pop.style.display === 'none') return;
+    if (!pop.contains(e.target) && !e.target.closest('.decl-val-clickable')) hideProvenance();
+});
 
 function applyDeclarationEdits() {
     const inputs = document.querySelectorAll('[data-decl-key]');

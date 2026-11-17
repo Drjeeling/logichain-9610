@@ -1,0 +1,117 @@
+/* 9610 单证视图（A4）——只作用于 #declFormOverlay，避免影响主界面 */
+#declFormOverlay{
+  --df-ink:#111; --df-line:#1a1a1a; --df-soft:#6b7280;
+  --df-ok:#16a34a; --df-warn:#d97706; --df-need:#dc2626; --df-derive:#2563eb; --df-default:#7c3aed;
+  position:fixed; inset:0; z-index:90; display:none; flex-direction:column;
+  background:rgba(7,11,18,.8); backdrop-filter:blur(2px);
+}
+#declFormOverlay.open{display:flex;}
+body.df-open{overflow:hidden;}
+
+#declFormOverlay .df-bar{
+  flex:0 0 auto; display:flex; align-items:center; gap:12px; padding:10px 18px;
+  background:#101722; border-bottom:1px solid #223047; color:#dfe7f3;
+  font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif; font-size:12px;
+}
+#declFormOverlay .df-bar .df-title{font-weight:600;letter-spacing:.5px;}
+#declFormOverlay .df-bar .df-hint{color:#8a94a6;}
+#declFormOverlay .df-bar .df-legend{display:flex;gap:12px;margin-left:auto;flex-wrap:wrap;color:#9aa6b8;}
+#declFormOverlay .df-legend i{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:4px;vertical-align:1px;}
+#declFormOverlay .df-bar button{
+  font:inherit; padding:6px 12px; border:1px solid #334660; background:#182236; color:#dfe7f3;
+  border-radius:5px; cursor:pointer;
+}
+#declFormOverlay .df-bar button:hover{background:#22304a;}
+#declFormOverlay .df-bar button.primary{border-color:#2f6fed;background:#2f6fed;color:#fff;}
+#declFormOverlay .df-scroll{flex:1 1 auto; overflow:auto; padding:22px 12px 40px;}
+
+/* A4 纸张 */
+#declFormOverlay .df-sheet{
+  position:relative; overflow:hidden; width:794px; min-height:1123px; margin:0 auto;
+  padding:32px 40px 26px; background:#fff; color:var(--df-ink); box-shadow:0 2px 18px rgba(0,0,0,.35);
+  font-family:"Songti SC","SimSun","Noto Serif CJK SC","Source Han Serif SC",serif;
+}
+#declFormOverlay .df-sheet::before{
+  content:"演示样例 · 非正式单证"; position:absolute; inset:-40% -20%;
+  font-family:-apple-system,"PingFang SC",sans-serif; font-size:30px; letter-spacing:8px;
+  color:rgba(180,40,40,.07); display:flex; align-items:center; justify-content:center;
+  transform:rotate(-28deg); white-space:nowrap; pointer-events:none;
+}
+#declFormOverlay .df-kicker{font-size:11px;color:var(--df-soft);letter-spacing:2px;font-family:-apple-system,"PingFang SC",sans-serif;}
+#declFormOverlay h2.df-h1{font-size:20px;font-weight:600;text-align:center;margin:9px 0 4px;letter-spacing:1px;line-height:1.5;}
+#declFormOverlay .df-sub{text-align:center;font-size:10px;color:var(--df-soft);margin-bottom:12px;font-family:-apple-system,"PingFang SC",sans-serif;line-height:1.6;}
+#declFormOverlay .df-no{position:relative;display:flex;justify-content:flex-end;align-items:baseline;gap:8px;font-size:11.5px;margin-bottom:6px;padding-right:12px;}
+#declFormOverlay .df-no b{font-weight:600;letter-spacing:.5px;}
+#declFormOverlay .df-no .df-dot{top:50%;margin-top:-3px;right:0;}
+#declFormOverlay .df-no b.derive{color:var(--df-derive);}
+
+#declFormOverlay .df-grid{display:grid;grid-template-columns:repeat(4,1fr);border:1px solid var(--df-line);background:var(--df-line);gap:1px;}
+#declFormOverlay .df-cell{background:#fff;padding:4px 7px 3px;min-height:37px;display:flex;flex-direction:column;justify-content:center;position:relative;}
+#declFormOverlay .df-cell.df-span4{grid-column:span 4;}
+#declFormOverlay .df-k{font-size:9px;color:#4a4a4a;line-height:1.2;white-space:nowrap;letter-spacing:.2px;}
+#declFormOverlay .df-k em{font-style:normal;font-size:7px;color:#c2c7cf;margin-right:3px;vertical-align:top;letter-spacing:0;}
+#declFormOverlay .df-v{font-size:11.5px;font-weight:600;margin-top:2px;line-height:1.25;word-break:break-all;}
+#declFormOverlay .df-v.sim,#declFormOverlay .df-s .df-v.sim{color:#b45309;text-decoration:underline dotted rgba(217,119,6,.5);text-underline-offset:2px;}
+#declFormOverlay .df-v.derive{color:var(--df-derive);}
+#declFormOverlay .df-v.need{color:var(--df-need);}
+#declFormOverlay .df-v.empty{color:#b0b5bd;font-weight:400;}
+
+#declFormOverlay .df-dot{position:absolute;top:4px;right:5px;width:6px;height:6px;border-radius:50%;}
+#declFormOverlay .df-dot.ok{background:var(--df-ok);} #declFormOverlay .df-dot.sim{background:var(--df-warn);}
+#declFormOverlay .df-dot.need{background:var(--df-need);} #declFormOverlay .df-dot.derive{background:var(--df-derive);}
+#declFormOverlay .df-dot.default{background:var(--df-default);} #declFormOverlay .df-dot.empty{background:#cbd2da;}
+
+#declFormOverlay .df-sect{background:#f2f3f5;font-family:-apple-system,"PingFang SC",sans-serif;font-size:9px;color:#4b5563;
+  padding:3px 7px;letter-spacing:1px;border:1px solid var(--df-line);border-bottom:none;margin-top:10px;}
+#declFormOverlay .df-strip{display:grid;grid-template-columns:repeat(6,1fr);gap:1px;background:var(--df-line);border:1px solid var(--df-line);border-bottom:none;}
+#declFormOverlay .df-s{background:#fbfbfb;padding:3px 6px;min-height:30px;position:relative;}
+#declFormOverlay .df-s .df-k{font-size:8px;color:#6b7280;line-height:1.2;}
+#declFormOverlay .df-s .df-k em{font-size:6.5px;color:#c2c7cf;margin-right:2px;}
+#declFormOverlay .df-s .df-v{font-size:9.5px;font-weight:600;margin-top:1px;color:#1f2937;word-break:break-all;line-height:1.25;}
+#declFormOverlay .df-s .df-v.empty{color:#b0b5bd;font-weight:400;}
+
+#declFormOverlay .df-body-label{margin-top:12px;margin-bottom:4px;font-size:10px;color:#374151;
+  font-family:-apple-system,"PingFang SC",sans-serif;display:flex;justify-content:space-between;gap:12px;}
+#declFormOverlay table.df-items{width:100%;border-collapse:collapse;table-layout:fixed;}
+#declFormOverlay table.df-items th,#declFormOverlay table.df-items td{border:1px solid var(--df-line);padding:2px 3px;
+  font-size:8.5px;line-height:1.2;text-align:center;vertical-align:middle;word-break:break-all;}
+#declFormOverlay table.df-items th{background:#f7f8fa;font-weight:600;font-size:8px;color:#222;}
+#declFormOverlay table.df-items td.left{text-align:left;}
+#declFormOverlay table.df-items td.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap;}
+#declFormOverlay table.df-items td.code{white-space:nowrap;font-size:8px;letter-spacing:-.2px;}
+#declFormOverlay table.df-items td.unit{white-space:nowrap;font-size:8px;}
+#declFormOverlay table.df-items td.sim{color:#b45309;}
+#declFormOverlay table.df-items td.need{color:var(--df-need);}
+#declFormOverlay table.df-items tbody tr{height:32px;}
+#declFormOverlay table.df-items tfoot td{background:#fafbfc;font-weight:600;font-size:8.5px;}
+#declFormOverlay .df-code-note{margin-top:4px;font-size:8.5px;color:#6b7280;line-height:1.5;font-family:-apple-system,"PingFang SC",sans-serif;}
+
+#declFormOverlay .df-footer{margin-top:14px;display:grid;grid-template-columns:1.05fr 1.5fr 1.05fr;border:1px solid var(--df-line);}
+#declFormOverlay .df-fbox{padding:5px 8px;font-size:9px;line-height:1.8;}
+#declFormOverlay .df-fbox + .df-fbox{border-left:1px solid var(--df-line);}
+#declFormOverlay .df-fbox .df-row{display:flex;justify-content:space-between;gap:6px;}
+#declFormOverlay .df-fbox .df-row span:first-child{color:#4b5563;}
+#declFormOverlay .df-fbox .df-row span:last-child{font-weight:600;}
+#declFormOverlay .df-declare{display:flex;flex-direction:column;height:100%;}
+#declFormOverlay .df-declare .df-txt{font-size:9px;line-height:1.7;}
+#declFormOverlay .df-declare .df-sign{margin-top:auto;text-align:center;}
+#declFormOverlay .df-declare .df-dash{display:inline-block;min-width:150px;border-bottom:1px solid #999;height:1px;}
+#declFormOverlay .df-declare .df-cap{font-size:8px;color:#6b7280;margin-top:3px;}
+#declFormOverlay .df-customs .df-h{font-size:9px;font-weight:600;margin-bottom:3px;}
+#declFormOverlay .df-customs .df-line{display:flex;justify-content:space-between;border-top:1px dashed #c7ccd4;padding:4px 0;color:#4b5563;}
+
+#declFormOverlay .df-footnote{margin-top:10px;font-family:-apple-system,"PingFang SC",sans-serif;font-size:8.5px;color:#6b7280;
+  line-height:1.65;display:flex;justify-content:space-between;gap:16px;}
+#declFormOverlay .df-footnote b{color:#374151;}
+
+/* 打印：只留单证纸 */
+@media print{
+  body.df-printing > *:not(#declFormOverlay){display:none !important;}
+  body.df-printing #declFormOverlay{position:static;inset:auto;display:block;background:#fff;backdrop-filter:none;overflow:visible;}
+  body.df-printing #declFormOverlay .df-bar,
+  body.df-printing #declFormOverlay .df-scroll{display:block;padding:0;overflow:visible;}
+  body.df-printing #declFormOverlay .df-bar{display:none !important;}
+  body.df-printing #declFormOverlay .df-sheet{width:auto;min-height:auto;box-shadow:none;padding:9mm 10mm;margin:0;}
+  body.df-printing #declFormOverlay .df-sheet::before{display:none;}
+  @page{size:A4 portrait;margin:0;}
+}
